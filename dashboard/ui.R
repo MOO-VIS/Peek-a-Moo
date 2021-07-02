@@ -28,6 +28,6 @@ shinyUI(pageWithSidebar(
   
   mainPanel(
     id="main_panel",
-    dataTableOutput("table")
+    plotOutput("feed_range")
   )
 ))
