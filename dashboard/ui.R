@@ -21,8 +21,6 @@ body <- dashboardBody(
   tabItems(
     tabItem(
       "dashboard",
-      
-      # Boxes with solid headers
       fluidRow(
         box(
           title="Customizations", width = 12, solidHeader = TRUE, status = "primary",
@@ -50,13 +48,25 @@ body <- dashboardBody(
       fluidRow(
         tabBox(
           title = "Feeding Duration", side = "right", selected = "Over Time",
-          tabPanel("24 hour", plotOutput("feed_day")),
+          tabPanel("Data", DT::dataTableOutput("feed_table")),
           tabPanel("Over Time", plotOutput("feed_range"))
         ),
         tabBox(
           title = "Drinking Duration", side = "right", selected = "Over Time",
-          tabPanel("24 hour", plotOutput("water_day")),
-          tabPanel("Over Time", plotOutput("water_range"))
+          tabPanel("Data", DT::dataTableOutput("drink_table")),
+          tabPanel("Over Time", plotOutput("drink_range"))
+        )
+      ),
+      fluidRow(
+        tabBox(
+          title = "Standing Duration", side = "right", selected = "Over Time",
+          tabPanel("Data", DT::dataTableOutput("standing_time_table")),
+          tabPanel("Over Time", plotOutput("standing_time_range"))
+        ),
+        tabBox(
+          title = "Standing Bout Duration", side = "right", selected = "Over Time",
+          tabPanel("Data", DT::dataTableOutput("standing_bout_table")),
+          tabPanel("Over Time", plotOutput("standing_bout_range"))
         )
       )
     )
@@ -66,16 +76,11 @@ body <- dashboardBody(
 notifications <- dropdownMenu(
   type = "notifications", badgeStatus = "warning",
   notificationItem(
-    text = "5 new users today",
+    text = "Example",
     icon("users")
   ),
   notificationItem(
-    text = "12 items delivered",
-    icon("truck"),
-    status = "success"
-  ),
-  notificationItem(
-    text = "Server load at 86%",
+    text = "Warning message example",
     icon = icon("exclamation-triangle"),
     status = "warning"
   )
