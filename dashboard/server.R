@@ -13,14 +13,14 @@ shinyServer(function(input, output) {
     df %>%
       filter({{col}} %in% input$cow_selection)
   }
-
+  
   feed_range_plot <- reactive({
     
     # convert Cow col to character to add summary stats later
     df <- dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]] %>%
       mutate(Cow = as.character(Cow)) %>%
       filter_date_range(date)
-
+    
     # calculate summary stats
     average_rows <- df %>%
       group_by(date) %>%
@@ -32,7 +32,7 @@ shinyServer(function(input, output) {
     df <- df %>%
       filter_cows(Cow) %>%
       bind_rows(average_rows)
-
+    
     # generate plot
     return(
       df %>%
@@ -41,8 +41,9 @@ shinyServer(function(input, output) {
         geom_line()
     )
   })
-
+  
   output$feed_range <- renderPlot({
     feed_range_plot() 
   })
+
 })
