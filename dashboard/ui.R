@@ -1,33 +1,42 @@
 library(shiny)
 library(lubridate)
 
-shinyUI(pageWithSidebar(
+#load("../data/full_10_month_analysis_HOBO_result_summary_only_dashboard.Rda")
+#load("../data/full_10_month_analysis_Insentec_result_summary_only_dashboard.Rda")
+#load("../data/full_10_month_analysis_result_summary_only_dashboard.Rda")
 
-  headerPanel("Dairy Cow Dashboard"),
+shinyUI(fluidPage(
+
+  title = "Dairy Cow Dashboard",
   
-  sidebarPanel(
-    id="sidebar_panel",
-
-    dateRangeInput(
-      "date_range",
-      "Dates",
-      start = today() - years(1),
-      end = NULL,
-      min = NULL,
-      max = NULL
+  fluidRow(
+    column(6,
+      dateRangeInput(
+        "date_range",
+        "Dates",
+        start = today() - years(1),
+        end = NULL,
+        min = NULL,
+        max = NULL
+      )
     ),
-    
-    selectInput(
-      "cow_selection",
-      "Cows",
-      unique(dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]][["Cow"]]),
-      multiple = TRUE,
-      selectize = TRUE
+    column(6,
+      selectInput(
+        "cow_selection",
+        "Cows",
+        unique(dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]][["Cow"]]),
+        multiple = TRUE,
+        selectize = TRUE
+      )
     )
   ),
-  
-  mainPanel(
-    id="main_panel",
-    plotOutput("feed_range")
+  fluidRow(
+    column(6,
+      plotOutput("feed_range")
+    ),
+    column(6,
+      plotOutput("water_range")
+    )
   )
+  
 ))

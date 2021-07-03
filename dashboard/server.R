@@ -2,11 +2,6 @@ library(shiny)
 library(tidyverse)
 
 shinyServer(function(input, output) {
-  open_data <- reactive({
-    load("../data/full_10_month_analysis_HOBO_result_summary_only_dashboard.Rda")
-    load("../data/full_10_month_analysis_Insentec_result_summary_only_dashboard.Rda")
-    load("../data/full_10_month_analysis_result_summary_only_dashboard.Rda")
-  })
   
   filter_date_range <- function(df, col){
     df %>%
