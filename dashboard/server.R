@@ -5,9 +5,15 @@ shinyServer(function(input, output) {
   
   # filter by user input date range
   filter_date_range <- function(df, col){
-    df %>%
-      filter({{col}} >= input$date_range[[1]]) %>%
-      filter({{col}} <= input$date_range[[2]])
+    if(input$time_type == 'date_range'){
+      df %>%
+        filter({{col}} >= input$date_range[[1]]) %>%
+        filter({{col}} <= input$date_range[[2]])
+    }
+    else{
+      df %>%
+        filter({{col}} == input$day)
+    }
   }
 
   # filter by user input cow slection
@@ -55,7 +61,7 @@ shinyServer(function(input, output) {
     )
     
     # generate plot
-    output[[paste0(var_name, "_range")]] <- renderPlot({
+    output[[paste0(var_name, "_plot")]] <- renderPlot({
       df %>%
         ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) + 
         geom_line()
