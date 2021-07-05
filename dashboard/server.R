@@ -1,6 +1,7 @@
 library(shiny)
 library(tidyverse)
 library(plotly)
+library(shinyWidgets)
 
 shinyServer(function(input, output, session) {
   
@@ -86,9 +87,9 @@ shinyServer(function(input, output, session) {
     cow_choices <- filter_date_range(feed_drink_df, date) %>%
       select("Cow") %>%
       unique()
-    colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " options in date range")
+    colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
 
-    updateSelectInput(
+    updatePickerInput(
       session = session,
       inputId = "cow_selection",
       choices = cow_choices

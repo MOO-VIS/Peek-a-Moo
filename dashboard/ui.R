@@ -1,6 +1,7 @@
 library(shinydashboard)
 library(lubridate)
 library(here)
+library(shinyWidgets)
 
 # load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
 
@@ -59,12 +60,14 @@ activities_tab <- tabItem(
              )
       ),
       column(4,
-             selectInput(
+             pickerInput(
                inputId = "cow_selection",
                label = "Cows",
                choices = list(),
                multiple = TRUE,
-               selectize = TRUE
+               options = list(
+                 "actions-box" = TRUE,
+                 "none-selected-text" = "Select cows")
              )
       )
     )
