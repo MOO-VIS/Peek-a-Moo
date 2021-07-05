@@ -1,30 +1,40 @@
 library(shiny)
+library(shinyWidgets)
 library(tidyverse)
 library(plotly)
-library(shinyWidgets)
 
 shinyServer(function(input, output, session) {
   
-  # filter by user input date range
+  #' Filter by user input date range
+  #'
+  #' @param df The dataframe to filter
+  #' @param col The date column
+  #'
+  #' @return Filtered dataframe with only dates within selected range
   filter_date_range <- function(df, col){
-    if(input$time_type == 'date_range'){
-      df %>%
-        filter({{col}} >= input$date_range[[1]]) %>%
-        filter({{col}} <= input$date_range[[2]])
-    }
-    else{
-      df %>%
-        filter({{col}} == input$day)
-    }
+    df %>%
+      filter({{col}} >= input$date_range[[1]]) %>%
+      filter({{col}} <= input$date_range[[2]])
   }
 
-  # filter by user input cow selection
+  #' Filter by user input cow selection
+  #'
+  #' @param df The dataframe to filter
+  #' @param col The cow column
+  #'
+  #' @return Filtered dataframe with only selected cows
   filter_cows <- function(df, col){
+    
     df %>%
       filter({{col}} %in% input$cow_selection)
   }
   
-  range_data <- function(df){
+  #' Filter data by user input and add summary rows
+  #'
+  #' @param df Dataframe to filter and adjust
+  #'
+  #' @return Filtered dataframe with additional stats
+  process_range_data <- function(df){
     
     # convert Cow col to character to add summary stats later and filter by date
     df <- df %>%
@@ -45,10 +55,17 @@ shinyServer(function(input, output, session) {
       group_by(Cow)
   }
 
+  #' Generate the plot and data tabs for time range plots
+  #'
+  #' @param df The dataframe containing data to be displayed
+  #' @param ycol The column of interest
+  #' @param var_name The name of the UI output variable
+  #'
+  #' @return NULL
   range_plot <- function(df, ycol, var_name){
-    orig_df <- df
+    
     # filter table
-    df <- range_data(df)
+    df <- process_range_data(df)
     
     # generate table
     output[[paste0(var_name, "_table")]] <- DT::renderDataTable(

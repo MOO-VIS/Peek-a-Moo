@@ -1,7 +1,7 @@
 library(shinydashboard)
+library(shinyWidgets)
 library(lubridate)
 library(here)
-library(shinyWidgets)
 
 # load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
 
@@ -30,33 +30,23 @@ activities_tab <- tabItem(
   "activities",
   fluidRow(
     box(
-      title="Customizations", width = 12, solidHeader = TRUE, status = "primary",
+      title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(3,
              radioButtons(
-               inputId = "time_type",
-               label = "Time Range Type",
-               choiceNames = c("Date Range", "24 Hour"),
-               choiceValues = c("date_range", "day")
+               inputId = "agg_type",
+               label = "Aggregate",
+               choiceNames = c("By Day", "By Month"),
+               choiceValues = c("day", "month"),
              )
       ),
       column(4,
-             conditionalPanel(
-               condition = "input.time_type == 'date_range'",
-               dateRangeInput(
-                 inputId = "date_range",
-                 label = "Date Range",
-                 start = today() - years(1),
-                 end = NULL,
-                 min = NULL,
-                 max = NULL
-               )
-             ),
-             conditionalPanel(
-               condition = "input.time_type == 'day'",
-               dateInput(
-                 inputId = "day",
-                 label = "Date"
-               )
+             dateRangeInput(
+               inputId = "date_range",
+               label = "Date Range",
+               start = today() - years(1),
+               end = NULL,
+               min = NULL,
+               max = NULL
              )
       ),
       column(4,
