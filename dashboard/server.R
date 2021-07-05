@@ -2,7 +2,7 @@ library(shiny)
 library(tidyverse)
 library(plotly)
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
   
   # filter by user input date range
   filter_date_range <- function(df, col){
@@ -65,8 +65,7 @@ shinyServer(function(input, output) {
     output[[paste0(var_name, "_plot")]] <- renderPlotly({
       plt <- df %>%
         ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
-        geom_line() +
-        theme(legend.position = "bottom")
+        geom_line() 
       plt %>%
         ggplotly()
     })
@@ -82,6 +81,21 @@ shinyServer(function(input, output) {
     mutate(date = as.Date(date)) %>%
     unnest(value)
 
+  # update cow selection
+  observe({
+    cow_choices <- filter_date_range(feed_drink_df, date) %>%
+      select("Cow") %>%
+      unique()
+    colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " options in date range")
+
+    updateSelectInput(
+      session = session,
+      inputId = "cow_selection",
+      choices = cow_choices
+    )
+  })
+
+  # render plots
   observe({
     range_plot(
       feed_drink_df,

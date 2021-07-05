@@ -3,7 +3,6 @@ library(lubridate)
 library(here)
 
 # load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
-cow_options <- unique(dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]][["Cow"]])
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -63,7 +62,7 @@ activities_tab <- tabItem(
              selectInput(
                inputId = "cow_selection",
                label = "Cows",
-               cow_options,
+               choices = list(),
                multiple = TRUE,
                selectize = TRUE
              )
