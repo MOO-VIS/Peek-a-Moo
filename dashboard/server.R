@@ -16,7 +16,7 @@ shinyServer(function(input, output) {
     }
   }
 
-  # filter by user input cow slection
+  # filter by user input cow selection
   filter_cows <- function(df, col){
     df %>%
       filter({{col}} %in% input$cow_selection)
@@ -28,7 +28,7 @@ shinyServer(function(input, output) {
     df <- df %>%
       mutate(Cow = as.character(Cow)) %>%
       filter_date_range(date)
-    
+
     # calculate summary stats
     average_rows <- df %>%
       group_by(date) %>%
@@ -63,14 +63,20 @@ shinyServer(function(input, output) {
     # generate plot
     output[[paste0(var_name, "_plot")]] <- renderPlot({
       df %>%
-        ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) + 
+        ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
         geom_line()
     })
   }
   
   # add plots and tables to the UI
-  feed_drink_df <- dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]]
-  standing_bout_df <- dashboard_full_analysis[["HOBO"]][["lying_standing_summary_by_date"]]
+  hobo <- dashboard_full_analysis[["HOBO"]]
+  insentec <- dashboard_full_analysis[["Insentec"]]
+  
+  standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
+  feed_drink_df <- insentec[["Feeding and drinking analysis"]]
+  non_nutritive_df <- enframe(insentec[["non_nutritive_visits"]], name = "date") %>%
+    mutate(date = as.Date(date)) %>%
+    unnest(value)
 
   observe({
     range_plot(
@@ -90,10 +96,17 @@ shinyServer(function(input, output) {
       `standing_time(seconds)`,
       "standing_time"
     ) 
+    
     range_plot(
       standing_bout_df,
       `standing_bout`,
       "standing_bout"
     ) 
+    
+    range_plot(
+      non_nutritive_df,
+      `number_of_non_nutritive_visits`,
+      "non_nutritive"
+    )
   })
 })

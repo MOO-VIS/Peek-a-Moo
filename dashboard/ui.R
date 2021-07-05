@@ -9,6 +9,7 @@ sidebar <- dashboardSidebar(
     menuItem("Activities", icon = icon("bar-chart-o"), tabName = "activities"),
     menuItem("Relationships", icon = icon("heart"), tabName = "relationships"),
     menuItem("Bins", icon = icon("grain", lib = "glyphicon"), tabName = "bins"),
+    menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("Source code", icon = icon("file-code-o"),
              href = "https://github.com/MOO-VIS/Peek-a-Moo"
     )
@@ -74,6 +75,9 @@ activities_tab <- tabItem(
   fluidRow(
     default_tabBox("Standing Duration", "standing_time"),
     default_tabBox("Standing Bout Duration", "standing_bout")
+  ),
+  fluidRow(
+    default_tabBox("Non-nutritive visits", "non_nutritive")
   )
 )
 
@@ -86,20 +90,21 @@ bins_tab <- tabItem(
     "bins"
 )
 
+warnings_tab <- tabItem(
+  "warnings"
+)
+
 body <- dashboardBody(
   tabItems(
     activities_tab,
     relationships_tab,
-    bins_tab
+    bins_tab,
+    warnings_tab
   )
 )
 
 notifications <- dropdownMenu(
   type = "notifications", badgeStatus = "warning",
-  notificationItem(
-    text = "Example",
-    icon("users")
-  ),
   notificationItem(
     text = "Warning message example",
     icon = icon("exclamation-triangle"),
