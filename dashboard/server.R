@@ -1,5 +1,6 @@
 library(shiny)
 library(tidyverse)
+library(plotly)
 
 shinyServer(function(input, output) {
   
@@ -44,7 +45,7 @@ shinyServer(function(input, output) {
   }
 
   range_plot <- function(df, ycol, var_name){
-
+    orig_df <- df
     # filter table
     df <- range_data(df)
     
@@ -61,10 +62,13 @@ shinyServer(function(input, output) {
     )
     
     # generate plot
-    output[[paste0(var_name, "_plot")]] <- renderPlot({
-      df %>%
+    output[[paste0(var_name, "_plot")]] <- renderPlotly({
+      plt <- df %>%
         ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
-        geom_line()
+        geom_line() +
+        theme(legend.position = "bottom")
+      plt %>%
+        ggplotly()
     })
   }
   

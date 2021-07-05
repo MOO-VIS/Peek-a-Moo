@@ -2,11 +2,13 @@ library(shinydashboard)
 library(lubridate)
 library(here)
 
-#load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+# load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+cow_options <- unique(dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]][["Cow"]])
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    menuItem("Activities", icon = icon("bar-chart-o"), tabName = "activities"),
+    menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
+    menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Relationships", icon = icon("heart"), tabName = "relationships"),
     menuItem("Bins", icon = icon("grain", lib = "glyphicon"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
@@ -20,7 +22,7 @@ default_tabBox <- function(title, var_name){
   tabBox(
     title = title, side = "right", selected = "Chart",
     tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Chart", plotOutput(paste0(var_name, "_plot")))
+    tabPanel("Chart", plotlyOutput(paste0(var_name, "_plot")))
   )
 }
 
@@ -61,7 +63,7 @@ activities_tab <- tabItem(
              selectInput(
                inputId = "cow_selection",
                label = "Cows",
-               unique(dashboard_full_analysis[["Insentec"]][["Feeding and drinking analysis"]][["Cow"]]),
+               cow_options,
                multiple = TRUE,
                selectize = TRUE
              )
@@ -81,6 +83,9 @@ activities_tab <- tabItem(
   )
 )
 
+daily_tab <-  tabItem(
+  "daily_behavior"
+)
 
 relationships_tab <- tabItem(
   "relationships"
@@ -97,6 +102,7 @@ warnings_tab <- tabItem(
 body <- dashboardBody(
   tabItems(
     activities_tab,
+    daily_tab,
     relationships_tab,
     bins_tab,
     warnings_tab
