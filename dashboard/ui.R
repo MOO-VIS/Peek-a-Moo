@@ -4,7 +4,7 @@ library(lubridate)
 library(here)
 library(plotly)
 
-load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+#load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -38,12 +38,19 @@ activities_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(3,
+      column(2,
              radioButtons(
                inputId = "agg_type",
                label = "Aggregate",
                choiceNames = c("By Day", "By Month"),
                choiceValues = c("day", "month"),
+             )
+      ),
+      column(2,
+             checkboxInput(
+               inputId = "show_average",
+               label = "Show Dashed Average Lines",
+               value = FALSE
              )
       ),
       column(4,

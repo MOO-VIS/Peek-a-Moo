@@ -55,7 +55,7 @@ shinyServer(function(input, output, session) {
       mutate(date = lubridate::floor_date(date, input$agg_type)) %>%
       group_by(Cow, date) %>%
       summarise(.,
-                across(where(is.character), ~"Average"),
+                across(where(is.character), ~"Herd Average"),
                 across(where(is.numeric), mean))
   }
 
@@ -87,15 +87,20 @@ shinyServer(function(input, output, session) {
     output[[paste0(var_name, "_plot")]] <- renderPlotly({
       plt <- df %>%
         ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
-        geom_line() +
-        stat_smooth(
-          method = "lm", 
-          formula = y~1,
-          se = FALSE,
-          fullrange = TRUE,
-          size = 0.5,
-          linetype = "dashed"
-        )
+        geom_line() 
+      
+      if(input$show_average){
+        plt <- plt + 
+          stat_smooth(
+            method = "lm", 
+            formula = y~1,
+            se = FALSE,
+            fullrange = TRUE,
+            size = 0.5,
+            linetype = "dashed"
+          )
+      }
+      
       plt %>%
         ggplotly()
     })
