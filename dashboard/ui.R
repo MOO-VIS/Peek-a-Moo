@@ -2,8 +2,9 @@ library(shinydashboard)
 library(shinyWidgets)
 library(lubridate)
 library(here)
+library(plotly)
 
-# load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
