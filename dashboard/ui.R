@@ -18,11 +18,17 @@ sidebar <- dashboardSidebar(
   )
 )
 
+#' Helper function for creating boxes with plot and data tab
+#'
+#' @param title The title to display for the box
+#' @param var_name The beginning of the variable name used by server.R
+#'
+#' @return tabBox
 default_tabBox <- function(title, var_name){
   tabBox(
-    title = title, side = "right", selected = "Chart",
+    title = title, side = "right", selected = "Plot",
     tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Chart", plotlyOutput(paste0(var_name, "_plot")))
+    tabPanel("Plot", plotlyOutput(paste0(var_name, "_plot")))
   )
 }
 

@@ -42,17 +42,21 @@ shinyServer(function(input, output, session) {
       filter_date_range(date)
 
     # calculate summary stats
-    average_rows <- df %>%
+    herd_average <- df %>%
       group_by(date) %>%
       summarise(.,
-                across(where(is.character), ~"Average"),
+                across(where(is.character), ~"Herd Average"),
                 across(where(is.numeric), mean))
     
     # filter by cow and add summary rows
     df %>%
       filter_cows(Cow) %>%
-      bind_rows(average_rows) %>%
-      group_by(Cow)
+      bind_rows(herd_average) %>%
+      mutate(date = lubridate::floor_date(date, input$agg_type)) %>%
+      group_by(Cow, date) %>%
+      summarise(.,
+                across(where(is.character), ~"Average"),
+                across(where(is.numeric), mean))
   }
 
   #' Generate the plot and data tabs for time range plots
@@ -83,7 +87,15 @@ shinyServer(function(input, output, session) {
     output[[paste0(var_name, "_plot")]] <- renderPlotly({
       plt <- df %>%
         ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
-        geom_line() 
+        geom_line() +
+        stat_smooth(
+          method = "lm", 
+          formula = y~1,
+          se = FALSE,
+          fullrange = TRUE,
+          size = 0.5,
+          linetype = "dashed"
+        )
       plt %>%
         ggplotly()
     })
