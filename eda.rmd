@@ -10,11 +10,9 @@ library(kableExtra)
 ```
 
 ```{r}
-
 my_df <- bind_rows(dashboard_Insentec$`Replacement behaviour by date`, .id = "date")
 
 my_df
-
 ```
 
 
@@ -37,7 +35,6 @@ cow_id = 6130
 cow_6130 <- actor_reactor_analysis %>%
           filter(Actor_cow == cow_id)  
           
-
 cow_6130$date <- ymd(cow_6130$date)
 
 cow_6130
@@ -45,15 +42,18 @@ cow_6130
 
 ```{r}
 
+colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red")
+
+
 first_plot <- ggplot(cow_6130, aes(x = date)) +
-  
-  geom_line(aes(y = actor_cow_freq), color="steelblue") +
-  geom_line(aes(y = unique_reactor_cows_kicked), color="red") +
+  geom_line(aes(y = actor_cow_freq, color = "Being Actor")) +
+  geom_line(aes(y = unique_reactor_cows_kicked, color = "Unique Cows kicked")) +
   geom_point(aes(y = actor_cow_freq)) +
   geom_point(aes(y = unique_reactor_cows_kicked)) +
   scale_x_date(date_labels = "%B-%y") +
   #theme_ipsum() +
-  labs(x = '', y = 'Number of times Cow 6130 was actor cow') +
+  labs(x = 'Date', y = 'Frequency', color = "Legend") +
+  scale_color_manual(values = colours) +
   theme(axis.text.x=element_text(angle=60, hjust=1))
 
 ggplotly(first_plot)
