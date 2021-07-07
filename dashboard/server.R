@@ -139,7 +139,7 @@ shinyServer(function(input, output, session) {
   })
 
   # render network
-  g <- make_tidygraph(HOBO$`paired lying total time`)
+  g <- .make_tidygraph(hobo$`paired lying total time`)
   output$network <- visNetwork::renderVisNetwork({
     plot_network(g)
   })
