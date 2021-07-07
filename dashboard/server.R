@@ -2,6 +2,7 @@ library(shiny)
 library(shinyWidgets)
 library(tidyverse)
 library(plotly)
+source(here("R/network.R"))
 
 shinyServer(function(input, output, session) {
 
@@ -109,12 +110,9 @@ shinyServer(function(input, output, session) {
   }
 
   # add plots and tables to the UI
-  hobo <- dashboard_full_analysis[["HOBO"]]
-  insentec <- dashboard_full_analysis[["Insentec"]]
-
   standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
   feed_drink_df <- insentec[["Feeding and drinking analysis"]]
-  
+
   # helper function for dataframes without dates in a single column
   convert_date_col <- function(df){
     enframe(df, name = "date") %>%
@@ -139,7 +137,7 @@ shinyServer(function(input, output, session) {
   })
 
   # render network
-  g <- make_tidygraph(HOBO$`paired lying total time`)
+  g <- .make_tidygraph(hobo$`paired lying total time`)
   output$network <- visNetwork::renderVisNetwork({
     plot_network(g)
   })
