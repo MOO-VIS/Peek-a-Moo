@@ -6,6 +6,10 @@ library(plotly)
 library(visNetwork)
 
 
+<<<<<<< HEAD
+#load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+=======
+>>>>>>> origin
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -39,12 +43,19 @@ activities_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(3,
+      column(2,
              radioButtons(
                inputId = "agg_type",
                label = "Aggregate",
                choiceNames = c("By Day", "By Month"),
                choiceValues = c("day", "month"),
+             )
+      ),
+      column(2,
+             checkboxInput(
+               inputId = "show_average",
+               label = "Show Dashed Average Lines",
+               value = FALSE
              )
       ),
       column(4,
@@ -79,7 +90,8 @@ activities_tab <- tabItem(
     default_tabBox("Standing Bout Duration", "standing_bout")
   ),
   fluidRow(
-    default_tabBox("Non-nutritive visits", "non_nutritive")
+    default_tabBox("Non-nutritive Visits", "non_nutritive"),
+    default_tabBox("Average # Feeding Buddies", "feeding_together")
   )
 )
 
@@ -96,7 +108,22 @@ relationships_tab <- tabItem(
 )
 
 bins_tab <- tabItem(
-    "bins"
+    "bins",
+    fluidRow(
+      box(
+        title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+        column(4,
+               dateInput(
+                 inputId = "bin_date",
+                 label = "Date"
+               )
+        )
+      )
+    ),
+    fluidRow(
+      default_tabBox("Hunger Plot", "bins")
+    )
+    
 )
 
 warnings_tab <- tabItem(
