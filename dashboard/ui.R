@@ -5,12 +5,6 @@ library(here)
 library(plotly)
 library(visNetwork)
 
-
-<<<<<<< HEAD
-#load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
-=======
->>>>>>> origin
-
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
