@@ -3,8 +3,9 @@ library(shinyWidgets)
 library(lubridate)
 library(here)
 library(plotly)
+library(visNetwork)
 
-load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -87,7 +88,11 @@ daily_tab <-  tabItem(
 )
 
 relationships_tab <- tabItem(
-  "relationships"
+  "relationships",
+  tabBox(
+    title = "Social Network", side = "right", selected = "Plot",
+    tabPanel("Plot", visNetworkOutput("network"))
+  )
 )
 
 bins_tab <- tabItem(
