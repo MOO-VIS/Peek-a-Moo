@@ -47,7 +47,8 @@ cow_reac_6130
 
 ```{r}
 
-colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red", "Being Reactor" = "yellow", "Unique cows kicking" = "green")
+colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red",
+             "Being Reactor" = "yellow", "Unique cows kicking" = "green")
 
 
 first_plot <- ggplot(cow_6130, aes(x = date)) +
