@@ -33,25 +33,34 @@ actor_reactor_analysis
 cow_id = 6130
 
 cow_6130 <- actor_reactor_analysis %>%
-          filter(Actor_cow == cow_id)  
+          filter(Actor_cow == cow_id) 
+
+cow_reac_6130 <- actor_reactor_analysis %>%
+                  filter(Reactor_cow == cow_id)
           
 cow_6130$date <- ymd(cow_6130$date)
 
-cow_6130
+cow_reac_6130$date <- ymd(cow_reac_6130$date)
+
+cow_reac_6130
 ```
 
 ```{r}
 
-colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red")
+colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red", "Being Reactor" = "yellow", "Unique cows kicking" = "green")
 
 
 first_plot <- ggplot(cow_6130, aes(x = date)) +
   geom_line(aes(y = actor_cow_freq, color = "Being Actor")) +
   geom_line(aes(y = unique_reactor_cows_kicked, color = "Unique Cows kicked")) +
-  geom_point(aes(y = actor_cow_freq)) +
-  geom_point(aes(y = unique_reactor_cows_kicked)) +
+  geom_point(shape = 2, aes(y = actor_cow_freq, color = "Being Actor")) +
+  geom_point(shape = 12, aes(y = unique_reactor_cows_kicked, color = "Unique Cows kicked")) +
+  
+  geom_line(data = cow_reac_6130, aes(y = reactor_cow_freq, color = "Being Reactor")) +
+  geom_line(data = cow_reac_6130, aes(y = unique_actor_cows_kicking, color = "Unique cows kicking")) +
+  geom_point(shape = 18, data = cow_reac_6130, aes(y = reactor_cow_freq, color = "Being Reactor")) +
+  geom_point(shape = 8, data = cow_reac_6130, aes(y = unique_actor_cows_kicking, color = "Unique cows kicking")) +
   scale_x_date(date_labels = "%B-%y") +
-  #theme_ipsum() +
   labs(x = 'Date', y = 'Frequency', color = "Legend") +
   scale_color_manual(values = colours) +
   theme(axis.text.x=element_text(angle = 60, hjust = 1))
