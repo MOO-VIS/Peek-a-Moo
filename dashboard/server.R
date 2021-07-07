@@ -2,6 +2,7 @@ library(shiny)
 library(shinyWidgets)
 library(tidyverse)
 library(plotly)
+source(here("R/network.R"))
 
 shinyServer(function(input, output, session) {
 
