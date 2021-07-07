@@ -85,7 +85,8 @@ activities_tab <- tabItem(
     default_tabBox("Standing Bout Duration", "standing_bout")
   ),
   fluidRow(
-    default_tabBox("Non-nutritive visits", "non_nutritive")
+    default_tabBox("Non-nutritive Visits", "non_nutritive"),
+    default_tabBox("Average # Feeding Buddies", "feeding_together")
   )
 )
 
@@ -98,7 +99,22 @@ relationships_tab <- tabItem(
 )
 
 bins_tab <- tabItem(
-    "bins"
+    "bins",
+    fluidRow(
+      box(
+        title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+        column(4,
+               dateInput(
+                 inputId = "bin_date",
+                 label = "Date"
+               )
+        )
+      )
+    ),
+    fluidRow(
+      default_tabBox("Hunger Plot", "bins")
+    )
+    
 )
 
 warnings_tab <- tabItem(

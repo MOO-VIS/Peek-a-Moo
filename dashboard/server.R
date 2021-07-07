@@ -46,7 +46,7 @@ shinyServer(function(input, output, session) {
       group_by(date) %>%
       summarise(.,
                 across(where(is.character), ~"Herd Average"),
-                across(where(is.numeric), mean))
+                across(where(is.numeric), mean, na.rm=TRUE))
     
     # filter by cow and add summary rows
     df %>%
@@ -56,24 +56,24 @@ shinyServer(function(input, output, session) {
       group_by(Cow, date) %>%
       summarise(.,
                 across(where(is.character), ~"Herd Average"),
-                across(where(is.numeric), mean))
+                across(where(is.numeric), mean, na.rm=TRUE))
   }
 
   #' Generate the plot and data tabs for time range plots
   #'
   #' @param df The dataframe containing data to be displayed
-  #' @param ycol The column of interest
+  #' @param y_col The column of interest
   #' @param var_name The name of the UI output variable
   #'
   #' @return NULL
-  range_plot <- function(df, ycol, var_name){
+  cow_date_range_plot <- function(df, y_col, var_name){
     
     # filter table
     df <- process_range_data(df)
     
     # generate table
     output[[paste0(var_name, "_table")]] <- DT::renderDataTable(
-      {df},
+      df,
       extensions = "Buttons",
       options = list(
         scrollX = TRUE,
@@ -86,8 +86,9 @@ shinyServer(function(input, output, session) {
     # generate plot
     output[[paste0(var_name, "_plot")]] <- renderPlotly({
       plt <- df %>%
-        ggplot(aes(x = date, y = {{ycol}}, colour = Cow)) +
-        geom_line() 
+        ggplot(aes(x = date, y = {{y_col}}, colour = `Cow`)) +
+        geom_line() +
+        theme(legend.position = "bottom")
       
       if(input$show_average){
         plt <- plt + 
@@ -102,7 +103,8 @@ shinyServer(function(input, output, session) {
       }
       
       plt %>%
-        ggplotly()
+        ggplotly() %>%
+        layout(legend = list(orientation = "h", y = -0.2))
     })
   }
   
@@ -112,9 +114,15 @@ shinyServer(function(input, output, session) {
   
   standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
   feed_drink_df <- insentec[["Feeding and drinking analysis"]]
-  non_nutritive_df <- enframe(insentec[["non_nutritive_visits"]], name = "date") %>%
-    mutate(date = as.Date(date)) %>%
-    unnest(value)
+  
+  # helper function for dataframes without dates in a single column
+  convert_date_col <- function(df){
+    enframe(df, name = "date") %>%
+      mutate(date = as.Date(date)) %>%
+      unnest(value)
+  }
+  non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
+  feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
 
   # update cow selection
   observe({
@@ -132,34 +140,41 @@ shinyServer(function(input, output, session) {
 
   # render plots
   observe({
-    range_plot(
+    cow_date_range_plot(
       feed_drink_df,
       `Feeding_Duration(s)`, 
       "feed"
     )
   
-    range_plot(
+    cow_date_range_plot(
       feed_drink_df,
       `Drinking_Duration(s)`,
       "drink"
     ) 
   
-    range_plot(
+    cow_date_range_plot(
       standing_bout_df,
       `standing_time(seconds)`,
       "standing_time"
     ) 
     
-    range_plot(
+    cow_date_range_plot(
       standing_bout_df,
       `standing_bout`,
       "standing_bout"
-    ) 
+    )
     
-    range_plot(
+    cow_date_range_plot(
       non_nutritive_df,
       `number_of_non_nutritive_visits`,
       "non_nutritive"
     )
+    
+    cow_date_range_plot(
+      feeding_together_df,
+      `average_num_other_cows_feeding_together`,
+      "feeding_together"
+    )
+
   })
 })
