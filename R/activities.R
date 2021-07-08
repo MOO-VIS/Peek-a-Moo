@@ -1,9 +1,9 @@
-library(tidyverse)
 
 #' Filter by user input date range
 #'
 #' @param df The dataframe to filter
 #' @param col The date column
+#' @param date_range A list containing two dates - start and end date
 #'
 #' @return Filtered dataframe with only dates within selected range
 filter_date_range <- function(df, col, date_range){
@@ -16,6 +16,7 @@ filter_date_range <- function(df, col, date_range){
 #'
 #' @param df The dataframe to filter
 #' @param col The cow column
+#' @param cow_selection A list of cows Ids to display
 #'
 #' @return Filtered dataframe with only selected cows
 filter_cows <- function(df, col, cow_selection){
@@ -27,6 +28,9 @@ filter_cows <- function(df, col, cow_selection){
 #' Filter data by user input and add summary rows
 #'
 #' @param df Dataframe to filter and adjust
+#' @param agg_type A string representing aggregation type, day/month/year
+#' @param cow_selection A list of cow Ids to display
+#' @param date_range A list containing two dates - start and end date
 #'
 #' @return Filtered dataframe with additional stats
 process_range_data <- function(df, agg_type, cow_selection, date_range){
@@ -54,6 +58,13 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
     bind_rows(herd_average) 
 }
 
+#' Generate the plot and data tabs for time range plots
+#'
+#' @param df The dataframe containing data to be displayed
+#' @param y_col The column of interest
+#' @param show_average Boolean whether to show average line per cow
+#'
+#' @return NULL
 cow_date_range_plot <- function(df, y_col, show_average){
   plt <- df %>%
     ggplot(aes(x = date, y = {{y_col}}, colour = `Cow`)) +

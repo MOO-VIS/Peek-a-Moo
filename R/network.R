@@ -42,7 +42,7 @@ plot_network <- function(g, conditions = (from_friendship_rank <= 1 | to_friends
 #'   dates).
 #' @to_date A date up to which to include entries. Defaults to NULL (all
 #'   dates).
-#'
+#' @return A dataframe object.
 combine_data <- function(x, from_date = NULL, to_date = NULL){
 
   # set defaults

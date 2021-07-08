@@ -1,9 +1,3 @@
-library(shinydashboard)
-library(shinyWidgets)
-library(lubridate)
-library(here)
-library(plotly)
-library(visNetwork)
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -17,22 +11,6 @@ sidebar <- dashboardSidebar(
     )
   )
 )
-
-#' Helper function for creating boxes with plot and data tab
-#'
-#' @param title The title to display for the box
-#' @param var_name The beginning of the variable name used by server.R
-#' @param width The width of the box, defaults to 6
-#' @param output_fun Function for producting the plot output, defaults to plotlyOutput
-#'
-#' @return tabBox
-default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput){
-  tabBox(
-    title = title, side = "right", selected = "Plot", width = width,
-    tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Plot", output_fun(paste0(var_name, "_plot")))
-  )
-}
 
 activities_tab <- tabItem(
   "activities",
@@ -59,7 +37,7 @@ activities_tab <- tabItem(
              dateRangeInput(
                inputId = "date_range",
                label = "Date Range",
-               start = today() - years(1),
+               start = lubridate::today() - lubridate::years(1),
                end = NULL,
                min = NULL,
                max = NULL

@@ -1,9 +1,3 @@
-library(shiny)
-library(shinyWidgets)
-library(tidyverse)
-library(plotly)
-source(here("R/network.R"))
-source(here("R/activities.R"))
 
 shinyServer(function(input, output, session) {
 
@@ -56,7 +50,7 @@ shinyServer(function(input, output, session) {
   })
   output$network_table <- format_dt_table(combine_data(raw_graph_data))
 
-  # render plots
+  # render activity plots
   observe({
     plot_cow_date_range(
       feed_drink_df,
