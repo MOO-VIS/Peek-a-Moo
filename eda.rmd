@@ -13,14 +13,11 @@ my_df <- bind_rows(dashboard_Insentec$`Replacement behaviour by date`, .id = "da
 ```
 
 ```{r}
-#' Title
+#' Combine the dataframes of the replacement behaviour based of their dates.
 #'
 #' @param df 
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return Full dataframe
 make_analysis_df <- function(df) {
   df <- bind_rows(df, .id = "date")
 }
@@ -48,12 +45,13 @@ df %>%
 }
 ```
 
-
 ```{r}
 #' Title
 #'
 #' @param df 
 #' @param cow_id 
+#' @param start_date 
+#' @param end_date 
 #'
 #' @return
 #' @export
@@ -88,10 +86,10 @@ analysis_plot <- ggplot(cow_act_df, aes(x = date)) +
   geom_line(data = cow_reac_df, aes(y = unique_actor_cows_kicking, color = "Unique cows kicking")) +
   geom_point(shape = 18, data = cow_reac_df, aes(y = reactor_cow_freq, color = "Being Reactor")) +
   geom_point(shape = 8, data = cow_reac_df, aes(y = unique_actor_cows_kicking, color = "Unique cows kicking")) +
-  scale_x_date(date_labels = "%B-%y") +
+  scale_x_date(date_labels = "%d-%B-%y") +
   labs(x = 'Date', y = 'Frequency', color = "Legend") +
-  scale_color_manual(values = colours) +
-  theme(axis.text.x=element_text(angle = 60, hjust = 1))
+  scale_color_manual(values = colours) #+
+  #theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ggplotly(analysis_plot)
 }
@@ -99,7 +97,11 @@ ggplotly(analysis_plot)
 
 
 
+```{r}
 
+plot_bully_analysis(ac_df, 6130, '2020-07-15', '2020-11-15')
+
+```
 
 
 
