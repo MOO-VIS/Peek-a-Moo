@@ -26,12 +26,9 @@ make_analysis_df <- function(df) {
 ```{r}
 #' Carry out the analysis and create new columns for the desired replacement 
 #' behaviour.
-#' @param df 
+#' @param df The combined dataframe i.e the output of make_analysis_df function
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return A dataframe with 4 new columns after undertaking the required analysis
 actor_reactor_analysis <- function(df) {
 
 df %>%
