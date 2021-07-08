@@ -10,8 +10,6 @@ library(ggplot2)
 
 ```{r}
 my_df <- bind_rows(dashboard_Insentec$`Replacement behaviour by date`, .id = "date")
-
-my_df 
 ```
 
 ```{r}
@@ -31,7 +29,6 @@ df %>%
     group_by(Reactor_cow, date) %>%
     mutate(reactor_cow_freq = n(), 
            unique_actor_cows_kicking = length(unique(Actor_cow)))
- 
 }
 ```
 
@@ -41,7 +38,6 @@ df %>%
 plot_bully_analysis <- function(df, cow_id) {
   
   ### Make plotting data 
-  
   cow_act_df <- df %>%
               filter(Actor_cow == cow_id) 
 
@@ -49,10 +45,10 @@ plot_bully_analysis <- function(df, cow_id) {
                filter(Reactor_cow == cow_id)
           
   cow_act_df$date <- ymd(cow_act_df$date)
-
   cow_reac_df$date <- ymd(cow_reac_df$date)
 
   
+### Make plot
 colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red",
              "Being Reactor" = "yellow", "Unique cows kicking" = "green")
 
@@ -75,11 +71,11 @@ ggplotly(analysis_plot)
 }
 ```
 
-```{r}
 
-plot_bully_analysis(ac_df)
 
-```
+
+
+
 
 
 
