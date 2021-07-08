@@ -15,17 +15,17 @@ my_df <- bind_rows(dashboard_Insentec$`Replacement behaviour by date`, .id = "da
 ```{r}
 #' Combine the dataframes of the replacement behaviour based of their dates.
 #'
-#' @param df 
+#' @param df The insentec dataframe after indexing the 'Replacement behaviour by date' list
 #'
-#' @return Full dataframe
+#' @return Combined dataframe
 make_analysis_df <- function(df) {
   df <- bind_rows(df, .id = "date")
 }
 ```
 
 ```{r}
-#' Title
-#'
+#' Carry out the analysis and create new columns for the desired replacement 
+#' behaviour.
 #' @param df 
 #'
 #' @return
