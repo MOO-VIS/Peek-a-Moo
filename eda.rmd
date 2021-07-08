@@ -37,7 +37,6 @@ actor_reactor_analysis <- function(df) {
 ```
 
 ```{r}
-
 prepare_plotting_data <- function(df, cow_id) {
 
 cow_act_df <- actor_reactor_analysis %>%
