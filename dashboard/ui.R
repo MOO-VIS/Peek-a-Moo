@@ -22,13 +22,15 @@ sidebar <- dashboardSidebar(
 #'
 #' @param title The title to display for the box
 #' @param var_name The beginning of the variable name used by server.R
+#' @param width The width of the box, defaults to 6
+#' @param output_fun Function for producting the plot output, defaults to plotlyOutput
 #'
 #' @return tabBox
-default_tabBox <- function(title, var_name){
+default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput){
   tabBox(
-    title = title, side = "right", selected = "Plot",
+    title = title, side = "right", selected = "Plot", width = width,
     tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Plot", plotlyOutput(paste0(var_name, "_plot")))
+    tabPanel("Plot", output_fun(paste0(var_name, "_plot")))
   )
 }
 
@@ -41,6 +43,7 @@ activities_tab <- tabItem(
              radioButtons(
                inputId = "agg_type",
                label = "Aggregate",
+               selected = "month", 
                choiceNames = c("By Day", "By Month"),
                choiceValues = c("day", "month"),
              )
@@ -95,10 +98,7 @@ daily_tab <-  tabItem(
 
 relationships_tab <- tabItem(
   "relationships",
-  tabBox(
-    title = "Social Network", side = "right", selected = "Plot",
-    tabPanel("Plot", visNetworkOutput("network"))
-  )
+  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
 )
 
 bins_tab <- tabItem(

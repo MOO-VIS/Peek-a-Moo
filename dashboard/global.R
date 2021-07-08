@@ -9,3 +9,17 @@ if(!exists("hobo") || !exists("feed_drink_df")){
     
     rm(dashboard_full_analysis)
 }
+
+
+format_dt_table <- function(df){
+  DT::renderDataTable(
+    df,
+    extensions = "Buttons",
+    options = list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = 'Bftip',
+      buttons = c("csv")
+    )
+  )
+}

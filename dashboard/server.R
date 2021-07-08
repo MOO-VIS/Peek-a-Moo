@@ -73,16 +73,7 @@ shinyServer(function(input, output, session) {
     df <- process_range_data(df)
 
     # generate table
-    output[[paste0(var_name, "_table")]] <- DT::renderDataTable(
-      df,
-      extensions = "Buttons",
-      options = list(
-        scrollX = TRUE,
-        pageLength = 5,
-        dom = 'Bftip',
-        buttons = c("csv")
-      )
-    )
+    output[[paste0(var_name, "_table")]] <- format_dt_table(df)
 
     # generate plot
     output[[paste0(var_name, "_plot")]] <- renderPlotly({
@@ -137,10 +128,12 @@ shinyServer(function(input, output, session) {
   })
 
   # render network
-  g <- .make_tidygraph(hobo$`paired lying total time`)
-  output$network <- visNetwork::renderVisNetwork({
+  raw_graph_data <- hobo[["paired lying total time"]]
+  g <- .make_tidygraph(raw_graph_data)
+  output$network_plot <- visNetwork::renderVisNetwork({
     plot_network(g)
   })
+  output$network_table <- format_dt_table(combine_data(raw_graph_data))
 
   # render plots
   observe({

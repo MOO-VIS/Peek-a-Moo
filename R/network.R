@@ -1,3 +1,5 @@
+library(tidygraph)
+
 #' Plot a Network of Cows
 #'
 #' @param g A tidygraph object. Expects a weighted undirected graph.
@@ -32,6 +34,28 @@ plot_network <- function(g, conditions = (from_friendship_rank <= 1 | to_friends
 }
 
 
+#' Combine list data into a single dataframe for a date range
+#'
+#' @param x A named list of adjacency matrices. The names must be dates
+#'   in YYYY-MM-DD format.
+#' @from_date A date up from which to include entries. Defaults to NULL (all
+#'   dates).
+#' @to_date A date up to which to include entries. Defaults to NULL (all
+#'   dates).
+#'
+combine_data <- function(x, from_date = NULL, to_date = NULL){
+
+  # set defaults
+  from_date <- from_date %||% -Inf
+  to_date   <- to_date %||% Inf
+
+  # combine list into one long data frame
+  x %>%
+    purrr::map_df(adjacency_to_long, .id = "date") %>%
+    dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    filter(date >= from_date,
+           date <= to_date)
+}
 
 #' Create a Tidy Graph
 #'
@@ -40,27 +64,13 @@ plot_network <- function(g, conditions = (from_friendship_rank <= 1 | to_friends
 #' @weight A unquoted name for the variable representing the weight of the
 #'   edges in the graph. Defaults to `paired_lying_time` but may also be
 #'   `n_interactions`.
-#' @from_date A date up from which to include entries. Defaults to NULL (all
-#'   dates).
-#' @to_date A date up to which to include entries. Defaults to NULL (all
-#'   dates).
-#'
 #' @return A tidygraph object.
-.make_tidygraph <- function(x, weight = "paired_lying_time",
-                            from_date = NULL, to_date = NULL) {
-  # set defaults
-  from_date <- from_date %||% -Inf
-  to_date   <- to_date %||% Inf
+.make_tidygraph <- function(x, weight = "paired_lying_time") {
 
-  # combine list into one long data frame
-  combo_df <- x %>%
-    purrr::map_df(adjacency_to_long, .id = "date") %>%
-    dplyr::mutate(dplyr::across(date, as.Date))
+  combo_df <- combine_data(x)
 
   # reshape data into and edgelist
   edgelist <- combo_df %>%
-    filter(date >= from_date,
-           date <= to_date) %>%
     group_by(from, to) %>%
     summarise(n_interactions = n(),
               paired_lying_time = sum(value, na.rm = TRUE),
