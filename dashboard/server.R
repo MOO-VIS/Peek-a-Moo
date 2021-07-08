@@ -1,6 +1,14 @@
 
 shinyServer(function(input, output, session) {
-
+  
+  warning_table <- insentec[["Insentec warning"]]
+  output$warning_table <- format_dt_table(warning_table)
+  
+  output$notifications <- renderMenu({
+    get_warnings(warning_table)
+  })
+  
+  
   #' Generate the plot and data tabs for time range plots
   #'
   #' @param df The dataframe containing data to be displayed

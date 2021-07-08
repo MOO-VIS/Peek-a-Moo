@@ -1,4 +1,9 @@
 
+header <- dashboardHeader(
+  title = "Dairy Cow Dashboard",
+  dropdownMenuOutput("notifications")
+)
+
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
@@ -109,13 +114,14 @@ bins_tab <- tabItem(
       )
     ),
     fluidRow(
-      default_tabBox("Hunger Plot", "bins")
+      default_tabBox("Hunger Plot", "bins", width = 12)
     )
     
 )
 
 warnings_tab <- tabItem(
-  "warnings"
+  "warnings", 
+  default_tabBox("Warnings", "warning", width = 12)
 )
 
 body <- dashboardBody(
@@ -126,20 +132,6 @@ body <- dashboardBody(
     bins_tab,
     warnings_tab
   )
-)
-
-notifications <- dropdownMenu(
-  type = "notifications", badgeStatus = "warning",
-  notificationItem(
-    text = "Warning message example",
-    icon = icon("exclamation-triangle"),
-    status = "warning"
-  )
-)
-
-header <- dashboardHeader(
-  title = "Dairy Cow Dashboard",
-  notifications
 )
 
 shinyUI(dashboardPage(header, sidebar, body, skin = "blue"))
