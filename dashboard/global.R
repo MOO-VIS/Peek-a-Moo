@@ -1,4 +1,3 @@
-library(here)
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
@@ -6,12 +5,12 @@ library(shinyWidgets)
 library(plotly)
 library(visNetwork)
 
-source(here("R/network.R"))
-source(here("R/activities.R"))
+source(here::here("R/network.R"))
+source(here::here("R/activities.R"))
 
 # load data if not already in memory
 if(!exists("hobo") || !exists("feed_drink_df")){
-    load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+    load(here::here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
     
     hobo <- dashboard_full_analysis[["HOBO"]]
     insentec <- dashboard_full_analysis[["Insentec"]]
@@ -48,7 +47,7 @@ format_dt_table <- function(df){
     options = list(
       scrollX = TRUE,
       pageLength = 5,
-      dom = 'Bftip',
+      dom = "Bftip",
       buttons = c("csv")
     )
   )
