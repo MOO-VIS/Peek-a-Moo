@@ -43,17 +43,14 @@ df %>%
 ```
 
 ```{r}
-#' Title
+#' Make an interactive plot of the actor reactor analysis. 
 #'
-#' @param df 
-#' @param cow_id 
-#' @param start_date 
-#' @param end_date 
+#' @param df The dataframe with new columns i.e the output of actor_reactor_analysis function
+#' @param cow_id An interger value used to represent the cow in which the user is interested. 
+#' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param end_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
 #'
-#' @return
-#' @export
-#'
-#' @examples
+#' @return An interactive plotly plot. 
 plot_bully_analysis <- function(df, cow_id, start_date, end_date) {
   
   ### Make plotting data 
