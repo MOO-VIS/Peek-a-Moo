@@ -10,7 +10,7 @@ if(!exists("hobo") || !exists("feed_drink_df")){
     rm(dashboard_full_analysis)
 }
 
-
+# helper function to format tables with export option
 format_dt_table <- function(df){
   DT::renderDataTable(
     df,
@@ -22,4 +22,12 @@ format_dt_table <- function(df){
       buttons = c("csv")
     )
   )
+}
+
+
+# helper function for dataframes without dates in a single column
+convert_date_col <- function(df){
+  enframe(df, name = "date") %>%
+    mutate(date = as.Date(date)) %>%
+    unnest(value)
 }
