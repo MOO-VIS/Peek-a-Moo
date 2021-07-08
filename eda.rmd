@@ -11,7 +11,7 @@ library(ggplot2)
 ```{r}
 my_df <- bind_rows(dashboard_Insentec$`Replacement behaviour by date`, .id = "date")
 
-#my_df 
+my_df 
 ```
 
 ```{r}
@@ -22,10 +22,8 @@ make_analysis_df <- function(df) {
 
 ```{r}
 actor_reactor_analysis <- function(df) {
-  
-  df <- make_analysis_df(df)
-  
-  df %>%
+
+df %>%
     group_by(Actor_cow, date) %>%
     mutate(actor_cow_freq = n(),
            unique_reactor_cows_kicked = length(unique(Reactor_cow))) %>%
@@ -33,39 +31,32 @@ actor_reactor_analysis <- function(df) {
     group_by(Reactor_cow, date) %>%
     mutate(reactor_cow_freq = n(), 
            unique_actor_cows_kicking = length(unique(Actor_cow)))
+ 
 }
 ```
 
-```{r}
-prepare_plotting_data <- function(df, cow_id) {
 
-actor_reactor_analysis_df <- actor_reactor_analysis(df)
- 
-cow_act_df <- actor_reactor_analysis_df %>%
+```{r}
+
+plot_bully_analysis <- function(df, cow_id) {
+  
+  ### Make plotting data 
+  
+  cow_act_df <- df %>%
               filter(Actor_cow == cow_id) 
 
-cow_reac_df <- actor_reactor_analysis_df %>%
-                filter(Reactor_cow == cow_id)
+  cow_reac_df <- df %>%
+               filter(Reactor_cow == cow_id)
           
-cow_act_df$date <- ymd(cow_act_df$date)
+  cow_act_df$date <- ymd(cow_act_df$date)
 
-cow_reac_df$date <- ymd(cow_reac_df$date)
+  cow_reac_df$date <- ymd(cow_reac_df$date)
 
-return(list(cow_act_df, cow_reac_df))
-}
-```
-
-```{r}
-
-plot_bully_analysis <- function(df) {
-  
- cow_act_df <- prepare_plotting_data(df)[1]
- cow_reac_df <- prepare_plotting_data(df)[2]
   
 colours <- c("Being Actor" = "steelblue", "Unique Cows kicked" = "red",
              "Being Reactor" = "yellow", "Unique cows kicking" = "green")
 
-first_plot <- ggplot(cow_act_df, aes(x = date)) +
+analysis_plot <- ggplot(cow_act_df, aes(x = date)) +
   geom_line(aes(y = actor_cow_freq, color = "Being Actor")) +
   geom_line(aes(y = unique_reactor_cows_kicked, color = "Unique Cows kicked")) +
   geom_point(shape = 2, aes(y = actor_cow_freq, color = "Being Actor")) +
@@ -80,11 +71,16 @@ first_plot <- ggplot(cow_act_df, aes(x = date)) +
   scale_color_manual(values = colours) +
   theme(axis.text.x=element_text(angle = 60, hjust = 1))
 
-ggplotly(first_plot)
-  
+ggplotly(analysis_plot)
 }
+```
+
+```{r}
+
+plot_bully_analysis(ac_df)
 
 ```
+
 
 
 ```{r}
@@ -140,14 +136,4 @@ first_plot <- ggplot(cow_6130, aes(x = date)) +
 ggplotly(first_plot)
 ```
 
-```{r}
-library(tidyverse, quietly = TRUE)
-library(broom)
-library(lubridate)
-library(plotly)
-library(ggplot2)
 
-
-
-
-```
