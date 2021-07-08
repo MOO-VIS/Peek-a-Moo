@@ -30,8 +30,14 @@ if(!exists("hobo") || !exists("feed_drink_df")){
 default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput){
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
-    tabPanel("Data", shinycssloaders::withSpinner(DT::dataTableOutput(paste0(var_name, "_table")))),
-    tabPanel("Plot", shinycssloaders::withSpinner(output_fun(paste0(var_name, "_plot"))))
+    tabPanel("Data", shinycssloaders::withSpinner(
+      image = "loading_cow2.gif",
+      DT::dataTableOutput(paste0(var_name, "_table")))
+    ),
+    tabPanel("Plot", shinycssloaders::withSpinner(
+      image = "loading_cow1.gif",
+      output_fun(paste0(var_name, "_plot")))
+    )
   )
 }
 
