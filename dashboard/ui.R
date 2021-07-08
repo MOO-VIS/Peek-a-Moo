@@ -1,9 +1,3 @@
-library(shinydashboard)
-library(shinyWidgets)
-library(lubridate)
-library(here)
-library(plotly)
-library(visNetwork)
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -18,20 +12,6 @@ sidebar <- dashboardSidebar(
   )
 )
 
-#' Helper function for creating boxes with plot and data tab
-#'
-#' @param title The title to display for the box
-#' @param var_name The beginning of the variable name used by server.R
-#'
-#' @return tabBox
-default_tabBox <- function(title, var_name){
-  tabBox(
-    title = title, side = "right", selected = "Plot",
-    tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Plot", plotlyOutput(paste0(var_name, "_plot")))
-  )
-}
-
 activities_tab <- tabItem(
   "activities",
   fluidRow(
@@ -41,6 +21,7 @@ activities_tab <- tabItem(
              radioButtons(
                inputId = "agg_type",
                label = "Aggregate",
+               selected = "month", 
                choiceNames = c("By Day", "By Month"),
                choiceValues = c("day", "month"),
              )
@@ -56,7 +37,7 @@ activities_tab <- tabItem(
              dateRangeInput(
                inputId = "date_range",
                label = "Date Range",
-               start = today() - years(1),
+               start = lubridate::today() - lubridate::years(1),
                end = NULL,
                min = NULL,
                max = NULL
@@ -95,10 +76,7 @@ daily_tab <-  tabItem(
 
 relationships_tab <- tabItem(
   "relationships",
-  tabBox(
-    title = "Social Network", side = "right", selected = "Plot",
-    tabPanel("Plot", visNetworkOutput("network"))
-  )
+  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
 )
 
 bins_tab <- tabItem(
