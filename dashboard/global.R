@@ -35,7 +35,7 @@ default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput
       DT::dataTableOutput(paste0(var_name, "_table")))
     ),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = "loading_cow1.gif",
+      image = "loading_cow5.gif",
       output_fun(paste0(var_name, "_plot")))
     )
   )
