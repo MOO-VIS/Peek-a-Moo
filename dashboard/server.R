@@ -43,12 +43,15 @@ shinyServer(function(input, output, session) {
   })
 
   # render network
-  raw_graph_data <- hobo[["paired lying total time"]]
-  g <- .make_tidygraph(raw_graph_data)
-  output$network_plot <- visNetwork::renderVisNetwork({
-    plot_network(g)
+  observe({
+    raw_graph_data <- hobo[["paired lying total time"]]
+    combo_df <- combine_data(raw_graph_data, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+    g <- .make_tidygraph(raw_graph_data, combo_df)
+    output$network_plot <- visNetwork::renderVisNetwork({
+      plot_network(g)
+    })
+    output$network_table <- format_dt_table(combo_df)
   })
-  output$network_table <- format_dt_table(combine_data(raw_graph_data))
 
   # render activity plots
   observe({

@@ -76,7 +76,23 @@ daily_tab <-  tabItem(
 
 relationships_tab <- tabItem(
   "relationships",
-  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
+  fluidRow(
+    box(
+      title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(4,
+             dateRangeInput(
+               inputId = "relationship_date_range",
+               label = "Date Range",
+               start = lubridate::today() - lubridate::years(1),
+               end = NULL,
+               min = NULL,
+               max = NULL
+             )
+      )
+    )
+  ),
+  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput),
+  default_tabBox("Actor/Reactor", "bullying", width = 12)
 )
 
 bins_tab <- tabItem(
