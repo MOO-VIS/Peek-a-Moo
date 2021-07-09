@@ -49,13 +49,32 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
               across(where(is.numeric), mean, na.rm=TRUE))
   
   # filter by cow and add summary rows
-  df %>%
+  df <- df %>%
     filter_cows(Cow, cow_selection) %>%
     group_by(Cow, date) %>%
     summarise(.,
               across(where(is.character), ~"Herd Average"),
               across(where(is.numeric), mean, na.rm=TRUE)) %>%
     bind_rows(herd_average) 
+  
+  # convert Cow to factor
+  df$Cow <- factor(df$Cow) %>%
+    fct_rev()
+  
+  df
+}
+
+#' Format column names for display
+#' 
+#' @param col_name The column name to format
+#' 
+#' return the formatted column name
+format_col_name <- function(col_name){
+  str_replace_all(col_name, "_", " ") %>%
+    str_to_title() %>%
+    str_replace("Seconds", "s") %>%
+    str_replace("\\((?i)s\\)", " (s)") %>%
+    str_replace("\\((?i)kg\\)", " (kg)")
 }
 
 #' Generate the plot and data tabs for time range plots
@@ -66,10 +85,21 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
 #'
 #' @return NULL
 cow_date_range_plot <- function(df, y_col, show_average){
+  
+  # throw error if no data available for date range
+  if(nrow(df)==0) stop('No data available for this date range')
+  
+  # extract y_label from unquoted col and format
+  y_label <- quo_name(enquo(y_col)) %>%
+    format_col_name()
+  
   plt <- df %>%
     ggplot(aes(x = date, y = {{y_col}}, colour = `Cow`)) +
     geom_line() +
-    theme(legend.position = "bottom")
+    theme(legend.position = "bottom") + 
+    xlab("Date") +
+    ylab(y_label) +
+    scale_x_date(date_labels = "%b-%Y") +
   
   if(show_average){
     plt <- plt + 
