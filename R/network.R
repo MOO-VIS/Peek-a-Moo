@@ -61,13 +61,14 @@ combine_data <- function(x, from_date = NULL, to_date = NULL){
 #'
 #' @param x A named list of adjacency matrices. The names must be dates
 #'   in YYYY-MM-DD format.
+#' @param combo_df A long form dataframe with filtered values, defaults to NULL
 #' @weight A unquoted name for the variable representing the weight of the
 #'   edges in the graph. Defaults to `paired_lying_time` but may also be
 #'   `n_interactions`.
 #' @return A tidygraph object.
-.make_tidygraph <- function(x, weight = "paired_lying_time") {
-
-  combo_df <- combine_data(x)
+.make_tidygraph <- function(x, combo_df = NULL, weight = "paired_lying_time") {
+  
+  combo_df <- combo_df %||% combine_data(x)
 
   # reshape data into and edgelist
   edgelist <- combo_df %>%

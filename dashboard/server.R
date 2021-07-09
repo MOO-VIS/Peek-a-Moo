@@ -1,6 +1,23 @@
 
 shinyServer(function(input, output, session) {
-
+  
+  # Warning section
+  observe({
+    warning_df <- combine_warnings(
+      insentec, 
+      food_cuttoff = input$food_intake, 
+      water_cuttoff = input$water_intake
+    )
+    
+    output$warning_table <- format_dt_table(warning_df, page_length = 20)
+    print(warning_df %>%
+      filter(date == max(date)))
+    # Warning notifications menu
+    output$notifications <- renderMenu({
+      get_warning_dropdown(warning_df)
+    })
+  })
+  
   #' Generate the plot and data tabs for time range plots
   #'
   #' @param df The dataframe containing data to be displayed
@@ -31,8 +48,9 @@ shinyServer(function(input, output, session) {
   # update cow selection
   observe({
     cow_choices <- filter_date_range(feed_drink_df, date, input$date_range) %>%
-      select("Cow") %>%
-      unique()
+      select(Cow) %>%
+      unique() %>%
+      arrange(desc(Cow))
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
 
     updatePickerInput(
@@ -43,12 +61,15 @@ shinyServer(function(input, output, session) {
   })
 
   # render network
-  raw_graph_data <- hobo[["paired lying total time"]]
-  g <- .make_tidygraph(raw_graph_data)
-  output$network_plot <- visNetwork::renderVisNetwork({
-    plot_network(g)
+  observe({
+    raw_graph_data <- hobo[["paired lying total time"]]
+    combo_df <- combine_data(raw_graph_data, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+    g <- .make_tidygraph(raw_graph_data, combo_df)
+    output$network_plot <- visNetwork::renderVisNetwork({
+      plot_network(g)
+    })
+    output$network_table <- format_dt_table(combo_df)
   })
-  output$network_table <- format_dt_table(combine_data(raw_graph_data))
 
   # render activity plots
   observe({
