@@ -1,3 +1,9 @@
+#' Generate water or feed intake warnings based on cuttoff
+#'
+#' @param df Dataframe containing water or feed intake
+#' @param cuttoff The threshold to qualify for a warning if intake is below
+#'
+#' @return Dataframe containing a row for each date with warning messages
 intake_warnings <- function(df, cuttoff){
   convert_date_col(df) %>%
     mutate(date = as.Date(date)) %>%

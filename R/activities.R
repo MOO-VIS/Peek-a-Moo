@@ -1,30 +1,3 @@
-
-#' Filter by user input date range
-#'
-#' @param df The dataframe to filter
-#' @param col The date column
-#' @param date_range A list containing two dates - start and end date
-#'
-#' @return Filtered dataframe with only dates within selected range
-filter_date_range <- function(df, col, date_range){
-  df %>%
-    filter({{col}} >= date_range[[1]]) %>%
-    filter({{col}} <= date_range[[2]])
-}
-
-#' Filter by user input cow selection
-#'
-#' @param df The dataframe to filter
-#' @param col The cow column
-#' @param cow_selection A list of cows Ids to display
-#'
-#' @return Filtered dataframe with only selected cows
-filter_cows <- function(df, col, cow_selection){
-  
-  df %>%
-    filter({{col}} %in% cow_selection)
-}
-
 #' Filter data by user input and add summary rows
 #'
 #' @param df Dataframe to filter and adjust
@@ -87,7 +60,7 @@ format_col_name <- function(col_name){
 cow_date_range_plot <- function(df, y_col, show_average){
   
   # throw error if no data available for date range
-  if(nrow(df)==0) stop('No data available for this date range')
+  if(nrow(df) == 0) stop('No data available for this date range')
   
   # extract y_label from unquoted col and format
   y_label <- quo_name(enquo(y_col)) %>%
@@ -99,7 +72,7 @@ cow_date_range_plot <- function(df, y_col, show_average){
     theme(legend.position = "bottom") + 
     xlab("Date") +
     ylab(y_label) +
-    scale_x_date(date_labels = "%b-%Y") +
+    scale_x_date(date_labels = "%b-%Y")
   
   if(show_average){
     plt <- plt + 

@@ -1,4 +1,3 @@
-
 header <- dashboardHeader(
   title = "Dairy Cow Dashboard",
   dropdownMenuOutput("notifications")
@@ -24,7 +23,7 @@ activities_tab <- tabItem(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(2,
              radioButtons(
-               inputId = "agg_type",
+               inputId = "activity_agg_type",
                label = "Aggregate",
                selected = "month", 
                choiceNames = c("By Day", "By Month"),
@@ -40,7 +39,7 @@ activities_tab <- tabItem(
       ),
       column(4,
              dateRangeInput(
-               inputId = "date_range",
+               inputId = "activity_date_range",
                label = "Date Range",
                start = lubridate::today() - lubridate::years(1),
                end = NULL,
@@ -50,7 +49,7 @@ activities_tab <- tabItem(
       ),
       column(4,
              pickerInput(
-               inputId = "cow_selection",
+               inputId = "activity_cow_selection",
                label = "Cows",
                choices = list(),
                multiple = TRUE,
@@ -76,7 +75,29 @@ activities_tab <- tabItem(
 )
 
 daily_tab <-  tabItem(
-  "daily_behavior"
+  "daily_behavior",
+  fluidRow(
+    box(
+      title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(4,
+             dateInput(
+               inputId = "daily_date",
+               label = "Date"
+             )
+      ),
+      column(4,
+             pickerInput(
+               inputId = "daily_cow_selection",
+               label = "Cows",
+               choices = list(),
+               multiple = TRUE,
+               options = list(
+                 "actions-box" = TRUE,
+                 "none-selected-text" = "Select cows")
+             )
+      )
+    )
+  )
 )
 
 relationships_tab <- tabItem(
@@ -84,6 +105,15 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(4,
+             radioButtons(
+               inputId = "relationship_agg_type",
+               label = "Aggregate",
+               selected = "month", 
+               choiceNames = c("By Day", "By Month"),
+               choiceValues = c("day", "month"),
+             )
+      ),
       column(4,
              dateRangeInput(
                inputId = "relationship_date_range",
@@ -144,9 +174,13 @@ warnings_tab <- tabItem(
 )
 
 body <- dashboardBody(
-  tags$script(HTML("function clickFunction(link){ 
-                       Shiny.onInputChange('linkClicked',link);
-    }")),
+  tags$script(
+    HTML(
+      "function clickFunction(link){
+        Shiny.onInputChange('linkClicked',link);
+      }"
+    )
+  ),
   tabItems(
     activities_tab,
     daily_tab,
