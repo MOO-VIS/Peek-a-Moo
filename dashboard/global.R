@@ -45,15 +45,16 @@ default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput
 #' Helper function to format tables with export option
 #'
 #' @param df The dataframe to convert
+#' @param page_length Number of pages to show, defaults to 5
 #'
 #' @return DT datatable
-format_dt_table <- function(df){
+format_dt_table <- function(df, page_length=5){
   DT::renderDataTable(
     df,
     extensions = "Buttons",
     options = list(
       scrollX = TRUE,
-      pageLength = 5,
+      pageLength = page_length,
       dom = "Bftip",
       buttons = c("csv")
     )

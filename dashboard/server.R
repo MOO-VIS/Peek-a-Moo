@@ -1,11 +1,13 @@
 
 shinyServer(function(input, output, session) {
   
+  # Warning section
   warning_table <- insentec[["Insentec warning"]]
-  output$warning_table <- format_dt_table(warning_table)
+  output$warning_table <- format_dt_table(warning_table, page_length = 20)
   
+  # Warning notifications menu
   output$notifications <- renderMenu({
-    get_warnings(warning_table)
+    get_warning_dropdown(warning_table)
   })
   
   
