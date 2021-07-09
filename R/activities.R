@@ -95,7 +95,8 @@ cow_date_range_plot <- function(df, y_col, show_average){
     geom_line() +
     theme(legend.position = "bottom") + 
     xlab("Date") +
-    ylab(y_label)
+    ylab(y_label) +
+    scale_x_date(date_labels = "%b-%Y") +
   
   if(show_average){
     plt <- plt + 
