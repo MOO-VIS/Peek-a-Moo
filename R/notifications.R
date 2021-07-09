@@ -1,15 +1,41 @@
-#' Generate warning message list
+intake_warnings <- function(df, cuttoff){
+  convert_date_col(df) %>%
+    mutate(date = as.Date(date)) %>%
+    group_by(Cow, date) %>%
+    summarise(intake = sum(Intake)) %>%
+    filter(intake < cuttoff) %>%
+    mutate(message = paste(Cow, ": ", intake))
+}
+
+#' Combine additional warnings with original warnings
 #'
-#' @param raw_df Dataframe containing all warnings
+#' @param insentec Dataframe containing all insentec tables
 #' @param food_cuttoff Cuttoff for feed to trigger warning
 #' @param water_cuttoff Cuttoff for water to trigger warning
 #'
 #' @return named list containing error names and messages
-get_warnings <- function(warning_df, food_cuttoff, water_cuttoff){
+combine_warnings <- function(insentec, food_cuttoff = 0, water_cuttoff = 0){
+  
+  #food_warnings <- intake_warnings(insentec[["Cleaned_feeding_original_data"]], food_cuttoff)
+  #drink_warnings <- intake_warnings(insentec[["Cleaned_drinking_original_data"]], water_cuttoff)
+  
+  # get the latest warnings
+  all_warnings <- insentec[["Insentec warning"]] %>%
+    mutate(date = as.Date(date)) %>%
+    arrange(desc(date))
+  all_warnings
+  
+}
+
+#' Generate warning message list
+#'
+#' @param warning_df Dataframe containing all warnings
+#'
+#' @return named list containing error names and messages
+parse_warnings <- function(warning_df){
   
   # get the latest warnings
   latest_warning_df <- warning_df %>%
-    mutate(date = as.Date(date)) %>%
     filter(date == max(date))
   
   # warning types to notify
@@ -32,9 +58,9 @@ get_warnings <- function(warning_df, food_cuttoff, water_cuttoff){
 #' @param water_cuttoff Cuttoff for water to trigger warning
 #'
 #' @return dropdownMenu with warning messages
-get_warning_dropdown <- function(raw_df, food_cuttoff = 0, water_cuttoff = 0){
+get_warning_dropdown <- function(warning_df){
   
-  warning_types <- get_warnings(raw_df, food_cuttoff, water_cuttoff)
+  warning_types <- parse_warnings(warning_df)
   
   # format warning messages
   warning_names <- lapply(
