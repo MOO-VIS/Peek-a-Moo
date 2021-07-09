@@ -5,7 +5,7 @@ header <- dashboardHeader(
 )
 
 sidebar <- dashboardSidebar(
-  sidebarMenu(
+  sidebarMenu(id="sidemenu",
     menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Relationships", icon = icon("heart"), tabName = "relationships"),
@@ -144,6 +144,9 @@ warnings_tab <- tabItem(
 )
 
 body <- dashboardBody(
+  tags$script(HTML("function clickFunction(link){ 
+                       Shiny.onInputChange('linkClicked',link);
+    }")),
   tabItems(
     activities_tab,
     daily_tab,

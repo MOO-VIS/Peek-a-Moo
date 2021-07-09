@@ -76,17 +76,24 @@ get_warning_dropdown <- function(warning_df){
       paste(names(warning_types[x]), ": ", warning_types[x])
     }
   ) 
+  
+  get_noti <- function(x){
+    notification <- notificationItem(
+         text = x,
+         icon = icon("exclamation-triangle"), 
+         status = "warning"
+         )
+    notification$children[[1]] <- a(href = "#shiny-tab-warnings_tab",
+                                    "onclick" = paste0(
+                                      "clickFunction('",paste0(substr(as.character(runif(1, 0, 1)),1,6),"noti"),"'); return false;"),
+                                    list(notification$children[[1]]$children))
+    return(notification)
+  }
+  
   # create notification items list
   warnings_list <- warning_names %>%
-    lapply(
-      function(x){
-        notificationItem(
-          text = x,
-          icon = icon("exclamation-triangle"),
-          status = "warning"
-        )
-      }
-    )
+    lapply(get_noti)
+  
   
   # return dropdown menu with notification items
   dropdownMenu(
