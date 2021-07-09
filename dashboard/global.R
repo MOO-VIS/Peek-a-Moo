@@ -5,8 +5,9 @@ library(shinyWidgets)
 library(plotly)
 library(visNetwork)
 
-source(here::here("R/network.R"))
+source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
+source(here::here("R/network.R"))
 
 # load data if not already in memory
 if(!exists("hobo") || !exists("feed_drink_df")){
@@ -30,23 +31,30 @@ if(!exists("hobo") || !exists("feed_drink_df")){
 default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput){
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
-    tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Plot", output_fun(paste0(var_name, "_plot")))
+    tabPanel("Data", shinycssloaders::withSpinner(
+      image = "loading_cow5.gif",
+      DT::dataTableOutput(paste0(var_name, "_table")))
+    ),
+    tabPanel("Plot", shinycssloaders::withSpinner(
+      image = "loading_cow2.gif",
+      output_fun(paste0(var_name, "_plot")))
+    )
   )
 }
 
 #' Helper function to format tables with export option
 #'
 #' @param df The dataframe to convert
+#' @param page_length Number of pages to show, defaults to 5
 #'
 #' @return DT datatable
-format_dt_table <- function(df){
+format_dt_table <- function(df, page_length=5){
   DT::renderDataTable(
     df,
     extensions = "Buttons",
     options = list(
       scrollX = TRUE,
-      pageLength = 5,
+      pageLength = page_length,
       dom = "Bftip",
       buttons = c("csv")
     )

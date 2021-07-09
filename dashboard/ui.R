@@ -1,4 +1,9 @@
 
+header <- dashboardHeader(
+  title = "Dairy Cow Dashboard",
+  dropdownMenuOutput("notifications")
+)
+
 sidebar <- dashboardSidebar(
   sidebarMenu(
     menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
@@ -76,7 +81,23 @@ daily_tab <-  tabItem(
 
 relationships_tab <- tabItem(
   "relationships",
-  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
+  fluidRow(
+    box(
+      title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(4,
+             dateRangeInput(
+               inputId = "relationship_date_range",
+               label = "Date Range",
+               start = lubridate::today() - lubridate::years(1),
+               end = NULL,
+               min = NULL,
+               max = NULL
+             )
+      )
+    )
+  ),
+  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput),
+  default_tabBox("Actor/Reactor", "bullying", width = 12)
 )
 
 bins_tab <- tabItem(
@@ -93,13 +114,33 @@ bins_tab <- tabItem(
       )
     ),
     fluidRow(
-      default_tabBox("Hunger Plot", "bins")
+      default_tabBox("Hunger Plot", "bins", width = 12)
     )
     
 )
 
 warnings_tab <- tabItem(
-  "warnings"
+  "warnings",
+  box(
+    title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+    column(4,
+           numericInput(
+             inputId = "food_intake",
+             label = "Food Intake Cuttoff",
+             value = 0,
+             min = 0
+          )
+    ),
+    column(4,
+           numericInput(
+             inputId = "water_intake",
+             label = "Water Intake Cuttoff",
+             value = 0,
+             min = 0
+           )
+    )
+  ),
+  default_tabBox("Warnings", "warning", width = 12)
 )
 
 body <- dashboardBody(
@@ -110,20 +151,6 @@ body <- dashboardBody(
     bins_tab,
     warnings_tab
   )
-)
-
-notifications <- dropdownMenu(
-  type = "notifications", badgeStatus = "warning",
-  notificationItem(
-    text = "Warning message example",
-    icon = icon("exclamation-triangle"),
-    status = "warning"
-  )
-)
-
-header <- dashboardHeader(
-  title = "Dairy Cow Dashboard",
-  notifications
 )
 
 shinyUI(dashboardPage(header, sidebar, body, skin = "blue"))
