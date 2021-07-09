@@ -16,6 +16,11 @@ shinyServer(function(input, output, session) {
     output$notifications <- renderMenu({
       get_warning_dropdown(warning_df)
     })
+    observeEvent(input$linkClicked,{
+      print(input$linkClicked)
+      updateTabItems(session,"sidemenu",selected = "warnings")
+      output$dropdown=renderMenu({get_warning_dropdown(warning_df)})
+    })
   })
   
   #' Generate the plot and data tabs for time range plots

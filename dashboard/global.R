@@ -25,7 +25,7 @@ if(!exists("hobo") || !exists("feed_drink_df")){
 #' @param title The title to display for the box
 #' @param var_name The beginning of the variable name used by server.R
 #' @param width The width of the box, defaults to 6
-#' @param output_fun Function for producting the plot output, defaults to plotlyOutput
+#' @param output_fun Function for producing the plot output, defaults to plotlyOutput
 #'
 #' @return tabBox
 default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput){
