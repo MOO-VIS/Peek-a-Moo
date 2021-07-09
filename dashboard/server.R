@@ -2,7 +2,9 @@
 shinyServer(function(input, output, session) {
   
   # Warning section
-  warning_table <- insentec[["Insentec warning"]]
+  warning_table <- insentec[["Insentec warning"]] %>%
+    mutate(date = as.Date(date)) %>%
+    arrange(desc(date))
   output$warning_table <- format_dt_table(warning_table, page_length = 20)
   
   # Warning notifications menu
@@ -41,8 +43,9 @@ shinyServer(function(input, output, session) {
   # update cow selection
   observe({
     cow_choices <- filter_date_range(feed_drink_df, date, input$date_range) %>%
-      select("Cow") %>%
-      unique()
+      select(Cow) %>%
+      unique() %>%
+      arrange(desc(Cow))
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
 
     updatePickerInput(

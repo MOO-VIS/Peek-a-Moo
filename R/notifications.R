@@ -1,3 +1,10 @@
+#' Generate warning message list
+#'
+#' @param raw_df Dataframe containing all warnings
+#' @param food_cuttoff Cuttoff for feed to trigger warning
+#' @param water_cuttoff Cuttoff for water to trigger warning
+#'
+#' @return named list containing error names and messages
 get_warnings <- function(warning_df, food_cuttoff, water_cuttoff){
   
   # get the latest warnings
@@ -15,29 +22,27 @@ get_warnings <- function(warning_df, food_cuttoff, water_cuttoff){
   )
   
   # filter out empty warnings
-  warning_types <- warning_types[warning_types != ""]
+  warning_types[warning_types != ""]
+}
+
+#' Generate warning notifications and dropdown
+#'
+#' @param raw_df Dataframe containing all warnings
+#' @param food_cuttoff Cuttoff for feed to trigger warning
+#' @param water_cuttoff Cuttoff for water to trigger warning
+#'
+#' @return dropdownMenu with warning messages
+get_warning_dropdown <- function(raw_df, food_cuttoff = 0, water_cuttoff = 0){
+  
+  warning_types <- get_warnings(raw_df, food_cuttoff, water_cuttoff)
   
   # format warning messages
-  lapply(
+  warning_names <- lapply(
     seq_along(warning_types), 
     function(x){
       paste(names(warning_types[x]), ": ", warning_types[x])
     }
   ) 
-  
-}
-
-#' Generate warning notifications and dropdown
-#'
-#' @param warning_df Dataframe containing warnings
-#' @param food_cuttoff Cuttoff for feed to trigger warning
-#' @param water_cuttoff Cuttoff for water to trigger warning
-#'
-#' @return dropdownMenu with warning messages
-get_warning_dropdown <- function(warning_df, food_cuttoff = 0, water_cuttoff = 0){
-  
-  warning_names <- get_warnings(warning_df, food_cuttoff, water_cuttoff)
-  
   # create notification items list
   warnings_list <- warning_names %>%
     lapply(
