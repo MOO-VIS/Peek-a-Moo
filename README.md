@@ -4,7 +4,17 @@ Dairy Cow Dashboard for UBC Faculty of Land and Food Systems - Animal Welfare Pr
 # Dependenices
 Run the following command in R to install the dependencies:
 
-`install.packages(c("shiny", "shinydashboard", "DT", "lubridate", "here"))`
+`install.packages(
+c("tidyverse",
+"shiny",
+"shinydashboard",
+"shinyWidgets",
+"shinycssloaders",
+"plotly",
+"visNetwork",
+"lubridate",
+"DT",
+"here"))`
 
 # Launching the app
 From the root directory, run: 

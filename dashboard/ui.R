@@ -1,10 +1,8 @@
-library(shinydashboard)
-library(shinyWidgets)
-library(lubridate)
-library(here)
-library(plotly)
 
-load(here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+header <- dashboardHeader(
+  title = "Dairy Cow Dashboard",
+  dropdownMenuOutput("notifications")
+)
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -19,38 +17,32 @@ sidebar <- dashboardSidebar(
   )
 )
 
-#' Helper function for creating boxes with plot and data tab
-#'
-#' @param title The title to display for the box
-#' @param var_name The beginning of the variable name used by server.R
-#'
-#' @return tabBox
-default_tabBox <- function(title, var_name){
-  tabBox(
-    title = title, side = "right", selected = "Plot",
-    tabPanel("Data", DT::dataTableOutput(paste0(var_name, "_table"))),
-    tabPanel("Plot", plotlyOutput(paste0(var_name, "_plot")))
-  )
-}
-
 activities_tab <- tabItem(
   "activities",
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(3,
+      column(2,
              radioButtons(
                inputId = "agg_type",
                label = "Aggregate",
+               selected = "month", 
                choiceNames = c("By Day", "By Month"),
                choiceValues = c("day", "month"),
+             )
+      ),
+      column(2,
+             checkboxInput(
+               inputId = "show_average",
+               label = "Show Dashed Average Lines",
+               value = FALSE
              )
       ),
       column(4,
              dateRangeInput(
                inputId = "date_range",
                label = "Date Range",
-               start = today() - years(1),
+               start = lubridate::today() - lubridate::years(1),
                end = NULL,
                min = NULL,
                max = NULL
@@ -78,7 +70,8 @@ activities_tab <- tabItem(
     default_tabBox("Standing Bout Duration", "standing_bout")
   ),
   fluidRow(
-    default_tabBox("Non-nutritive visits", "non_nutritive")
+    default_tabBox("Non-nutritive Visits", "non_nutritive"),
+    default_tabBox("Average # Feeding Buddies", "feeding_together")
   )
 )
 
@@ -87,15 +80,67 @@ daily_tab <-  tabItem(
 )
 
 relationships_tab <- tabItem(
-  "relationships"
+  "relationships",
+  fluidRow(
+    box(
+      title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(4,
+             dateRangeInput(
+               inputId = "relationship_date_range",
+               label = "Date Range",
+               start = lubridate::today() - lubridate::years(1),
+               end = NULL,
+               min = NULL,
+               max = NULL
+             )
+      )
+    )
+  ),
+  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput),
+  default_tabBox("Actor/Reactor", "bullying", width = 12)
 )
 
 bins_tab <- tabItem(
-    "bins"
+    "bins",
+    fluidRow(
+      box(
+        title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+        column(4,
+               dateInput(
+                 inputId = "bin_date",
+                 label = "Date"
+               )
+        )
+      )
+    ),
+    fluidRow(
+      default_tabBox("Hunger Plot", "bins", width = 12)
+    )
+    
 )
 
 warnings_tab <- tabItem(
-  "warnings"
+  "warnings",
+  box(
+    title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+    column(4,
+           numericInput(
+             inputId = "food_intake",
+             label = "Food Intake Cuttoff",
+             value = 0,
+             min = 0
+          )
+    ),
+    column(4,
+           numericInput(
+             inputId = "water_intake",
+             label = "Water Intake Cuttoff",
+             value = 0,
+             min = 0
+           )
+    )
+  ),
+  default_tabBox("Warnings", "warning", width = 12)
 )
 
 body <- dashboardBody(
@@ -106,20 +151,6 @@ body <- dashboardBody(
     bins_tab,
     warnings_tab
   )
-)
-
-notifications <- dropdownMenu(
-  type = "notifications", badgeStatus = "warning",
-  notificationItem(
-    text = "Warning message example",
-    icon = icon("exclamation-triangle"),
-    status = "warning"
-  )
-)
-
-header <- dashboardHeader(
-  title = "Dairy Cow Dashboard",
-  notifications
 )
 
 shinyUI(dashboardPage(header, sidebar, body, skin = "blue"))
