@@ -289,13 +289,6 @@
       "Repository": "CRAN",
       "Hash": "44594a07a42e5f91fac9f93fda6d0109"
     },
-    "fst": {
-      "Package": "fst",
-      "Version": "0.9.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "66c2d5dffed8d181b9555617beb2d0f9"
-    },
     "gargle": {
       "Package": "gargle",
       "Version": "1.1.0",
@@ -739,6 +732,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "7dd5f3ee96c64a47fdbc6e437ff1c7e1"
+    },
+    "shinycssloaders": {
+      "Package": "shinycssloaders",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f39bb3c44a9b496723ec7e86f9a771d8"
     },
     "shinydashboard": {
       "Package": "shinydashboard",
