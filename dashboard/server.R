@@ -48,6 +48,9 @@ shinyServer(function(input, output, session) {
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
+  observe({
+    update_cow_selection(input$relationship_date_range, "relationship_cow_selection", session)
+  })
 
   # render network
   observe({

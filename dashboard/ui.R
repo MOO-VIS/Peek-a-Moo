@@ -21,15 +21,7 @@ activities_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(2,
-             radioButtons(
-               inputId = "activity_agg_type",
-               label = "Aggregate",
-               selected = "month", 
-               choiceNames = c("By Day", "By Month"),
-               choiceValues = c("day", "month"),
-             )
-      ),
+      column(2, aggregation_widget("activity_agg_type")),
       column(2,
              checkboxInput(
                inputId = "show_average",
@@ -37,27 +29,8 @@ activities_tab <- tabItem(
                value = FALSE
              )
       ),
-      column(4,
-             dateRangeInput(
-               inputId = "activity_date_range",
-               label = "Date Range",
-               start = lubridate::today() - lubridate::years(1),
-               end = NULL,
-               min = NULL,
-               max = NULL
-             )
-      ),
-      column(4,
-             pickerInput(
-               inputId = "activity_cow_selection",
-               label = "Cows",
-               choices = list(),
-               multiple = TRUE,
-               options = list(
-                 "actions-box" = TRUE,
-                 "none-selected-text" = "Select cows")
-             )
-      )
+      column(4, date_range_widget("activity_date_range")),
+      column(4, cow_selection_widget("activity_cow_selection"))
     )
   ),
   fluidRow(
@@ -79,23 +52,8 @@ daily_tab <-  tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(4,
-             dateInput(
-               inputId = "daily_date",
-               label = "Date"
-             )
-      ),
-      column(4,
-             pickerInput(
-               inputId = "daily_cow_selection",
-               label = "Cows",
-               choices = list(),
-               multiple = TRUE,
-               options = list(
-                 "actions-box" = TRUE,
-                 "none-selected-text" = "Select cows")
-             )
-      )
+      column(4, date_widget("daily_date")),
+      column(4, cow_selection_widget("daily_cow_selection"))
     )
   )
 )
@@ -105,29 +63,20 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(4,
-             radioButtons(
-               inputId = "relationship_agg_type",
-               label = "Aggregate",
-               selected = "month", 
-               choiceNames = c("By Day", "By Month"),
-               choiceValues = c("day", "month"),
-             )
-      ),
-      column(4,
-             dateRangeInput(
-               inputId = "relationship_date_range",
-               label = "Date Range",
-               start = lubridate::today() - lubridate::years(1),
-               end = NULL,
-               min = NULL,
-               max = NULL
-             )
+      column(2, aggregation_widget("relationship_agg_type")),
+      column(4, date_range_widget("relationship_date_range")),
+      box(
+        title="Actor/Reactor Customizations", width = 6,
+        column(12, cow_selection_widget("relationship_cow_selection"))
       )
     )
   ),
-  default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput),
-  default_tabBox("Actor/Reactor", "bullying", width = 12)
+  fluidRow(
+    default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
+  ),
+  fluidRow(
+    default_tabBox("Actor/Reactor", "bullying", width = 12)
+  )
 )
 
 bins_tab <- tabItem(
@@ -135,12 +84,7 @@ bins_tab <- tabItem(
     fluidRow(
       box(
         title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-        column(4,
-               dateInput(
-                 inputId = "bin_date",
-                 label = "Date"
-               )
-        )
+        column(4, date_widget("bin_date"))
       )
     ),
     fluidRow(

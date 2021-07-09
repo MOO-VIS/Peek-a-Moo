@@ -11,7 +11,7 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
   # convert Cow col to character to add summary stats later and filter by date
   df <- df %>%
     mutate(Cow = as.character(Cow)) %>%
-    filter_date_range(date, date_range)
+    filter_dates(date, date_range)
   
   # calculate summary stats
   herd_average <- df %>%

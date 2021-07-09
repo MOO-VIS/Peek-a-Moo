@@ -109,6 +109,48 @@ format_dt_table <- function(df, page_length=5){
   )
 }
 
+# widget helper functions: 
+aggregation_widget <- function(inputId){
+  radioButtons(
+    inputId = inputId,
+    label = "Aggregate",
+    selected = "month", 
+    choiceNames = c("By Day", "By Month"),
+    choiceValues = c("day", "month"),
+  )
+}
+
+date_range_widget <- function(inputId){
+  dateRangeInput(
+    inputId = inputId,
+    label = "Date Range",
+    start = lubridate::today() - lubridate::years(1),
+    end = NULL,
+    min = NULL,
+    max = NULL
+  )
+}
+
+cow_selection_widget <- function(inputId){
+  pickerInput(
+    inputId = inputId,
+    label = "Cows",
+    choices = list(),
+    multiple = TRUE,
+    options = list(
+      "actions-box" = TRUE,
+      "none-selected-text" = "Select cows")
+  )
+}
+
+date_widget <- function(inputId){
+  dateInput(
+    inputId = inputId,
+    label = "Date"
+  )
+}
+
+
 #' Helper function for updating cow selection picker input widgets
 #'
 #' @param date_obj The date or date range to filter by
@@ -130,3 +172,5 @@ update_cow_selection <- function(date_obj, inputId, session){
     choices = cow_choices
   )
 }
+
+
