@@ -86,6 +86,9 @@ format_col_name <- function(col_name){
 #' @return NULL
 cow_date_range_plot <- function(df, y_col, show_average){
   
+  # throw error if no data available for date range
+  if(nrow(df)==0) stop('No data available for this date range')
+  
   # extract y_label from unquoted col and format
   y_label <- quo_name(enquo(y_col)) %>%
     format_col_name()
