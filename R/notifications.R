@@ -4,7 +4,9 @@ intake_warnings <- function(df, cuttoff){
     group_by(Cow, date) %>%
     summarise(intake = sum(Intake)) %>%
     filter(intake < cuttoff) %>%
-    mutate(message = paste(Cow, ": ", intake))
+    mutate(intake_message = paste(Cow, ": ", intake)) %>%
+    group_by(date) %>%
+    summarise(intake_message = paste(intake_message, collapse = ", "))
 }
 
 #' Combine additional warnings with original warnings
@@ -16,14 +18,19 @@ intake_warnings <- function(df, cuttoff){
 #' @return named list containing error names and messages
 combine_warnings <- function(insentec, food_cuttoff = 0, water_cuttoff = 0){
   
-  #food_warnings <- intake_warnings(insentec[["Cleaned_feeding_original_data"]], food_cuttoff)
-  #drink_warnings <- intake_warnings(insentec[["Cleaned_drinking_original_data"]], water_cuttoff)
+  food_warnings <- intake_warnings(insentec[["Cleaned_feeding_original_data"]], food_cuttoff) 
+  drink_warnings <- intake_warnings(insentec[["Cleaned_drinking_original_data"]], water_cuttoff) 
   
   # get the latest warnings
   all_warnings <- insentec[["Insentec warning"]] %>%
     mutate(date = as.Date(date)) %>%
     arrange(desc(date))
-  all_warnings
+  
+  all_warnings %>%
+    left_join(food_warnings[c("date", "intake_message")], by = "date") %>%
+    rename(food_intake = intake_message) %>%
+    left_join(drink_warnings[c("date", "intake_message")], by = "date") %>%
+    rename(water_intake = intake_message)
   
 }
 

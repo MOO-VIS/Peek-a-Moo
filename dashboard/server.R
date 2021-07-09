@@ -2,15 +2,21 @@
 shinyServer(function(input, output, session) {
   
   # Warning section
-  warning_df <- combine_warnings(insentec)
-  
-  output$warning_table <- format_dt_table(warning_df, page_length = 20)
-
-  # Warning notifications menu
-  output$notifications <- renderMenu({
-    get_warning_dropdown(warning_df)
+  observe({
+    warning_df <- combine_warnings(
+      insentec, 
+      food_cuttoff = input$food_intake, 
+      water_cuttoff = input$water_intake
+    )
+    
+    output$warning_table <- format_dt_table(warning_df, page_length = 20)
+    print(warning_df %>%
+      filter(date == max(date)))
+    # Warning notifications menu
+    output$notifications <- renderMenu({
+      get_warning_dropdown(warning_df)
+    })
   })
-  
   
   #' Generate the plot and data tabs for time range plots
   #'

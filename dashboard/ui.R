@@ -120,7 +120,26 @@ bins_tab <- tabItem(
 )
 
 warnings_tab <- tabItem(
-  "warnings", 
+  "warnings",
+  box(
+    title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+    column(4,
+           numericInput(
+             inputId = "food_intake",
+             label = "Food Intake Cuttoff",
+             value = 0,
+             min = 0
+          )
+    ),
+    column(4,
+           numericInput(
+             inputId = "water_intake",
+             label = "Water Intake Cuttoff",
+             value = 0,
+             min = 0
+           )
+    )
+  ),
   default_tabBox("Warnings", "warning", width = 12)
 )
 
