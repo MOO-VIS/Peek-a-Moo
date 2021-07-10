@@ -14,7 +14,9 @@ c("tidyverse",
 "visNetwork",
 "lubridate",
 "DT",
-"here"))`
+"here",
+"tidygraph",
+"memoise"))`
 
 # Launching the app
 From the root directory, run: 
