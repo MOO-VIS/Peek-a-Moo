@@ -115,6 +115,9 @@ shinyServer(function(input, output, session) {
   #' daily_schedu_moo_data(dashboard_full_analysis=dashboard_full_analysis, cow_id = 6047, date = '2020-07-15')
   daily_schedu_moo_data <-
     function(dashboard_full_analysis, cow_id, date) {
+      cow_id <- as.numeric(cow_id)
+      date <- as.character(date)
+      
       # Create feeding, drinking, and lying_standing dataframes
       feeding <-
         insentec[["Cleaned_feeding_original_data"]]
@@ -140,7 +143,7 @@ shinyServer(function(input, output, session) {
       
       # Concatenate dataframes and only keep data for the cow of interest.
       df <- bind_rows(drinking, feeding, lying_standing) %>%
-        filter(Cow == cow_id) %>%
+        filter(Cow %in% cow_id) %>%
         mutate(Cow = paste0('Cow ', as.character(Cow))) %>%
         mutate(event_id = row_number()) %>%
         # Trim events starting before the beginning of the day of interest or after the end of the day of interest

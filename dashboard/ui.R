@@ -57,7 +57,7 @@ daily_tab <-  tabItem(
     )
   ),
   fluidRow(
-    default_tabBox("Daily Behavior", "daily")
+    default_tabBox("Daily Behavior", "daily", width = 12)
   ),
 )
 
