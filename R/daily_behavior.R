@@ -78,8 +78,6 @@ daily_schedu_moo_plot <- function(df) {
     plot_ly(
       type = 'scatter',
       mode = 'lines',
-      width = 800,
-      height = 200,
       yaxis=list(type='category'),
     )
   
