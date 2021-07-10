@@ -5,6 +5,49 @@ library(shinyWidgets)
 library(plotly)
 library(visNetwork)
 
+#' Helper function for converting dataframes to having dates in a single column
+#'
+#' @param df The dataframe to convert
+#'
+#' @return Dataframe with dates in a single date column
+convert_date_col <- function(df){
+  enframe(df, name = "date") %>%
+    mutate(date = as.Date(date)) %>%
+    unnest(value)
+}
+
+#' Helper function to filter by user input date range
+#'
+#' @param df The dataframe to filter
+#' @param col The date column
+#' @param date_obj A list containing start and end date or a single date
+#'
+#' @return Filtered dataframe with only dates within selected range
+filter_dates <- function(df, col, date_obj){
+  if(length(date_obj) > 1){
+    df %>%
+      filter({{col}} >= date_obj[[1]]) %>%
+      filter({{col}} <= date_obj[[2]])
+  }
+  else{
+    df %>%
+      filter({{col}} == date_obj)
+  }
+}
+
+#' Helper function to filter by user input cow selection
+#'
+#' @param df The dataframe to filter
+#' @param col The cow column
+#' @param cow_selection A list of cows Ids to display
+#'
+#' @return Filtered dataframe with only selected cows
+filter_cows <- function(df, col, cow_selection){
+  df %>%
+    filter({{col}} %in% cow_selection)
+}
+
+# load in plot/table creation scripts
 source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
 source(here::here("R/network.R"))
@@ -19,6 +62,11 @@ if(!exists("hobo") || !exists("feed_drink_df")){
     rm(dashboard_full_analysis)
 }
 
+# create dataframes for plots and tables
+standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
+feed_drink_df <- insentec[["Feeding and drinking analysis"]]
+non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
+feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
 
 #' Helper function for creating boxes with plot and data tab
 #'
@@ -61,13 +109,68 @@ format_dt_table <- function(df, page_length=5){
   )
 }
 
-#' Helper function for converting dataframes to having dates in a single column
-#'
-#' @param df The dataframe to convert
-#'
-#' @return Dataframe with dates in a single date column
-convert_date_col <- function(df){
-  enframe(df, name = "date") %>%
-    mutate(date = as.Date(date)) %>%
-    unnest(value)
+# widget helper functions: 
+aggregation_widget <- function(inputId){
+  radioButtons(
+    inputId = inputId,
+    label = "Aggregate",
+    selected = "month", 
+    choiceNames = c("By Day", "By Month"),
+    choiceValues = c("day", "month"),
+  )
 }
+
+date_range_widget <- function(inputId){
+  dateRangeInput(
+    inputId = inputId,
+    label = "Date Range",
+    start = lubridate::today() - lubridate::years(1),
+    end = NULL,
+    min = NULL,
+    max = NULL
+  )
+}
+
+cow_selection_widget <- function(inputId){
+  pickerInput(
+    inputId = inputId,
+    label = "Cows",
+    choices = list(),
+    multiple = TRUE,
+    options = list(
+      "actions-box" = TRUE,
+      "none-selected-text" = "Select cows")
+  )
+}
+
+date_widget <- function(inputId){
+  dateInput(
+    inputId = inputId,
+    label = "Date"
+  )
+}
+
+
+#' Helper function for updating cow selection picker input widgets
+#'
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+update_cow_selection <- function(date_obj, inputId, session){
+  
+  # find cows that exist in date range
+  cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
+    select(Cow) %>%
+    unique() %>%
+    arrange(desc(Cow))
+  colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
+  
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = cow_choices
+  )
+}
+
+

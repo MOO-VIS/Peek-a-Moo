@@ -1,4 +1,4 @@
-
+# Set up shiny server
 shinyServer(function(input, output, session) {
   
   # Warning section
@@ -10,8 +10,7 @@ shinyServer(function(input, output, session) {
     )
     
     output$warning_table <- format_dt_table(warning_df, page_length = 20)
-    print(warning_df %>%
-      filter(date == max(date)))
+    
     # Warning notifications menu
     output$notifications <- renderMenu({
       get_warning_dropdown(warning_df)
@@ -28,12 +27,10 @@ shinyServer(function(input, output, session) {
   #' @param df The dataframe containing data to be displayed
   #' @param y_col The column of interest
   #' @param var_name The name of the UI output variable
-  #'
-  #' @return NULL
   plot_cow_date_range <- function(df, y_col, var_name){
 
     # filter table
-    df <- process_range_data(df, input$agg_type, input$cow_selection, input$date_range)
+    df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
 
     # generate table
     output[[paste0(var_name, "_table")]] <- format_dt_table(df)
@@ -44,25 +41,15 @@ shinyServer(function(input, output, session) {
     })
   }
 
-  # add plots and tables to the UI
-  standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
-  feed_drink_df <- insentec[["Feeding and drinking analysis"]]
-  non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
-  feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
-
-  # update cow selection
+  # update cow selections based on selected dates
   observe({
-    cow_choices <- filter_date_range(feed_drink_df, date, input$date_range) %>%
-      select(Cow) %>%
-      unique() %>%
-      arrange(desc(Cow))
-    colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
-
-    updatePickerInput(
-      session = session,
-      inputId = "cow_selection",
-      choices = cow_choices
-    )
+    update_cow_selection(input$activity_date_range, "activity_cow_selection", session)
+  })
+  observe({
+    update_cow_selection(input$daily_date, "daily_cow_selection", session)
+  })
+  observe({
+    update_cow_selection(input$relationship_date_range, "relationship_cow_selection", session)
   })
 
   # render network
