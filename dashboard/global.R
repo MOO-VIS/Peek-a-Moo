@@ -4,6 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
 library(visNetwork)
+library(lubridate)
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
