@@ -51,6 +51,7 @@ filter_cows <- function(df, col, cow_selection){
 # load in plot/table creation scripts
 source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
+source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
 
 # load data if not already in memory
