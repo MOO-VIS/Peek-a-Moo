@@ -82,11 +82,11 @@ default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
     tabPanel("Data", shinycssloaders::withSpinner(
-      image = "loading_cow5.gif",
+      image = "loading_cow_table.gif",
       DT::dataTableOutput(paste0(var_name, "_table")))
     ),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = "loading_cow2.gif",
+      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
       output_fun(paste0(var_name, "_plot")))
     )
   )
