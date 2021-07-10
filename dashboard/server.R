@@ -110,4 +110,51 @@ shinyServer(function(input, output, session) {
     )
 
   })
-})
+  
+  ## feed bin plot section
+  feed_bin_df <- convert_date_col(insentec$Cleaned_feeding_original_data) %>%
+    mutate(Startweight = case_when(Startweight < 0 ~ 0, # set to zero where weight is negative
+                                  TRUE ~ Startweight),
+           Endweight = case_when(Endweight < 0 ~ 0,
+                                  TRUE ~ Endweight))
+  # choose date
+  one_bin_df <- feed_bin_df %>% group_by(Bin) %>% arrange(Start) %>% slice(1)
+  # img from https://www.flaticon.com/free-icon/lunch-box_3649211?term=container&page=1&position=34&page=1&position=34&related_id=3649211&origin=tag#
+  # Load png file from imgur as binary
+  container_img <- readPNG("www/container.png")
+  h <- dim(container_img)[1]
+  w <- dim(container_img)[2]  
+  
+  # Find the rows where image starts & ends
+  pos1 <- which(apply(container_img[,,1], 1, function(y) any(y==1)))
+  mn1 <- min(pos1)
+  mx1 <- max(pos1)
+  pospct <- round((mx1-mn1)*one_bin_df$Startweight+mn1)
+
+  imgmtx <- container_img[h:1,,1]
+  whitemtx <- (imgmtx==1)
+  colmtx <- matrix(rep(FALSE,h*w),nrow=h)
+  # midpt <- round(w/2)-10
+  colmtx[mx1:pospct, 1:w] <- TRUE
+  
+  ## testing this section
+  dim(colmtx) <- c(dim(colmtx)[1], dim(colmtx)[-1], 1)
+  ## testing above
+  
+  imgmtx[whitemtx & colmtx] <- 0.5
+  # Need to melt the matrix into a data.frame that ggplot can understand
+  df <- reshape2::melt(imgmtx)
+  cols <- c(rgb(255,255,255,maxColorValue = 255),  # bg
+            rgb(128,128,128,maxColorValue = 255),  # empty
+            rgb(42,128,183,maxColorValue = 255))   # full
+  # Then use a heatmap with 3 colours for background, and percentage fills
+  # Converting the fill value to a factor causes a discrete scale.
+  # geom_tile takes three columns: x, y, fill corresponding to 
+  # x-coord, y-coord, and colour of the cell.
+  ggplot(df, aes(x = Var2, y = Var1, fill = factor(value)))+
+    geom_tile() +
+    scale_fill_manual(values = cols) +
+    theme(legend.position = "none") +
+    facet_wrap(~Bin)
+  
+  })
