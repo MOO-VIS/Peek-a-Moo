@@ -53,6 +53,7 @@ source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
 source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
+source(here::here("R/bully_analysis.R"))
 
 # load data if not already in memory
 if(!exists("hobo") || !exists("feed_drink_df")){

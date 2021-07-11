@@ -116,8 +116,16 @@ shinyServer(function(input, output, session) {
       output$daily_table <- format_dt_table(df)
       output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
     }
-    
-    
+  })
+  
+  observe({
+    if(!is.null(input$relationship_cow_selection) && !is.null(input$relationship_date_range)){
+      df <- actor_reactor_analysis(make_analysis_df(insentec[["Replacement behaviour by date"]]))
+      output$bullying_table <- format_dt_table(df)
+      output$bullying_plot <- renderPlotly({
+        plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      })
+    }
   })
 
 })
