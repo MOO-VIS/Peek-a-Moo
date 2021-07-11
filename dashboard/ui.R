@@ -115,6 +115,14 @@ warnings_tab <- tabItem(
              value = 0,
              min = 0
            )
+    ),
+    column(4,
+           numericInput(
+             inputId = "bin_volume",
+             label = "Bin Volume Cuttoff",
+             value = 0,
+             min = 0
+           )
     )
   ),
   default_tabBox("Warnings", "warning", width = 12)

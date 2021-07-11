@@ -6,7 +6,8 @@ shinyServer(function(input, output, session) {
     warning_df <- combine_warnings(
       insentec, 
       food_cuttoff = input$food_intake, 
-      water_cuttoff = input$water_intake
+      water_cuttoff = input$water_intake,
+      bin_cuttoff = input$bin_volume
     )
     
     output$warning_table <- format_dt_table(warning_df, page_length = 20)
