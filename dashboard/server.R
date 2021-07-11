@@ -102,4 +102,22 @@ shinyServer(function(input, output, session) {
     )
 
   })
+  
+  observe({
+    if(!is.null(input$daily_cow_selection) && !is.null(input$daily_date)){
+      
+      # Create feeding, drinking, and lying_standing dataframes
+      feeding <- insentec[["Cleaned_feeding_original_data"]]
+      drinking <- insentec[["Cleaned_drinking_original_data"]]
+      lying_standing <- hobo[["duration_for_each_bout"]]
+      
+      # Render daily behavior plot
+      df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+      output$daily_table <- format_dt_table(df)
+      output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
+    }
+    
+    
+  })
+
 })

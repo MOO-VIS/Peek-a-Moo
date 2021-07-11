@@ -55,7 +55,10 @@ daily_tab <-  tabItem(
       column(4, date_widget("daily_date")),
       column(4, cow_selection_widget("daily_cow_selection"))
     )
-  )
+  ),
+  fluidRow(
+    default_tabBox("Daily Behavior", "daily", width = 12)
+  ),
 )
 
 relationships_tab <- tabItem(

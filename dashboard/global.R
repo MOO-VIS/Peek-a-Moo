@@ -4,6 +4,7 @@ library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
 library(visNetwork)
+library(lubridate)
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -50,6 +51,7 @@ filter_cows <- function(df, col, cow_selection){
 # load in plot/table creation scripts
 source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
+source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
 
 # load data if not already in memory
@@ -80,11 +82,11 @@ default_tabBox <- function(title, var_name, width = 6, output_fun = plotlyOutput
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
     tabPanel("Data", shinycssloaders::withSpinner(
-      image = "loading_cow5.gif",
+      image = "loading_cow_table.gif",
       DT::dataTableOutput(paste0(var_name, "_table")))
     ),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = "loading_cow2.gif",
+      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
       output_fun(paste0(var_name, "_plot")))
     )
   )
