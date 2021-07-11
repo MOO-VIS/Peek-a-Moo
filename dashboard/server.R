@@ -113,7 +113,7 @@ shinyServer(function(input, output, session) {
       
       # Render daily behavior plot
       df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-      output$daily_table <- format_dt_table(df)
+      output$daily_table <- format_dt_table(drop_na(df,Cow))
       output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
     }
     
