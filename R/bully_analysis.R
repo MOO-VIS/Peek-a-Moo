@@ -1,8 +1,3 @@
-library(tidyverse)
-library(lubridate)
-library(plotly)
-library(ggplot2)
-
 #' Combine the dataframes of the replacement behaviour based of their dates.
 #'
 #' @param df The insentec dataframe after indexing the 'Replacement behaviour by date' list
