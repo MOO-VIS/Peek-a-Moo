@@ -53,7 +53,8 @@ daily_tab <-  tabItem(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_widget("daily_date")),
-      column(4, cow_selection_widget("daily_cow_selection"))
+      column(4, cow_selection_widget("daily_cow_selection")),
+      column(4, h5(br(), "Please select a valid date and cow(s) to view the plot below"))
     )
   ),
   fluidRow(
@@ -66,18 +67,19 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(2, aggregation_widget("relationship_agg_type")),
-      column(4, date_range_widget("relationship_date_range")),
-      box(
-        title="Actor/Reactor Customizations", width = 6,
-        column(12, cow_selection_widget("relationship_cow_selection"))
-      )
+      # column(2, aggregation_widget("relationship_agg_type")),
+      column(4, date_range_widget("relationship_date_range"))
     )
   ),
   fluidRow(
     default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
   ),
   fluidRow(
+    box(
+      title="Actor/Reactor Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(6, cow_selection_widget("relationship_cow_selection")),
+      column(6, h5(br(), "Please select a cow to view the plot below"))
+    ),
     default_tabBox("Actor/Reactor", "bullying", width = 12)
   )
 )
@@ -115,9 +117,17 @@ warnings_tab <- tabItem(
              value = 0,
              min = 0
            )
+    ),
+    column(4,
+           numericInput(
+             inputId = "bin_volume",
+             label = "Bin Volume Cuttoff",
+             value = 0,
+             min = 0
+           )
     )
   ),
-  default_tabBox("Warnings", "warning", width = 12)
+  default_tabBox("Warnings", "warning", width = 12, output_fun = DT::dataTableOutput)
 )
 
 body <- dashboardBody(

@@ -6,17 +6,29 @@ shinyServer(function(input, output, session) {
     warning_df <- combine_warnings(
       insentec, 
       food_cuttoff = input$food_intake, 
-      water_cuttoff = input$water_intake
+      water_cuttoff = input$water_intake,
+      bin_cuttoff = input$bin_volume
     )
     
     output$warning_table <- format_dt_table(warning_df, page_length = 20)
+    
+    output$warning_plot <- DT::renderDataTable({
+      warning_df %>%
+        filter(date == max(date)) %>%
+        t()
+    },
+    colnames = c("Warning Type", "Warning"),
+    options = list(
+      pageLength = 50,
+      dom = "ft"
+      )
+    )
     
     # Warning notifications menu
     output$notifications <- renderMenu({
       get_warning_dropdown(warning_df)
     })
     observeEvent(input$linkClicked,{
-      print(input$linkClicked)
       updateTabItems(session,"sidemenu",selected = "warnings")
       output$dropdown=renderMenu({get_warning_dropdown(warning_df)})
     })
@@ -116,6 +128,9 @@ shinyServer(function(input, output, session) {
       output$daily_table <- format_dt_table(drop_na(df,Cow))
       output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
     }
+    else{
+      output$daily_plot = NULL # empty plot
+    }
   })
   
   observe({
@@ -125,6 +140,9 @@ shinyServer(function(input, output, session) {
       output$bullying_plot <- renderPlotly({
         plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
       })
+    }
+    else{
+      output$bullying_plot = NULL # empty plot
     }
   })
 
