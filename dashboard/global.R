@@ -54,6 +54,7 @@ source(here::here("R/activities.R"))
 source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
 source(here::here("R/bully_analysis.R"))
+source(here::here("R/bins.R"))
 
 # load data if not already in memory
 if(!exists("hobo") || !exists("feed_drink_df")){
@@ -70,6 +71,7 @@ standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
 feed_drink_df <- insentec[["Feeding and drinking analysis"]]
 non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
 feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
+feed_df <- insentec[["Cleaned_feeding_original_data"]]
 
 #' Helper function for creating boxes with plot and data tab
 #'
@@ -176,4 +178,11 @@ update_cow_selection <- function(date_obj, inputId, session){
   )
 }
 
-
+bin_wt_widget <- function(inputId){
+  selectInput(
+    inputId = inputId,
+    label = "Full Bin Weight (KG)",
+    choices = rep(1:100),
+    selected = as.integer(75)
+  )
+}

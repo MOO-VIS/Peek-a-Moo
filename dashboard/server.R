@@ -146,4 +146,11 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  observe({
+  bin_df <- select_feed_bin_data(feed_df, feed_date=input$bin_date)
+  output$feed_bin_plot <- renderPlot({
+    plot_feed_bin_data(hourly_df=bin_df, hr=input$obs_hr, max_wt=input$bin_weight)
+  })
+  output$feed_bin_table <- format_dt_table(bin_df)
+  })
 })
