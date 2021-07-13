@@ -98,7 +98,7 @@ bins_tab <- tabItem(
               )))
     ),
     fluidRow(
-      default_tabBox("Feed Bin Plot", "feed_bin", width = 12, output_fun = plotOutput)
+      default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
     )
     
 )
