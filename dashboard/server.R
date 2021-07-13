@@ -146,4 +146,45 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  plot_cow_date_range <- function(df, y_col, var_name){
+    
+    # filter table
+    df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
+    
+    # generate table
+    output[[paste0(var_name, "_table")]] <- format_dt_table(df)
+    
+    # generate plot
+    output[[paste0(var_name, "_plot")]] <- renderPlotly({
+      cow_date_range_plot(df, {{y_col}}, input$show_average)
+    })
+  }
+  # Feed Bin selection
+  observe({
+    update_bin_selection(input$bin_date, "activity_bin_selection", session)
+  })
+  # feed bin tab
+  observe({
+    if (!is.null(input$bin_date) &&
+        !is.null(input$obs_hr) && !is.null(input$bin_weight) &&
+        !is.null(input$activity_bin_selection)) {
+
+      bin_df <- select_feed_bin_data(feed_df, 
+                                     feed_date = input$bin_date, 
+                                     bin_selection = input$activity_bin_selection)
+      # plot
+      output$feed_bin_plot <- renderPlot({
+        plot_feed_bin_data(
+          hourly_df = bin_df,
+          hr = input$obs_hr,
+          max_wt = input$bin_weight
+        )
+      })
+      # CSV output
+      output$feed_bin_table <- format_dt_table(bin_df)
+    }
+    else{
+      output$feed_bin_plot = NULL # empty plot
+    }
+  })
 })
