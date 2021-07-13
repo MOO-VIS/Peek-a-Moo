@@ -16,7 +16,8 @@ c("tidyverse",
 "DT",
 "here",
 "tidygraph",
-"memoise"))`
+"memoise",
+"png"))`
 
 # Launching the app
 From the root directory, run: 
