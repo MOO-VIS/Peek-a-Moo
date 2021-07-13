@@ -2,7 +2,7 @@
 #'
 #' @param df The data frame containing feed data
 #' @param feed_date The date of interest
-#' @return NULL
+#' @return Grouped dataframe for particular date chosen and summarised values.
 select_feed_bin_data <- function(df, feed_date){
   ## feed bin plot section
   df <- convert_date_col(df) %>%
@@ -18,7 +18,7 @@ select_feed_bin_data <- function(df, feed_date){
     group_by(Bin, Hour) %>% 
     # mutate(count_visits = n()) %>%
     summarise(hrly_avg_wt = mean(Startweight),
-              h_visits = n())
+              hrly_visits = n())
 }
 
 #' Generate Feed Bin Plot for a Particular Date
@@ -28,10 +28,13 @@ select_feed_bin_data <- function(df, feed_date){
 #' @param max_wt Maximum weight of a bin to represent 100% capacity, default 75kg.
 #' @return NULL
 plot_feed_bin_data <- function(hourly_df, hr, max_wt){
+  if (dim(hourly_df)[1] == 0) {
+    stop('No data available for this date.')
+  }
   # Adapted plot from 
   # https://stackoverflow.com/questions/48522350/create-an-image-filled-chart-in-r-using-ggplot
   # Load png file from imgur as binary
-  container_img <- readPNG(here::here("container.png"))
+  container_img <- readPNG(here::here("dashboard/www/container.png"))
   h <- dim(container_img)[1]
   w <- dim(container_img)[2]  
   
@@ -73,7 +76,8 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt){
   
   full_df <- merge(full_df, hourly_df, by='Bin') %>% #filter(Bin < 4) %>%
     mutate(Title_label = factor(Bin),
-           Label_wt = paste0(hrly_avg_wt, 'KG'))
+           Label_wt = paste0(hrly_avg_wt, 'KG'),
+           Label_visits = paste0(hrly_visits, ' Visits'))
   
   # Then use a heatmap with 3 colours for background, and percentage fills
   # Converting the fill value to a factor causes a discrete scale.
@@ -84,11 +88,13 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt){
     geom_tile() +
     # geom_text(x = 90, y = 100, aes(label = Label_wt)) +
     scale_fill_manual(values = cols) +
+    theme_bw() +
     theme(legend.position = "none",
           axis.ticks = element_blank(),
           axis.text = element_blank(),
-          axis.title = element_blank()) +
-    facet_wrap(~Title_label)
-
-  # ggplotly(feed_plot)
-}
+          axis.title = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          strip.background = element_rect(fill="#BCD3E7")) +
+    facet_wrap(~Title_label + Label_visits)
+  }
