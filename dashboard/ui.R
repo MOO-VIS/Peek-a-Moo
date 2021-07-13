@@ -90,14 +90,12 @@ bins_tab <- tabItem(
       box(
         title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
         column(4, date_widget("bin_date"),),
-        column(4, bin_wt_widget("bin_weight"),)
-      )
-    ),
-    fluidRow(
-      column(8, align='center',
-      sliderInput("obs_hr", "Hour",
-                  min = 0, max = 23, value = 12
-      ))
+        column(4, bin_wt_widget("bin_weight"),),
+        column(4, bin_selection_widget("activity_bin_selection")),
+        column(8, align='center',
+              sliderInput("obs_hr", "Hour",
+                          min = 0, max = 23, value = 12
+              )))
     ),
     fluidRow(
       default_tabBox("Feed Bin Plot", "feed_bin", width = 12, output_fun = plotOutput)
