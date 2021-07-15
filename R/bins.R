@@ -120,3 +120,19 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
     ) +
     facet_wrap( ~ Title_label + Label_visits)
 }
+
+
+parse_hunger_df <- function(df, bins){
+  df %>% 
+    pivot_longer(-date, names_to = "Bin", values_to = "Feed") %>%
+    filter(Bin %in% bins) %>%
+    mutate(Bin = forcats::as_factor(Bin)) 
+    
+}
+hunger_plot <- function(df){
+  plt <- df %>%
+    ggplot(aes(x = Bin, y = Feed, fill = Bin)) +
+    geom_col()
+
+  plt %>% ggplotly()
+}
