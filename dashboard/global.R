@@ -5,6 +5,7 @@ library(shinyWidgets)
 library(plotly)
 library(visNetwork)
 library(lubridate)
+library(png)
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -72,7 +73,8 @@ feed_drink_df <- insentec[["Feeding and drinking analysis"]]
 non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
 feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
 feed_df <- convert_date_col(insentec[["Cleaned_feeding_original_data"]])
-
+max_date <- max(feed_drink_df[["date"]])
+  
 #' Helper function for creating boxes with plot and data tab
 #'
 #' @param title The title to display for the box
@@ -136,12 +138,12 @@ date_range_widget <- function(inputId){
   )
 }
 
-cow_selection_widget <- function(inputId){
+cow_selection_widget <- function(inputId, multiple = TRUE){
   pickerInput(
     inputId = inputId,
     label = "Cows",
     choices = list(),
-    multiple = TRUE,
+    multiple = multiple,
     options = list(
       "actions-box" = TRUE,
       "none-selected-text" = "Select cows")
@@ -151,7 +153,8 @@ cow_selection_widget <- function(inputId){
 date_widget <- function(inputId){
   dateInput(
     inputId = inputId,
-    label = "Date"
+    label = "Date",
+    value = max_date
   )
 }
 
@@ -161,7 +164,7 @@ date_widget <- function(inputId){
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
-update_cow_selection <- function(date_obj, inputId, session){
+update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE){
   
   # find cows that exist in date range
   cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
@@ -174,7 +177,8 @@ update_cow_selection <- function(date_obj, inputId, session){
   updatePickerInput(
     session = session,
     inputId = inputId,
-    choices = cow_choices
+    choices = cow_choices, 
+    selected = if (select_all) cow_choices[[1]] else NULL
   )
 }
 
@@ -208,7 +212,8 @@ update_bin_selection <- function(date_obj, inputId, session){
   updatePickerInput(
     session = session,
     inputId = inputId,
-    choices = bin_choices
+    choices = bin_choices,
+    selected = bin_choices[[1]]
   )
 }
 
