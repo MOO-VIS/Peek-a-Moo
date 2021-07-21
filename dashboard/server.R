@@ -15,7 +15,9 @@ shinyServer(function(input, output, session) {
     output$warning_plot <- DT::renderDataTable({
       warning_df %>%
         filter(date == max(date)) %>%
-        t()
+        t() %>%
+        as.data.frame() %>%
+        filter(V1 != "")
     },
     colnames = c("Warning Type", "Warning"),
     options = list(
@@ -116,34 +118,23 @@ shinyServer(function(input, output, session) {
   })
   
   observe({
-    if(!is.null(input$daily_cow_selection) && !is.null(input$daily_date)){
-      
-      # Create feeding, drinking, and lying_standing dataframes
-      feeding <- insentec[["Cleaned_feeding_original_data"]]
-      drinking <- insentec[["Cleaned_drinking_original_data"]]
-      lying_standing <- hobo[["duration_for_each_bout"]]
-      
-      # Render daily behavior plot
-      df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-      output$daily_table <- format_dt_table(drop_na(df,Cow))
-      output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
-    }
-    else{
-      output$daily_plot = NULL # empty plot
-    }
+    # Create feeding, drinking, and lying_standing dataframes
+    feeding <- insentec[["Cleaned_feeding_original_data"]]
+    drinking <- insentec[["Cleaned_drinking_original_data"]]
+    lying_standing <- hobo[["duration_for_each_bout"]]
+    
+    # Render daily behavior plot
+    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_table <- format_dt_table(drop_na(df,Cow))
+    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
   })
   
   observe({
-    if(!is.null(input$relationship_cow_selection) && !is.null(input$relationship_date_range)){
-      df <- actor_reactor_analysis(make_analysis_df(insentec[["Replacement behaviour by date"]]))
-      output$bullying_table <- format_dt_table(df)
-      output$bullying_plot <- renderPlotly({
-        plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
-      })
-    }
-    else{
-      output$bullying_plot = NULL # empty plot
-    }
+    df <- actor_reactor_analysis(make_analysis_df(insentec[["Replacement behaviour by date"]]))
+    output$bullying_table <- format_dt_table(df)
+    output$bullying_plot <- renderPlotly({
+      plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+    })
   })
 
   plot_cow_date_range <- function(df, y_col, var_name){
@@ -165,27 +156,19 @@ shinyServer(function(input, output, session) {
   })
   # feed bin tab
   observe({
-    if (!is.null(input$bin_date) &&
-        !is.null(input$obs_hr) && !is.null(input$bin_weight) &&
-        !is.null(input$activity_bin_selection)) {
-
-      bin_df <- select_feed_bin_data(feed_df, 
-                                     feed_date = input$bin_date, 
-                                     bin_selection = input$activity_bin_selection)
-      # plot
-      output$feed_bin_plot <- renderPlot({
-        plot_feed_bin_data(
-          hourly_df = bin_df,
-          hr = input$obs_hr,
-          max_wt = input$bin_weight
-        )
-      })
-      # CSV output
-      output$feed_bin_table <- format_dt_table(bin_df)
-    }
-    else{
-      output$feed_bin_plot = NULL # empty plot
-    }
+    bin_df <- select_feed_bin_data(feed_df, 
+                                   feed_date = input$bin_date, 
+                                   bin_selection = input$activity_bin_selection)
+    # plot
+    output$feed_bin_plot <- renderPlot({
+      plot_feed_bin_data(
+        hourly_df = bin_df,
+        hr = input$obs_hr,
+        max_wt = input$bin_weight
+      )
+    })
+    # CSV output
+    output$feed_bin_table <- format_dt_table(bin_df)
   })
   
   observe({
