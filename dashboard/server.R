@@ -35,25 +35,7 @@ shinyServer(function(input, output, session) {
       output$dropdown=renderMenu({get_warning_dropdown(warning_df)})
     })
   })
-  
-  #' Generate the plot and data tabs for time range plots
-  #'
-  #' @param df The dataframe containing data to be displayed
-  #' @param y_col The column of interest
-  #' @param var_name The name of the UI output variable
-  plot_cow_date_range <- function(df, y_col, var_name){
 
-    # filter table
-    df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
-
-    # generate table
-    output[[paste0(var_name, "_table")]] <- format_dt_table(df)
-
-    # generate plot
-    output[[paste0(var_name, "_plot")]] <- renderPlotly({
-      cow_date_range_plot(df, {{y_col}}, input$show_average)
-    })
-  }
 
   # update cow selections based on selected dates
   observe({
@@ -68,6 +50,8 @@ shinyServer(function(input, output, session) {
 
   # render network
   observe({
+    req(input$relationship_date_range)
+    
     raw_graph_data <- hobo[["paired lying total time"]]
     combo_df <- combine_data(raw_graph_data, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
     g <- .make_tidygraph(raw_graph_data, combo_df)
@@ -79,6 +63,26 @@ shinyServer(function(input, output, session) {
 
   # render activity plots
   observe({
+    
+    #' Generate the plot and data tabs for time range plots
+    #'
+    #' @param df The dataframe containing data to be displayed
+    #' @param y_col The column of interest
+    #' @param var_name The name of the UI output variable
+    plot_cow_date_range <- function(df, y_col, var_name){
+      
+      # filter table
+      df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
+      
+      # generate table
+      output[[paste0(var_name, "_table")]] <- format_dt_table(df)
+      
+      # generate plot
+      output[[paste0(var_name, "_plot")]] <- renderPlotly({
+        cow_date_range_plot(df, {{y_col}}, input$show_average)
+      })
+    }
+    
     plot_cow_date_range(
       feed_drink_df,
       `Feeding_Duration(s)`,
@@ -118,6 +122,9 @@ shinyServer(function(input, output, session) {
   })
   
   observe({
+    req(input$daily_date)
+    req(input$daily_cow_selection)
+    
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- insentec[["Cleaned_feeding_original_data"]]
     drinking <- insentec[["Cleaned_drinking_original_data"]]
@@ -130,6 +137,9 @@ shinyServer(function(input, output, session) {
   })
   
   observe({
+    req(input$relationship_cow_selection)
+    req(input$relationship_date_range)
+    
     df <- actor_reactor_analysis(make_analysis_df(insentec[["Replacement behaviour by date"]]))
     output$bullying_table <- format_dt_table(df)
     output$bullying_plot <- renderPlotly({
@@ -137,25 +147,18 @@ shinyServer(function(input, output, session) {
     })
   })
 
-  plot_cow_date_range <- function(df, y_col, var_name){
-    
-    # filter table
-    df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
-    
-    # generate table
-    output[[paste0(var_name, "_table")]] <- format_dt_table(df)
-    
-    # generate plot
-    output[[paste0(var_name, "_plot")]] <- renderPlotly({
-      cow_date_range_plot(df, {{y_col}}, input$show_average)
-    })
-  }
+
   # Feed Bin selection
   observe({
     update_bin_selection(input$bin_date, "activity_bin_selection", session)
   })
+  
+  
   # feed bin tab
   observe({
+    req(input$bin_date)
+    req(input$activity_bin_selection)
+    
     bin_df <- select_feed_bin_data(feed_df, 
                                    feed_date = input$bin_date, 
                                    bin_selection = input$activity_bin_selection)
@@ -172,6 +175,9 @@ shinyServer(function(input, output, session) {
   })
   
   observe({
+    req(input$bin_date)
+    req(input$activity_bin_selection)
+    
     df <- filter_dates(insentec[["bin_empty_total_time_summary"]], date, input$bin_date) %>%
       parse_hunger_df(input$activity_bin_selection)
     
