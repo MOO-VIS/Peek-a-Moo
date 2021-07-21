@@ -97,8 +97,13 @@ bins_tab <- tabItem(
         fluidRow(column(12, align='center',
               sliderInput("obs_hr", "Hour",
                           min = 0, max = 23, value = 12
-              )))
+              )
+            )
+          )
         )
+    ),
+    fluidRow(
+      default_tabBox("Hunger Plot", "hunger", width = 12)
     ),
     fluidRow(
       default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)

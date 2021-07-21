@@ -187,4 +187,15 @@ shinyServer(function(input, output, session) {
       output$feed_bin_plot = NULL # empty plot
     }
   })
+  
+  observe({
+    df <- filter_dates(insentec[["bin_empty_total_time_summary"]], date, input$bin_date) %>%
+      parse_hunger_df(input$activity_bin_selection)
+    
+    output$hunger_table <- format_dt_table(df)
+    output$hunger_plot <- renderPlotly({
+      hunger_plot(df)
+    })
+    
+  })
 })
