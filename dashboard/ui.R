@@ -77,8 +77,7 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title="Actor/Reactor Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(6, cow_selection_widget("relationship_cow_selection", multiple = FALSE)),
-      column(6, h5(br(), "Please select a cow to view the plot below"))
+      column(4, cow_selection_widget("relationship_cow_selection", multiple = FALSE))
     ),
     default_tabBox("Actor/Reactor", "bullying", width = 12)
   )
@@ -91,19 +90,21 @@ bins_tab <- tabItem(
         title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
         fluidRow(
           column(4, date_widget("bin_date"),),
-          column(4, bin_wt_widget("bin_weight"),),
-          column(4, bin_selection_widget("activity_bin_selection")),
-        ),
-        fluidRow(column(12, align='center',
-              sliderInput("obs_hr", "Hour",
-                          min = 0, max = 23, value = 12
-              )
-            )
-          )
+          column(8, bin_selection_widget("activity_bin_selection")),
         )
+      )
     ),
     fluidRow(
       default_tabBox("Hunger Plot", "hunger", width = 12)
+    ),
+    fluidRow(
+      box(
+        title="Hourly Feed Bin Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+        fluidRow(
+          column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
+          column(4, bin_wt_widget("bin_weight"))
+        )
+      )
     ),
     fluidRow(
       default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
