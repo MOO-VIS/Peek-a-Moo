@@ -116,7 +116,7 @@ daily_schedu_moo_plot <- function(df) {
           ifelse(i == 'drinking' |
                    i == 'feeding', "Intake = %{text} kg", ""),
           "<extra></extra>"
-        )
+        ), template="simple_white"
       )
     fig <- layout(fig,yaxis=list(title=""))
   }

@@ -13,7 +13,7 @@ library(tidygraph)
 #' @export
 #'
 #' @examples
-#' x <- HOBO$`paired lying total time`
+#' x <- HOBO$`synchronized_lying_total_time`
 #' g <- make_tidygraph(x)
 #' plot_network(g)
 plot_network <- function(g, conditions = (from_friendship_rank <= 1 | to_friendship_rank <= 1 | paired_lying_time > quantile(paired_lying_time, 0.95)),
@@ -107,7 +107,7 @@ combine_data <- function(x, from_date = NULL, to_date = NULL){
 #' @inherit .make_tidygraph
 #' @export
 #' @examples
-#' x <- HOBO$`paired lying total time`
+#' x <- HOBO$`synchronized_lying_total_time`
 #' (g <- make_tidygraph(x))
 make_tidygraph <- memoise::memoise(.make_tidygraph)
 

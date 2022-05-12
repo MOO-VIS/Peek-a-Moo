@@ -28,19 +28,18 @@ bin_warnings <- function(df, cuttoff){
 
 #' Combine additional warnings with original warnings
 #'
-#' @param insentec Dataframe containing all insentec tables
 #' @param food_cuttoff Cuttoff for feed to trigger warning
 #' @param water_cuttoff Cuttoff for water to trigger warning
 #'
 #' @return named list containing error names and messages
-combine_warnings <- function(insentec, food_cuttoff = 0, water_cuttoff = 0, bin_cuttoff = 0){
+combine_warnings <- function(food_cuttoff = 0, water_cuttoff = 0, bin_cuttoff = 0){
   
-  food_warnings <- intake_warnings(insentec[["Cleaned_feeding_original_data"]], food_cuttoff) 
-  drink_warnings <- intake_warnings(insentec[["Cleaned_drinking_original_data"]], water_cuttoff) 
-  bin_warnings <- bin_warnings(insentec[["Cleaned_drinking_original_data"]], bin_cuttoff)
+  food_warnings <- intake_warnings(Cleaned_feeding_original_data, food_cuttoff) 
+  drink_warnings <- intake_warnings(Cleaned_drinking_original_data, water_cuttoff) 
+  bin_warnings <- bin_warnings(Cleaned_drinking_original_data, bin_cuttoff)
   
   # get the latest warnings
-  all_warnings <- insentec[["Insentec warning"]] %>%
+  all_warnings <- Insentec_warning %>%
     mutate(date = as.Date(date)) %>%
     arrange(desc(date))
   

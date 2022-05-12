@@ -43,7 +43,7 @@ activities_tab <- tabItem(
   ),
   fluidRow(
     default_tabBox("Non-nutritive Visits", "non_nutritive"),
-    default_tabBox("Average # Feeding Buddies", "feeding_together")
+    default_tabBox("Feed Intake", "feed_intake")
   )
 )
 
@@ -67,19 +67,15 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      # column(2, aggregation_widget("relationship_agg_type")),
-      column(4, date_range_widget("relationship_date_range"))
+      column(4, date_range_widget("relationship_date_range")),
+      column(4, network_selection_widget("relationship_network_selection", multiple = FALSE))
     )
   ),
   fluidRow(
     default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
   ),
   fluidRow(
-    box(
-      title="Actor/Reactor Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(4, cow_selection_widget("relationship_cow_selection", multiple = FALSE))
-    ),
-    default_tabBox("Actor/Reactor", "bullying", width = 12)
+    default_tabBox("THI", "THI", width = 12)
   )
 )
 

@@ -39,7 +39,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
   # https://stackoverflow.com/questions/48522350/create-an-image-filled-chart-in-r-using-ggplot
   # Load png file from imgur as binary
   container_img <-
-    readPNG(here::here("dashboard/www/container.png"))
+    readPNG(here::here("www/container.png"))
   h <- dim(container_img)[1]
   w <- dim(container_img)[2]
   
@@ -108,7 +108,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
   )) +
     geom_tile() +
     scale_fill_manual(values = cols) +
-    theme_bw() +
+    theme_classic() +
     theme(
       legend.position = "none",
       axis.ticks = element_blank(),
@@ -126,16 +126,17 @@ parse_hunger_df <- function(df, bins){
   df %>% 
     pivot_longer(-date, names_to = "Bin", values_to = "Duration") %>%
     filter(Bin %in% bins) %>%
-    mutate(Bin = forcats::as_factor(Bin)) 
-    
+    mutate(Bin = forcats::as_factor(Bin))
 }
 
 hunger_plot <- function(df){
   plt <- df %>%
-    ggplot(aes(x = Bin, y = Duration, fill = Bin)) +
+    ggplot(aes(x = Bin, y = Duration, fill = "red")) +
     geom_col() +
     ylab("Empty Duration") + 
-    geom_hline(yintercept = mean(df$Duration), linetype='dotted', col = 'red')
-
+    geom_hline(yintercept = mean(df$Duration), linetype='dotted', col = "gray", alpha = 0.5) +
+    theme_classic() +
+    theme(legend.position="none")
+  
   plt %>% ggplotly()
 }
