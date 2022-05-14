@@ -4,7 +4,6 @@ shinyServer(function(input, output, session) {
   # Warning section
   observe({
     warning_df <- combine_warnings(
-      insentec, 
       food_cuttoff = input$food_intake, 
       water_cuttoff = input$water_intake,
       bin_cuttoff = input$bin_volume
@@ -23,7 +22,7 @@ shinyServer(function(input, output, session) {
     options = list(
       pageLength = 50,
       dom = "ft"
-      )
+    )
     )
     
     # Warning notifications menu
@@ -35,24 +34,29 @@ shinyServer(function(input, output, session) {
       output$dropdown=renderMenu({get_warning_dropdown(warning_df)})
     })
   })
-
-
+  
+  
   # update cow selections based on selected dates
   observe({
     update_cow_selection(input$activity_date_range, "activity_cow_selection", session)
   })
   observe({
-    update_cow_selection(input$daily_date, "daily_cow_selection", session, select_all = TRUE)
+    update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
   observe({
     update_cow_selection(input$relationship_date_range, "relationship_cow_selection", session)
   })
-
+  
+  observe({
+    update_network_selection(input$relationship_network_selection, "relationship_network_selection", session)
+  })
+  
   # render network
   observe({
     req(input$relationship_date_range)
+    req(input$relationship_network_selection)
     
-    raw_graph_data <- hobo[["paired lying total time"]]
+    raw_graph_data <- synchronized_lying_total_time
     combo_df <- combine_data(raw_graph_data, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
     g <- .make_tidygraph(raw_graph_data, combo_df)
     output$network_plot <- visNetwork::renderVisNetwork({
@@ -60,7 +64,7 @@ shinyServer(function(input, output, session) {
     })
     output$network_table <- format_dt_table(combo_df)
   })
-
+  
   # render activity plots
   observe({
     
@@ -94,7 +98,7 @@ shinyServer(function(input, output, session) {
       `Drinking_Duration(s)`,
       "drink"
     ) 
-  
+    
     plot_cow_date_range(
       standing_bout_df,
       `standing_time(seconds)`,
@@ -114,11 +118,11 @@ shinyServer(function(input, output, session) {
     )
     
     plot_cow_date_range(
-      feeding_together_df,
-      `average_num_other_cows_feeding_together`,
-      "feeding_together"
+      feeding_intake_df,
+      `Feeding_Intake(kg)`,
+      "feed_intake"
     )
-
+    
   })
   
   observe({
@@ -126,9 +130,9 @@ shinyServer(function(input, output, session) {
     req(input$daily_cow_selection)
     
     # Create feeding, drinking, and lying_standing dataframes
-    feeding <- insentec[["Cleaned_feeding_original_data"]]
-    drinking <- insentec[["Cleaned_drinking_original_data"]]
-    lying_standing <- hobo[["duration_for_each_bout"]]
+    feeding <- Cleaned_feeding_original_data
+    drinking <- Cleaned_drinking_original_data
+    lying_standing <- duration_for_each_bout
     
     # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
@@ -140,14 +144,24 @@ shinyServer(function(input, output, session) {
     req(input$relationship_cow_selection)
     req(input$relationship_date_range)
     
-    df <- actor_reactor_analysis(make_analysis_df(insentec[["Replacement behaviour by date"]]))
+    df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
     output$bullying_table <- format_dt_table(df)
     output$bullying_plot <- renderPlotly({
       plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
     })
   })
-
-
+  
+  observe({
+    req(input$relationship_date_range)
+    
+    df <- THI_analysis(THI)
+    output$THI_table <- format_dt_table(df)
+    output$THI_plot <- renderPlotly({
+      plot_THI_analysis(df, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+    })
+  })
+  
+  
   # Feed Bin selection
   observe({
     update_bin_selection(input$bin_date, "activity_bin_selection", session)
@@ -178,7 +192,7 @@ shinyServer(function(input, output, session) {
     req(input$bin_date)
     req(input$activity_bin_selection)
     
-    df <- filter_dates(insentec[["bin_empty_total_time_summary"]], date, input$bin_date) %>%
+    df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
       parse_hunger_df(input$activity_bin_selection)
     
     output$hunger_table <- format_dt_table(df)

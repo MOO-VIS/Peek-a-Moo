@@ -1,3 +1,4 @@
+library(Rcpp)
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
@@ -6,6 +7,8 @@ library(plotly)
 library(visNetwork)
 library(lubridate)
 library(png)
+library(grid)
+
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -58,23 +61,33 @@ source(here::here("R/bully_analysis.R"))
 source(here::here("R/bins.R"))
 
 # load data if not already in memory
-if(!exists("hobo") || !exists("feed_drink_df")){
-    load(here::here("data/full_10_month_analysis_result_summary_only_dashboard.Rda"))
+if(!exists("THI")){
+    load(here::here("data/Wali_trial_summarized_THI.Rda"))
+    load(here::here("data/Feeding_and_drinking_analysis.Rda"))
+    load(here::here("data/Insentec_warning.Rda"))
+    load(here::here("data/duration_for_each_bout.Rda"))
+    load(here::here("data/lying_standing_summary_by_date.Rda"))
+    load(here::here("data/synchronized_lying_total_time.Rda"))
+    load(here::here("data/Cleaned_drinking_original_data.Rda"))
+    load(here::here("data/Cleaned_feeding_original_data.Rda"))
+    load(here::here("data/non_nutritive_visits.Rda"))
+    load(here::here("data/Replacement_behaviour_by_date.Rda"))
+    load(here::here("data/bin_empty_total_time_summary.Rda"))
+    load(here::here("data/average_number_of_feeding_buddies.Rda"))
     
-    hobo <- dashboard_full_analysis[["HOBO"]]
-    insentec <- dashboard_full_analysis[["Insentec"]]
-    
-    rm(dashboard_full_analysis)
+    THI <- master_summary
+
+    rm(master_summary)
 }
 
 # create dataframes for plots and tables
-standing_bout_df <- hobo[["lying_standing_summary_by_date"]]
-feed_drink_df <- insentec[["Feeding and drinking analysis"]]
-non_nutritive_df <- convert_date_col(insentec[["non_nutritive_visits"]])
-feeding_together_df <- convert_date_col(insentec[["average number of feeding buddies"]])
-feed_df <- convert_date_col(insentec[["Cleaned_feeding_original_data"]])
+standing_bout_df <- lying_standing_summary_by_date
+feed_drink_df <- Feeding_and_drinking_analysis
+non_nutritive_df <- convert_date_col(non_nutritive_visits)
+feeding_intake_df <- Feeding_and_drinking_analysis
+feed_df <- convert_date_col(Cleaned_feeding_original_data)
 max_date <- max(feed_drink_df[["date"]])
-  
+
 #' Helper function for creating boxes with plot and data tab
 #'
 #' @param title The title to display for the box
@@ -121,7 +134,7 @@ aggregation_widget <- function(inputId){
   radioButtons(
     inputId = inputId,
     label = "Aggregate",
-    selected = "month", 
+    selected = "day", 
     choiceNames = c("By Day", "By Month"),
     choiceValues = c("day", "month"),
   )
@@ -131,10 +144,10 @@ date_range_widget <- function(inputId){
   dateRangeInput(
     inputId = inputId,
     label = "Date Range",
-    start = lubridate::today() - lubridate::years(1),
-    end = NULL,
-    min = NULL,
-    max = NULL
+    start = lubridate::as_date(18628),
+    end = lubridate::as_date(18758),
+    min = lubridate::as_date(18458),
+    max = lubridate::as_date(18766)
   )
 }
 
@@ -143,6 +156,7 @@ cow_selection_widget <- function(inputId, multiple = TRUE){
     inputId = inputId,
     label = "Cows",
     choices = list(),
+    selected = NULL,
     multiple = multiple,
     options = list(
       "actions-box" = TRUE,
@@ -150,11 +164,25 @@ cow_selection_widget <- function(inputId, multiple = TRUE){
   )
 }
 
+network_selection_widget <- function(inputId, multiple = FALSE){
+  pickerInput(
+    inputId = inputId,
+    label = "Network",
+    choices = list(),
+    selected = NULL,
+    multiple = multiple,
+    options = list(
+      "actions-box" = TRUE,
+      "none-selected-text" = "Select network")
+  )
+}
+
 date_widget <- function(inputId){
   dateInput(
     inputId = inputId,
     label = "Date",
-    value = max_date
+    value = lubridate::as_date(18628),
+    max = lubridate::as_date(18766)
   )
 }
 
@@ -178,7 +206,49 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
     session = session,
     inputId = inputId,
     choices = cow_choices, 
-    selected = if (select_all) cow_choices[[1]] else NULL
+    selected = NULL
+  )
+}
+
+#' #' Helper function for updating THI selection picker input widgets
+#' #'
+#' #' @param date_obj The date or date range to filter by
+#' #' @param inputId The id of the picker input widget to update
+#' #' @param session The current server session
+#' update_THI_selection <- function(date_obj, inputId, session, select_all = FALSE){
+#'   
+#'   # find cows that exist in date range
+#'   cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
+#'     select(Cow) %>%
+#'     unique() %>%
+#'     arrange(desc(Cow))
+#'   colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
+#'   
+#'   # update widget
+#'   updatePickerInput(
+#'     session = session,
+#'     inputId = inputId,
+#'     choices = cow_choices, 
+#'     selected = NULL
+#'   )
+#' }
+
+#' Helper function for updating network selection picker input widgets
+#'
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+update_network_selection <- function(date_obj, inputId, session, select_all = FALSE){
+  
+  network <-c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement")
+  network_choices <- as.data.frame(network)
+  colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
+  
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = network_choices, 
+    selected = NULL
   )
 }
 
