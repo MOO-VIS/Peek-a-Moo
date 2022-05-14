@@ -59,6 +59,7 @@ source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
 source(here::here("R/bully_analysis.R"))
 source(here::here("R/bins.R"))
+source(here::here("R/THI_analysis.R"))
 
 # load data if not already in memory
 if(!exists("THI")){
