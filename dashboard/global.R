@@ -4,7 +4,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(plotly)
-library(visNetwork)
+library(igraph)
 library(lubridate)
 library(png)
 library(grid)
@@ -40,6 +40,12 @@ filter_dates <- function(df, col, date_obj){
   }
 }
 
+filter_cd <- function(df, col, cd_range){
+    df %>%
+      filter({{col}} >= cd_range[[1]]) %>%
+      filter({{col}} <= cd_range[[2]])
+}
+
 #' Helper function to filter by user input cow selection
 #'
 #' @param df The dataframe to filter
@@ -72,7 +78,7 @@ if(!exists("THI")){
     load(here::here("data/Cleaned_drinking_original_data.Rda"))
     load(here::here("data/Cleaned_feeding_original_data.Rda"))
     load(here::here("data/non_nutritive_visits.Rda"))
-    load(here::here("data/Replacement_behaviour_by_date.Rda"))
+    load(here::here("data/feed_replacement_10mon_CD.Rda"))
     load(here::here("data/bin_empty_total_time_summary.Rda"))
     load(here::here("data/average_number_of_feeding_buddies.Rda"))
     
@@ -88,6 +94,7 @@ non_nutritive_df <- convert_date_col(non_nutritive_visits)
 feeding_intake_df <- Feeding_and_drinking_analysis
 feed_df <- convert_date_col(Cleaned_feeding_original_data)
 max_date <- max(feed_drink_df[["date"]])
+replacement_df <- master_feed_replacement_all
 
 #' Helper function for creating boxes with plot and data tab
 #'
@@ -145,10 +152,10 @@ date_range_widget <- function(inputId){
   dateRangeInput(
     inputId = inputId,
     label = "Date Range",
-    start = lubridate::as_date(18628),
-    end = lubridate::as_date(18758),
-    min = lubridate::as_date(18458),
-    max = lubridate::as_date(18766)
+    start = lubridate::as_date('2021-5-1'),
+    end = lubridate::as_date('2021-5-4'),
+    min = lubridate::as_date('2020-7-13'),
+    max = lubridate::as_date('2021-6-12')
   )
 }
 
@@ -182,8 +189,8 @@ date_widget <- function(inputId){
   dateInput(
     inputId = inputId,
     label = "Date",
-    value = lubridate::as_date(18628),
-    max = lubridate::as_date(18766)
+    value = lubridate::as_date('2021-5-1'),
+    max = lubridate::as_date('2021-6-12')
   )
 }
 
@@ -209,6 +216,30 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
     choices = cow_choices, 
     selected = NULL
   )
+}
+
+update_cow_selection_displacement <- function(relationship_type, date_obj, inputId, session){
+  if (relationship_type != 'Displacement'){
+    update_cow_selection(date_obj, inputId, session)
+  }
+  else{
+    # find cows that exist in date range
+    cow_choices <- filter_dates(replacement_df, date, date_obj) %>%
+      # filter_cd(occupied_bins_with_feed_percent, cd_range) %>%
+      select(Actor_cow) %>%
+      unique() %>%
+      arrange(desc(Actor_cow))
+    colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date and cd range")
+    
+    # update widget
+    updatePickerInput(
+      session = session,
+      inputId = inputId,
+      choices = cow_choices, 
+      selected = NULL
+    )
+  }
+  
 }
 
 #' #' Helper function for updating THI selection picker input widgets

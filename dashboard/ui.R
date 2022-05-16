@@ -68,11 +68,13 @@ relationships_tab <- tabItem(
     box(
       title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_range_widget("relationship_date_range")),
-      column(4, network_selection_widget("relationship_network_selection", multiple = FALSE))
+      column(4, network_selection_widget("relationship_network_selection", multiple = FALSE)),
+      column(4, cow_selection_widget("relationship_cow_selection", multiple = FALSE)),
+      column(8, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2,0.5)))
     )
   ),
   fluidRow(
-    default_tabBox("Social Network", "network", width = 12, output_fun = visNetworkOutput)
+    default_tabBox("Social Network", "network", width = 12, output_fun = plotOutput)
   ),
   fluidRow(
     default_tabBox("THI", "THI", width = 12)

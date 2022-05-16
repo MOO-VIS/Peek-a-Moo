@@ -4,13 +4,13 @@ shinyServer(function(input, output, session) {
   # Warning section
   observe({
     warning_df <- combine_warnings(
-      food_cuttoff = input$food_intake, 
+      food_cuttoff = input$food_intake,
       water_cuttoff = input$water_intake,
       bin_cuttoff = input$bin_volume
     )
-    
+
     output$warning_table <- format_dt_table(warning_df, page_length = 20)
-    
+
     output$warning_plot <- DT::renderDataTable({
       warning_df %>%
         filter(date == max(date)) %>%
@@ -24,7 +24,7 @@ shinyServer(function(input, output, session) {
       dom = "ft"
     )
     )
-    
+
     # Warning notifications menu
     output$notifications <- renderMenu({
       get_warning_dropdown(warning_df)
@@ -43,26 +43,73 @@ shinyServer(function(input, output, session) {
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
-  observe({
-    update_cow_selection(input$relationship_date_range, "relationship_cow_selection", session)
-  })
-  
-  observe({
+ observe({
     update_network_selection(input$relationship_network_selection, "relationship_network_selection", session)
+  })
+ observe({
+   req(input$relationship_date_range)
+   req(input$relationship_network_selection)
+   # req(input$relationship_cow_selection)
+   # req(input$cd_range)
+    update_cow_selection_displacement(input$relationship_network_selection, 
+                                      input$relationship_date_range, 
+                                      "relationship_cow_selection", 
+                                      session)
   })
   
   # render network
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
+    # req(input$relationship_cow_selection)
+    # req(input$cd_range)
     
-    raw_graph_data <- synchronized_lying_total_time
-    combo_df <- combine_data(raw_graph_data, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
-    g <- .make_tidygraph(raw_graph_data, combo_df)
-    output$network_plot <- visNetwork::renderVisNetwork({
-      plot_network(g)
-    })
-    output$network_table <- format_dt_table(combo_df)
+    if (input$relationship_network_selection != 'Displacement'){
+      if (input$relationship_network_selection == 'Lying Synchronicity'){
+        raw_graph_data <- synchronized_lying_total_time
+      }
+      
+      else if (input$relationship_network_selection == 'Feeding Sychronicity'){
+        raw_graph_data <- Feeding_drinking_at_the_same_time_total_time
+      }
+      
+      else{
+        raw_graph_data <- Feeding_drinking_neighbour_total_time
+      }
+      
+      combo_df <- combine_data(raw_graph_data, 
+                               input$relationship_date_range[[1]], 
+                               input$relationship_date_range[[2]])
+      g <- .make_tidygraph(raw_graph_data, combo_df)
+      output$network_plot <- renderPlot({plot_network(g, input$relationship_cow_selection)})
+      output$network_table <- format_dt_table(combo_df %>% select(-edge_width))}
+    
+    else{
+      raw_graph_data <- master_feed_replacement_all
+      combo_df <- combine_replace_data(raw_graph_data, 
+                                       input$relationship_date_range[[1]], 
+                                       input$relationship_date_range[[2]],
+                                       cow_id = input$relationship_cow_selection, 
+                                       CD_min = input$cd_range[[1]], 
+                                       CD_max = input$cd_range[[2]])
+      
+        g <- .make_tidygraph(raw_graph_data, combo_df, directed = TRUE)
+        g$layout <- layout_as_star(g, center = V(g)[input$relationship_cow_selection])
+        E(g)$color <- rep('orange', ecount(g))
+        E(g)$color[E(g)$type == 'reactor'] <- 'steelblue'
+        output$network_plot <- renderPlot({plot(g,
+                                                vertex.size = 30,
+                                                vertex.size2 = 20,
+                                                vertex.shape = 'rectangle',
+                                                vertex.color = 'lightsteelblue',
+                                                vertex.frame.color = 'white',
+                                                vertex.label.cex = 1,
+                                                edge.arrow.size=0.5,
+                                                edge.curved=0.2,
+                                                edge.color = E(g)$color,
+                                                edge.width=E(g)$weight)})
+        output$network_table <- format_dt_table(combo_df) 
+      }
   })
   
   # render activity plots
@@ -143,6 +190,7 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$relationship_cow_selection)
     req(input$relationship_date_range)
+    
     
     df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
     output$bullying_table <- format_dt_table(df)
