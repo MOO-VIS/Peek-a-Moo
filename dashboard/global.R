@@ -81,6 +81,8 @@ if(!exists("THI")){
     load(here::here("data/feed_replacement_10mon_CD.Rda"))
     load(here::here("data/bin_empty_total_time_summary.Rda"))
     load(here::here("data/average_number_of_feeding_buddies.Rda"))
+    load(here::here("data/Feeding_drinking_at_the_same_time_total_time.Rda"))
+    load(here::here("data/Replacement_behaviour_by_date.Rda"))
     
     THI <- master_summary
 
