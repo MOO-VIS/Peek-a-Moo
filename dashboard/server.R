@@ -92,12 +92,12 @@ shinyServer(function(input, output, session) {
       #   }
       # )
       
-      validate(
-        need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
-             "No data for the first selected date, please select a different date."),
-        need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
-             "No data for the second selected date, please select a different date.")
-      )
+      # validate(
+      #   need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+      #        "No data for the first selected date, please select a different date."),
+      #   need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
+      #        "No data for the second selected date, please select a different date.")
+      # )
       
       combo_df <- combine_replace_data(raw_graph_data, 
                                        input$relationship_date_range[[1]], 
