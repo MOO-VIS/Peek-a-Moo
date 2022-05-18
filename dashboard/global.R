@@ -87,7 +87,7 @@ if (!exists("THI")) {
   THI <- master_summary
 
   rm(master_summary)
-
+}
 # create dataframes for plots and tables
 standing_bout_df <- lying_standing_summary_by_date
 feed_drink_df <- Feeding_and_drinking_analysis
