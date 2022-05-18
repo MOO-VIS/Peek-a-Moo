@@ -69,8 +69,6 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-    # req(input$relationship_cow_selection)
-    # req(input$cd_range)
     
     threshold_id <- input$relationship_threshold_selection
     threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75))

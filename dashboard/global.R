@@ -67,6 +67,7 @@ source(here::here("R/bins.R"))
 source(here::here("R/THI_analysis.R"))
 
 # load data if not already in memory
+
 if (!exists("THI")) {
   load(here::here("data/Wali_trial_summarized_THI.Rda"))
   load(here::here("data/Feeding_and_drinking_analysis.Rda"))
@@ -87,7 +88,6 @@ if (!exists("THI")) {
   THI <- master_summary
 
   rm(master_summary)
-}
 
 # create dataframes for plots and tables
 standing_bout_df <- lying_standing_summary_by_date
@@ -258,29 +258,6 @@ update_cow_selection_displacement <- function(relationship_type, date_obj, input
     )
   }
 }
-
-#' #' Helper function for updating THI selection picker input widgets
-#' #'
-#' #' @param date_obj The date or date range to filter by
-#' #' @param inputId The id of the picker input widget to update
-#' #' @param session The current server session
-#' update_THI_selection <- function(date_obj, inputId, session, select_all = FALSE){
-#'
-#'   # find cows that exist in date range
-#'   cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
-#'     select(Cow) %>%
-#'     unique() %>%
-#'     arrange(desc(Cow))
-#'   colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
-#'
-#'   # update widget
-#'   updatePickerInput(
-#'     session = session,
-#'     inputId = inputId,
-#'     choices = cow_choices,
-#'     selected = NULL
-#'   )
-#' }
 
 #' Helper function for updating network selection picker input widgets
 #'
