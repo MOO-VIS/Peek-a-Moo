@@ -115,7 +115,11 @@ shinyServer(function(input, output, session) {
       if(input$relationship_date_range[[1]] %!in% unique(master_feed_replacement_all$date) && input$relationship_date_range[[2]] %!in% unique(master_feed_replacement_all$date)){
         output$network_plot <- visNetwork::renderVisNetwork({validate(
           need(input$relationship_date_range[[1]] %in% unique(master_feed_replacement_all$date),
-               "There is no data for the selected date, please select a different date."),
+               paste0("There is no data for the selected date range ",
+                      input$relationship_date_range[[1]],
+                      " to ",
+                      input$relationship_date_range[[2]],
+                      ". Please select a different date range.")),
         )})
       }
       
