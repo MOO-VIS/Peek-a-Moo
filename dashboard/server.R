@@ -109,6 +109,20 @@ shinyServer(function(input, output, session) {
     } else {
       # Plot Displacement network
       raw_graph_data <- master_feed_replacement_all
+      
+      # validate(
+      #   if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
+      #   need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
+      #        paste0("No data for ", relationship_date_range[[1]], " please select a different date."))
+      #   }
+      # )
+
+      # validate(
+      #   need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+      #        "No data for the first selected date, please select a different date."),
+      #   need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
+      #        "No data for the second selected date, please select a different date.")
+      # )
 
       if (input$relationship_network_selection == "Displacement Star*") {
         cow_id <- input$relationship_cow_selection
