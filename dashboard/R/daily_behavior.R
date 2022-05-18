@@ -35,7 +35,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
     mutate(event_id = row_number()) %>%
     # Trim events starting before the beginning of the day of interest or after the end of the day of interest
     mutate(Start = case_when(
-      floor_date(Start, 'day') < as.POSIXct(date, tz = 'America/Los_Angeles') ~
+      lubridate::floor_date(Start, 'day') < as.POSIXct(date, tz = 'America/Los_Angeles') ~
         as.POSIXct(date, tz = 'America/Los_Angeles'),
       TRUE ~ Start
     )) %>%
@@ -44,7 +44,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
         as.POSIXct(paste0(date, ' 23:59:59'), tz = 'America/Los_Angeles'),
       TRUE ~ End
     )) %>%
-    pivot_longer(cols = Start:End,
+    tidyr::pivot_longer(cols = Start:End,
                  names_to = 'StartEnd',
                  values_to = 'Time')
   

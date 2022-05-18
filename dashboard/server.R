@@ -1,3 +1,4 @@
+
 # Set up shiny server
 shinyServer(function(input, output, session) {
 
@@ -57,6 +58,7 @@ shinyServer(function(input, output, session) {
     req(input$relationship_network_selection)
     # req(input$relationship_cow_selection)
     # req(input$cd_range)
+    
     update_cow_selection_displacement(
       input$relationship_network_selection,
       input$relationship_date_range,
@@ -70,20 +72,25 @@ shinyServer(function(input, output, session) {
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
     
+    # make sure end date later than start date
+    validate(
+      need(input$relationship_date_range[[2]] > input$relationship_date_range[[1]], "end date is earlier than start date"
+      )
+    )
+    
     threshold_id <- input$relationship_threshold_selection
     threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75))
     rownames(threshold_df) <- c("5%", "10%", "25%")
     threshold_selected <- threshold_df[threshold_id, ]
-
+    
     if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
       if (input$relationship_network_selection == "Lying Synchronicity") {
-        raw_graph_data <- synchronized_lying_total_time
+        raw_graph_data <- synchronized_lying_total_time_df
       } else if (input$relationship_network_selection == "Feeding Sychronicity") {
-        raw_graph_data <- Feeding_drinking_at_the_same_time_total_time
+        raw_graph_data <- Feeding_drinking_at_the_same_time_total_time_df
       } else {
-        raw_graph_data <- Feeding_drinking_neighbour_total_time
+        raw_graph_data <- Feeding_drinking_neighbour_total_time_df
       }
-
       edges <- combine_edges(
         raw_graph_data,
         input$relationship_date_range[[1]],
@@ -92,45 +99,51 @@ shinyServer(function(input, output, session) {
       )
       g <- .make_tidygraph(raw_graph_data, edges)
       deg <- degree(g)
-      
       nodes <- combine_nodes(edges, deg)
-      
       if (mean(edges$width > 2)) {
         edges$width <- edges$width / 2
       }
-      
       output$network_plot <- visNetwork::renderVisNetwork({
+        # make sure end date later than start date
+        validate(
+          need(input$relationship_date_range[[2]] > input$relationship_date_range[[1]], "end date is earlier than start date"
+          )
+        )
         plot_network(nodes, edges)
       })
-      
       output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
     } else {
       # Plot Displacement network
-      raw_graph_data <- master_feed_replacement_all
+      raw_graph_data <- replacement_df
+      # make sure end date later than start date
+      validate(
+        need(input$relationship_date_range[[2]] > input$relationship_date_range[[1]], "end date is earlier than start date"
+        )
+      )
       
-      # validate(
-      #   if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
-      #   need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
-      #        paste0("No data for ", relationship_date_range[[1]], " please select a different date."))
-      #   }
-      # )
+      validate(
+        if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
+        need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
+             paste0("No data for ", relationship_date_range[[1]], " please select a different date."))
+        }
+      )
 
-      # validate(
-      #   need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
-      #        "No data for the first selected date, please select a different date."),
-      #   need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
-      #        "No data for the second selected date, please select a different date.")
-      # )
-
+      validate(
+        need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+             "No data for the first selected date, please select a different date."),
+        need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
+             "No data for the second selected date, please select a different date.")
+      )
+      
       if (input$relationship_network_selection == "Displacement Star*") {
         cow_id <- input$relationship_cow_selection
-
+        
         edges <- combine_replace_edges_star(raw_graph_data,
-          input$relationship_date_range[[1]],
-          input$relationship_date_range[[2]],
-          cow_id = cow_id,
-          CD_min = input$cd_range[[1]],
-          CD_max = input$cd_range[[2]]
+                                            input$relationship_date_range[[1]],
+                                            input$relationship_date_range[[2]],
+                                            cow_id = cow_id,
+                                            CD_min = input$cd_range[[1]],
+                                            CD_max = input$cd_range[[2]]
         )
         edges$width <- edges$weight
         if (mean(edges$width > 2)) {
@@ -138,37 +151,78 @@ shinyServer(function(input, output, session) {
         }
         
         nodes <- combine_replace_nodes_star(edges, cow_id)
-
+        
         output$network_plot <- visNetwork::renderVisNetwork({
+          # make sure end date later than start date
+          validate(
+            need(input$relationship_date_range[[2]] > input$relationship_date_range[[1]], "end date is earlier than start date"
+            )
+          )
+          
+          validate(
+            if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
+              need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
+                   paste0("No data for ", relationship_date_range[[1]], " please select a different date."))
+            }
+          )
+          
+          validate(
+            need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+                 "No data for the first selected date, please select a different date."),
+            need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
+                 "No data for the second selected date, please select a different date.")
+          )
+          
           plot_network_disp_star(nodes, edges)
         })
         output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
       } else {
         edges <- combine_replace_edges(raw_graph_data,
-          input$relationship_date_range[[1]],
-          input$relationship_date_range[[2]],
-          CD_min = input$cd_range[[1]],
-          CD_max = input$cd_range[[2]],
-          threshold_selected
+                                       input$relationship_date_range[[1]],
+                                       input$relationship_date_range[[2]],
+                                       CD_min = input$cd_range[[1]],
+                                       CD_max = input$cd_range[[2]],
+                                       threshold_selected
         )
-
+        
         g <- .make_tidygraph(raw_graph_data, edges, directed = TRUE)
         deg <- degree(g, mode = "all")
-
+        
         nodes <- combine_replace_nodes(edges, deg)
         
         if (mean(edges$width > 2)) {
           edges$width <- edges$width / 2
         }
-
+        
         output$network_plot <- visNetwork::renderVisNetwork({
+          # make sure end date later than start date
+          validate(
+            need(input$relationship_date_range[[2]] > input$relationship_date_range[[1]], "end date is earlier than start date"
+            )
+          )
+          
+          validate(
+            if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
+              need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
+                   paste0("No data for ", relationship_date_range[[1]], " please select a different date."))
+            }
+          )
+          
+          validate(
+            need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+                 "No data for the first selected date, please select a different date."),
+            need(input$relationship_date_range[[2]] %in% unique(raw_graph_data$date),
+                 "No data for the second selected date, please select a different date.")
+          )
+          
           plot_network_disp(nodes, edges)
         })
         output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
       }
     }
   })
-  
+      
+
   # render activity plots
   observe({
 
@@ -222,10 +276,11 @@ shinyServer(function(input, output, session) {
     )
 
     plot_cow_date_range(
-      feeding_intake_df,
+      feed_drink_df,
       `Feeding_Intake(kg)`,
       "feed_intake"
     )
+
   })
 
   observe({
@@ -233,9 +288,9 @@ shinyServer(function(input, output, session) {
     req(input$daily_cow_selection)
 
     # Create feeding, drinking, and lying_standing dataframes
-    feeding <- Cleaned_feeding_original_data
-    drinking <- Cleaned_drinking_original_data
-    lying_standing <- duration_for_each_bout
+    feeding <- Cleaned_feeding_original_data_df
+    drinking <- Cleaned_drinking_original_data_df
+    lying_standing <- duration_for_each_bout_df
 
     # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
@@ -248,7 +303,7 @@ shinyServer(function(input, output, session) {
     req(input$relationship_date_range)
 
 
-    df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
+    df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date_df))
     output$bullying_table <- format_dt_table(df)
     output$bullying_plot <- renderPlotly({
       plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
@@ -277,9 +332,10 @@ shinyServer(function(input, output, session) {
     req(input$bin_date)
     req(input$activity_bin_selection)
 
+    
     bin_df <- select_feed_bin_data(feed_df,
-      feed_date = input$bin_date,
-      bin_selection = input$activity_bin_selection
+                                   feed_date = input$bin_date,
+                                   bin_selection = input$activity_bin_selection
     )
     # plot
     output$feed_bin_plot <- renderPlot({
@@ -297,7 +353,7 @@ shinyServer(function(input, output, session) {
     req(input$bin_date)
     req(input$activity_bin_selection)
 
-    df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
+    df <- filter_dates(bin_empty_total_time_summary_df, date, input$bin_date) %>%
       parse_hunger_df(input$activity_bin_selection)
 
     output$hunger_table <- format_dt_table(df)

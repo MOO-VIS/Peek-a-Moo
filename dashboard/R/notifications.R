@@ -34,9 +34,9 @@ bin_warnings <- function(df, cuttoff){
 #' @return named list containing error names and messages
 combine_warnings <- function(food_cuttoff = 0, water_cuttoff = 0, bin_cuttoff = 0){
   
-  food_warnings <- intake_warnings(Cleaned_feeding_original_data, food_cuttoff) 
-  drink_warnings <- intake_warnings(Cleaned_drinking_original_data, water_cuttoff) 
-  bin_warnings <- bin_warnings(Cleaned_drinking_original_data, bin_cuttoff)
+  food_warnings <- intake_warnings(Cleaned_feeding_original_data_df, food_cuttoff) 
+  drink_warnings <- intake_warnings(Cleaned_drinking_original_data_df, water_cuttoff) 
+  bin_warnings <- bin_warnings(Cleaned_drinking_original_data_df, bin_cuttoff)
   
   # get the latest warnings
   all_warnings <- Insentec_warning %>%

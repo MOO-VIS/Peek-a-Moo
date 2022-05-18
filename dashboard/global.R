@@ -1,14 +1,70 @@
 library(Rcpp)
-library(tidyverse)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
+library(ggplot2)
 library(plotly)
 library(igraph)
+library(visNetwork)
 library(lubridate)
 library(png)
 library(grid)
-library(visNetwork)
+library(aws.s3)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(DT)
+library(reshape2)
+library(magrittr)
+library(forcats)
+library(stringr)
+library(rlang)
+library(purrr)
+library(memoise)
+
+# load R scripts
+source("R/notifications.R")
+source("R/activities.R")
+source("R/daily_behavior.R")
+source("R/network.R")
+source("R/bully_analysis.R")
+source("R/bins.R")
+source("R/THI_analysis.R")
+
+# load data from S3 Bucket
+# don't share this!
+s3BucketName <- "awp-cow-bonds"
+access_key_id <- "your_key_id"
+secret_access_key <- "your_secret_access_key"
+
+
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = access_key_id,
+           "AWS_SECRET_ACCESS_KEY" = secret_access_key,
+           "AWS_DEFAULT_REGION" = "us-west-2")
+file_names <- aws.s3::get_bucket_df(s3BucketName)[["Key"]]
+for (i in 1:length(file_names)){
+  aws.s3::s3load(file_names[i], s3BucketName)
+}
+
+
+## create dataframes for plots and tables
+THI <- master_summary
+standing_bout_df <- lying_standing_summary_by_date
+feed_drink_df <- Feeding_and_drinking_analysis
+replacement_df <- master_feed_replacement_all
+synchronized_lying_total_time_df <- synchronized_lying_total_time
+Feeding_drinking_at_the_same_time_total_time_df <- Feeding_drinking_at_the_same_time_total_time
+Feeding_drinking_neighbour_total_time_df <- Feeding_drinking_neighbour_total_time
+Cleaned_feeding_original_data_df <- Cleaned_feeding_original_data
+Cleaned_drinking_original_data_df <- Cleaned_drinking_original_data
+duration_for_each_bout_df <- duration_for_each_bout
+Replacement_behaviour_by_date_df <- Replacement_behaviour_by_date
+bin_empty_total_time_summary_df <- bin_empty_total_time_summary
+Insentec_warning <- Insentec_warning
+
+max_date <- max(feed_drink_df[["date"]])
+min_date <- min(feed_drink_df[["date"]])
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -16,10 +72,13 @@ library(visNetwork)
 #'
 #' @return Dataframe with dates in a single date column
 convert_date_col <- function(df) {
-  enframe(df, name = "date") %>%
-    mutate(date = as.Date(date)) %>%
-    unnest(value)
+  tibble::enframe(df, name = "date") %>%
+    dplyr::mutate(date = as.Date(date)) %>%
+    tidyr::unnest(value)
 }
+
+feed_df <- convert_date_col(Cleaned_feeding_original_data)
+non_nutritive_df <- convert_date_col(non_nutritive_visits)
 
 #' Helper function to filter by user input date range
 #'
@@ -31,18 +90,18 @@ convert_date_col <- function(df) {
 filter_dates <- function(df, col, date_obj) {
   if (length(date_obj) > 1) {
     df %>%
-      filter({{ col }} >= date_obj[[1]]) %>%
-      filter({{ col }} <= date_obj[[2]])
+      dplyr::filter({{ col }} >= date_obj[[1]]) %>%
+      dplyr::filter({{ col }} <= date_obj[[2]])
   } else {
     df %>%
-      filter({{ col }} == date_obj)
+      dplyr::filter({{ col }} == date_obj)
   }
 }
 
 filter_cd <- function(df, col, cd_range) {
-  df %>%
-    filter({{ col }} >= cd_range[[1]]) %>%
-    filter({{ col }} <= cd_range[[2]])
+    df %>%
+    dplyr::filter({{ col }} >= cd_range[[1]]) %>%
+    dplyr::filter({{ col }} <= cd_range[[2]])
 }
 
 #' Helper function to filter by user input cow selection
@@ -54,48 +113,10 @@ filter_cd <- function(df, col, cd_range) {
 #' @return Filtered dataframe with only selected cows
 filter_cows <- function(df, col, cow_selection) {
   df %>%
-    filter({{ col }} %in% cow_selection)
+    dplyr::filter({{ col }} %in% cow_selection)
 }
 
-# load in plot/table creation scripts
-source(here::here("R/notifications.R"))
-source(here::here("R/activities.R"))
-source(here::here("R/daily_behavior.R"))
-source(here::here("R/network.R"))
-source(here::here("R/bully_analysis.R"))
-source(here::here("R/bins.R"))
-source(here::here("R/THI_analysis.R"))
 
-# load data if not already in memory
-
-if (!exists("THI")) {
-  load(here::here("data/Wali_trial_summarized_THI.Rda"))
-  load(here::here("data/Feeding_and_drinking_analysis.Rda"))
-  load(here::here("data/Insentec_warning.Rda"))
-  load(here::here("data/duration_for_each_bout.Rda"))
-  load(here::here("data/lying_standing_summary_by_date.Rda"))
-  load(here::here("data/synchronized_lying_total_time.Rda"))
-  load(here::here("data/Cleaned_drinking_original_data.Rda"))
-  load(here::here("data/Cleaned_feeding_original_data.Rda"))
-  load(here::here("data/non_nutritive_visits.Rda"))
-  load(here::here("data/feed_replacement_10mon_CD.Rda"))
-  load(here::here("data/bin_empty_total_time_summary.Rda"))
-  load(here::here("data/Feeding_drinking_at_the_same_time_total_time.Rda"))
-  load(here::here("data/Feeding_drinking_neighbour_total_time.Rda"))
-  load(here::here("data/Replacement_behaviour_by_date.Rda"))
-
-  THI <- master_summary
-
-  rm(master_summary)
-}
-# create dataframes for plots and tables
-standing_bout_df <- lying_standing_summary_by_date
-feed_drink_df <- Feeding_and_drinking_analysis
-non_nutritive_df <- convert_date_col(non_nutritive_visits)
-feeding_intake_df <- Feeding_and_drinking_analysis
-feed_df <- convert_date_col(Cleaned_feeding_original_data)
-max_date <- max(feed_drink_df[["date"]])
-replacement_df <- master_feed_replacement_all
 
 #' Helper function for creating boxes with plot and data tab
 #'
@@ -105,7 +126,7 @@ replacement_df <- master_feed_replacement_all
 #' @param output_fun Function for producing the plot output, defaults to plotlyOutput
 #'
 #' @return tabBox
-default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput) {
+default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput){
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
     height = height,
@@ -126,7 +147,7 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
 #' @param page_length Number of pages to show, defaults to 5
 #'
 #' @return DT datatable
-format_dt_table <- function(df, page_length = 5) {
+format_dt_table <- function(df, page_length = 5){
   DT::renderDataTable(
     df,
     extensions = "Buttons",
@@ -154,10 +175,10 @@ date_range_widget <- function(inputId) {
   dateRangeInput(
     inputId = inputId,
     label = "Date Range",
-    start = lubridate::as_date("2021-5-1"),
-    end = lubridate::as_date("2021-5-4"),
-    min = lubridate::as_date("2020-7-13"),
-    max = lubridate::as_date("2021-6-12")
+    start = lubridate::as_date('2020-8-1'),
+    end = lubridate::as_date('2020-8-14'),
+    min = lubridate::as_date(min_date),
+    max = lubridate::as_date(max_date)
   )
 }
 
@@ -171,7 +192,7 @@ cow_selection_widget <- function(inputId, multiple = TRUE) {
     options = list(
       "actions-box" = TRUE,
       "none-selected-text" = "Select cows"
-    )
+      )
   )
 }
 
@@ -207,8 +228,9 @@ date_widget <- function(inputId) {
   dateInput(
     inputId = inputId,
     label = "Date",
-    value = lubridate::as_date("2021-5-1"),
-    max = lubridate::as_date("2021-6-12")
+    value = lubridate::as_date('2020-8-1'),
+    min = lubridate::as_date(min_date),
+    max = lubridate::as_date(max_date)
   )
 }
 
@@ -222,9 +244,9 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
 
   # find cows that exist in date range
   cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
-    select(Cow) %>%
+    dplyr::select(Cow) %>%
     unique() %>%
-    arrange(desc(Cow))
+    dplyr::arrange(dplyr::desc(Cow))
   colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
 
   # update widget
@@ -243,9 +265,9 @@ update_cow_selection_displacement <- function(relationship_type, date_obj, input
     # find cows that exist in date range
     cow_choices <- filter_dates(replacement_df, date, date_obj) %>%
       # filter_cd(occupied_bins_with_feed_percent, cd_range) %>%
-      select(Actor_cow) %>%
+      dplyr::select(Actor_cow) %>%
       unique() %>%
-      arrange(desc(Actor_cow))
+      dplyr::arrange(dplyr::desc(Actor_cow))
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date and cd range")
 
     # update widget
@@ -256,7 +278,31 @@ update_cow_selection_displacement <- function(relationship_type, date_obj, input
       selected = NULL
     )
   }
+
 }
+
+#' #' Helper function for updating THI selection picker input widgets
+#' #'
+#' #' @param date_obj The date or date range to filter by
+#' #' @param inputId The id of the picker input widget to update
+#' #' @param session The current server session
+#' update_THI_selection <- function(date_obj, inputId, session, select_all = FALSE){
+#'
+#'   # find cows that exist in date range
+#'   cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
+#'     select(Cow) %>%
+#'     unique() %>%
+#'     arrange(desc(Cow))
+#'   colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
+#'
+#'   # update widget
+#'   updatePickerInput(
+#'     session = session,
+#'     inputId = inputId,
+#'     choices = cow_choices,
+#'     selected = NULL
+#'   )
+#' }
 
 #' Helper function for updating network selection picker input widgets
 #'
@@ -266,7 +312,7 @@ update_network_selection <- function(date_obj, inputId, session, select_all = FA
   network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement", "Displacement Star*")
   network_choices <- as.data.frame(network)
   colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
-
+  
   # update widget
   updatePickerInput(
     session = session,
@@ -312,12 +358,11 @@ bin_wt_widget <- function(inputId) {
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
 update_bin_selection <- function(date_obj, inputId, session) {
-
   # find bins that exist in date range
   bin_choices <- filter_dates(feed_df, date, date_obj) %>%
-    select(Bin) %>%
+    dplyr::select(Bin) %>%
     unique() %>%
-    arrange(Bin)
+    dplyr::arrange(Bin)
   colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
 
   # update widget
@@ -341,6 +386,6 @@ bin_selection_widget <- function(inputId) {
     options = list(
       "actions-box" = TRUE,
       "none-selected-text" = "Select bins"
-    )
+      )
   )
 }

@@ -39,7 +39,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
   # https://stackoverflow.com/questions/48522350/create-an-image-filled-chart-in-r-using-ggplot
   # Load png file from imgur as binary
   container_img <-
-    readPNG(here::here("dashboard/www/container.png"))
+    readPNG("www/container.png")
   h <- dim(container_img)[1]
   w <- dim(container_img)[2]
   

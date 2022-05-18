@@ -43,8 +43,8 @@ plot_bully_analysis <- function(df, cow_id, start_date, end_date) {
     filter(Reactor_cow == cow_id) %>%
     filter(date >= start_date & date <= end_date)
   
-  cow_act_df$date <- ymd(cow_act_df$date)
-  cow_reac_df$date <- ymd(cow_reac_df$date)
+  cow_act_df$date <- lubridate::ymd(cow_act_df$date)
+  cow_reac_df$date <- lubridate::ymd(cow_reac_df$date)
   
   
   ### Make plot

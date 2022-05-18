@@ -32,7 +32,7 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
   
   # convert Cow to factor
   df$Cow <- factor(df$Cow) %>%
-    fct_rev()
+    forcats::fct_rev()
   
   df
 }
@@ -43,11 +43,11 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
 #' 
 #' return the formatted column name
 format_col_name <- function(col_name){
-  str_replace_all(col_name, "_", " ") %>%
-    str_to_title() %>%
-    str_replace("Seconds", "s") %>%
-    str_replace("\\((?i)s\\)", " (s)") %>%
-    str_replace("\\((?i)kg\\)", " (kg)")
+  stringr::str_replace_all(col_name, "_", " ") %>%
+  stringr::str_to_title() %>%
+  stringr::str_replace("Seconds", "s") %>%
+  stringr::str_replace("\\((?i)s\\)", " (s)") %>%
+  stringr::str_replace("\\((?i)kg\\)", " (kg)")
 }
 
 #' Generate the plot and data tabs for time range plots

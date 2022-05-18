@@ -1,3 +1,4 @@
+
 header <- dashboardHeader(
   title = "Dairy Cow Dashboard",
   dropdownMenuOutput("notifications")
@@ -5,15 +6,15 @@ header <- dashboardHeader(
 
 sidebar <- dashboardSidebar(
   sidebarMenu(
-    id = "sidemenu",
-    menuItem("Activity Patterns", icon = icon("line-chart"), tabName = "activities"),
+    id="sidemenu",
+    menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Relationships", icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Bins", icon = icon("bar-chart-o"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("Source code",
-      icon = icon("file-code-o"),
-      href = "https://github.com/MOO-VIS/Peek-a-Moo"
+             icon = icon("file-code-o"),
+             href = "https://github.com/UBC-AWP/Peek-a-Moo.git"
     )
   )
 )
@@ -121,33 +122,33 @@ bins_tab <- tabItem(
 warnings_tab <- tabItem(
   "warnings",
   box(
-    title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+    title="Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
     column(
       4,
-      numericInput(
-        inputId = "food_intake",
-        label = "Food Intake Cuttoff",
-        value = 0,
-        min = 0
-      )
+           numericInput(
+             inputId = "food_intake",
+             label = "Food Intake Cuttoff",
+             value = 0,
+             min = 0
+          )
     ),
     column(
       4,
-      numericInput(
-        inputId = "water_intake",
-        label = "Water Intake Cuttoff",
-        value = 0,
-        min = 0
-      )
+           numericInput(
+             inputId = "water_intake",
+             label = "Water Intake Cuttoff",
+             value = 0,
+             min = 0
+           )
     ),
     column(
       4,
-      numericInput(
-        inputId = "bin_volume",
-        label = "Bin Volume Cuttoff",
-        value = 0,
-        min = 0
-      )
+           numericInput(
+             inputId = "bin_volume",
+             label = "Bin Volume Cuttoff",
+             value = 0,
+             min = 0
+           )
     )
   ),
   default_tabBox("Warnings", "warning", width = 12, output_fun = DT::dataTableOutput)
