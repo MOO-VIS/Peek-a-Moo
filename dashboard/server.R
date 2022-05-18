@@ -64,7 +64,7 @@ shinyServer(function(input, output, session) {
       session
     )
   })
-
+  
   # render network
   observe({
     req(input$relationship_date_range)
@@ -89,6 +89,11 @@ shinyServer(function(input, output, session) {
       raw_graph_data_names <-  names(raw_graph_data)
       raw_graph_data_names <- as.Date(raw_graph_data_names, format = "%Y-%m-%d")
       
+      range_days <- seq(as.Date(input$relationship_date_range[[1]]),
+                        as.Date(input$relationship_date_range[[2]]),
+                        by = "days")
+      range_of_df <- raw_graph_data_names[which(raw_graph_data_names == input$relationship_date_range[[1]]):which(raw_graph_data_names == input$relationship_date_range[[2]])]
+
       if (input$relationship_date_range[[1]] %!in% raw_graph_data_names && input$relationship_date_range[[2]] %!in% raw_graph_data_names){
         output$network_plot <- visNetwork::renderVisNetwork({validate(
           need(input$relationship_date_range[[1]] %in% raw_graph_data_names,
@@ -98,7 +103,14 @@ shinyServer(function(input, output, session) {
                       input$relationship_date_range[[2]],
                       ". Please select a different date range.")),)
           })
-      } else {
+      }
+      else {
+        
+        if( all(range_days %in% range_of_df) == FALSE ){
+          showNotification(type = "warning",
+                           paste0("Date range contains days with missing data."))
+        }
+        
         edges <- combine_edges(
           raw_graph_data,
           input$relationship_date_range[[1]],
