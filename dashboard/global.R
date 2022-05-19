@@ -62,6 +62,7 @@ source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
 source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
+source(here::here("R/elo.R"))
 source(here::here("R/bully_analysis.R"))
 source(here::here("R/bins.R"))
 source(here::here("R/THI_analysis.R"))
@@ -83,7 +84,8 @@ if (!exists("THI")) {
   load(here::here("data/Feeding_drinking_at_the_same_time_total_time.Rda"))
   load(here::here("data/Feeding_drinking_neighbour_total_time.Rda"))
   load(here::here("data/Replacement_behaviour_by_date.Rda"))
-
+  load(here::here("data/_10-mon__elo_all_replacements_long_noNA.rda"))
+  
   THI <- master_summary
 
   rm(master_summary)
@@ -96,6 +98,7 @@ feeding_intake_df <- Feeding_and_drinking_analysis
 feed_df <- convert_date_col(Cleaned_feeding_original_data)
 max_date <- max(feed_drink_df[["date"]])
 replacement_df <- master_feed_replacement_all
+dominance_df <- elo_24h_na_filled
 
 #' Helper function for creating boxes with plot and data tab
 #'

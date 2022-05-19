@@ -65,6 +65,9 @@ plot_network_disp_star <- function(nodes, edges) {
       color = list(hightlight = "#D2E5FF", highlight.border = "#2B7CE9")
     ) |>
     visEdges(arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5))) |>
+    visInteraction(hover = TRUE, 
+                   tooltipDelay = 100, 
+                   tooltipStay = 300) |> 
     visPhysics(stabilization = FALSE)
 }
 
@@ -187,10 +190,12 @@ combine_replace_edges_star <- function(x,
     group_by(from, to) %>%
     summarise(weight = n()) %>%
     ungroup() %>%
-    mutate(type = case_when(
+    mutate(
+      type = case_when(
       from == cow_id ~ "actor",
       to == cow_id ~ "reactor"
-    )) %>%
+    ),
+      title = paste0("Actions: ", weight)) %>%
     arrange(from != cow_id)
 }
 

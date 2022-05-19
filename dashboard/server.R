@@ -69,7 +69,7 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-    
+
     threshold_id <- input$relationship_threshold_selection
     threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75))
     rownames(threshold_df) <- c("5%", "10%", "25%")
@@ -92,22 +92,22 @@ shinyServer(function(input, output, session) {
       )
       g <- .make_tidygraph(raw_graph_data, edges)
       deg <- degree(g)
-      
+
       nodes <- combine_nodes(edges, deg)
-      
+
       if (mean(edges$width > 2)) {
         edges$width <- edges$width / 2
       }
-      
+
       output$network_plot <- visNetwork::renderVisNetwork({
         plot_network(nodes, edges)
       })
-      
+
       output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
     } else {
       # Plot Displacement network
       raw_graph_data <- master_feed_replacement_all
-      
+
       # validate(
       #   if(input$relationship_date_range[[1]] == input$relationship_date_range[[2]]){
       #   need(input$relationship_date_range[[1]] %in% names(raw_graph_data),
@@ -136,7 +136,7 @@ shinyServer(function(input, output, session) {
         if (mean(edges$width > 2)) {
           edges$width <- edges$width / 2
         }
-        
+
         nodes <- combine_replace_nodes_star(edges, cow_id)
 
         output$network_plot <- visNetwork::renderVisNetwork({
@@ -156,7 +156,7 @@ shinyServer(function(input, output, session) {
         deg <- degree(g, mode = "all")
 
         nodes <- combine_replace_nodes(edges, deg)
-        
+
         if (mean(edges$width > 2)) {
           edges$width <- edges$width / 2
         }
@@ -168,7 +168,33 @@ shinyServer(function(input, output, session) {
       }
     }
   })
-  
+
+  # render elo plot
+  observe({
+    req(input$relationship_date_range)
+    req(input$relationship_network_selection)
+
+    cow_id <- input$relationship_cow_selection
+
+    if (input$relationship_network_selection == "Displacement Star*") {
+      raw_graph_data <- dominance_df
+
+      output$elo_plot <- renderPlotly({
+        plot_elo(raw_graph_data,
+          input$relationship_date_range[[1]],
+          input$relationship_date_range[[2]],
+          cow_id = cow_id
+        )
+      })
+
+      output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+        input$relationship_date_range[[1]],
+        input$relationship_date_range[[2]],
+        cow_id = cow_id
+      ))
+    }
+  })
+
   # render activity plots
   observe({
 
