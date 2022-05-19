@@ -76,6 +76,7 @@ shinyServer(function(input, output, session) {
     rownames(threshold_df) <- c("5%", "10%", "25%")
     threshold_selected <- threshold_df[threshold_id, ]
     
+    # check for erroneous date entry
     if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
       output$network_plot <- visNetwork::renderVisNetwork({
         validate(
@@ -88,6 +89,8 @@ shinyServer(function(input, output, session) {
         )
       })
     } else{
+    
+    # select network to plot
     if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
       if (input$relationship_network_selection == "Lying Synchronicity") {
         raw_graph_data <- synchronized_lying_total_time
@@ -99,7 +102,8 @@ shinyServer(function(input, output, session) {
       
       raw_graph_data_names <- names(raw_graph_data)
       raw_graph_data_names <- as.Date(raw_graph_data_names, format = "%Y-%m-%d")
-      
+    
+    # check for erroneous date entry
      if (input$relationship_date_range[[1]] %!in% raw_graph_data_names && input$relationship_date_range[[2]] == input$relationship_date_range[[1]]) {
         output$network_plot <- visNetwork::renderVisNetwork({
           validate(
@@ -149,7 +153,8 @@ shinyServer(function(input, output, session) {
             )
             }
         }
-
+        
+        # plot the network (not displacement)
           edges <- combine_edges(
             raw_graph_data,
             input$relationship_date_range[[1]],
@@ -173,9 +178,10 @@ shinyServer(function(input, output, session) {
           output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
       }
     } else {
-      # Plot Displacement network
+      # displacement network
       raw_graph_data <- master_feed_replacement_all
 
+      # check for erroneous date entry
       if (input$relationship_date_range[[1]] %!in% unique(raw_graph_data$date) && input$relationship_date_range[[2]] == input$relationship_date_range[[1]]) {
         output$network_plot <- visNetwork::renderVisNetwork({
           validate(
@@ -223,6 +229,7 @@ shinyServer(function(input, output, session) {
             )
           }
         }
+        # plot the displacement network
         if (input$relationship_network_selection == "Displacement Star*") {
           cow_id <- input$relationship_cow_selection
 
