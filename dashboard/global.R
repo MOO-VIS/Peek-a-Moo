@@ -293,7 +293,7 @@ update_threshold_selection <- function(date_obj, inputId, session, select_all = 
     selected = NULL
   )
 }
-
+      
 #' Widget for Bin Weight Selection
 #'
 #' @param inputId The id of the picker input widget to update
