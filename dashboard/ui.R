@@ -6,10 +6,10 @@ header <- dashboardHeader(
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "sidemenu",
-    menuItem("Activity Patterns", icon = icon("bar-chart-o"), tabName = "activities"),
+    menuItem("Activity Patterns", icon = icon("line-chart"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
-    menuItem("Relationships", icon = icon("heart"), tabName = "relationships"),
-    menuItem("Bins", icon = icon("grain", lib = "glyphicon"), tabName = "bins"),
+    menuItem("Relationships", icon = icon("connectdevelop"), tabName = "relationships"),
+    menuItem("Bins", icon = icon("bar-chart-o"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("Source code",
       icon = icon("file-code-o"),
