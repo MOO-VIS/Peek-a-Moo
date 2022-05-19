@@ -69,160 +69,130 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-
+    
     `%!in%` <- Negate(`%in%`)
-
+    
     threshold_id <- input$relationship_threshold_selection
     threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75))
     rownames(threshold_df) <- c("5%", "10%", "25%")
     threshold_selected <- threshold_df[threshold_id, ]
 
-    if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
-      output$network_plot <- visNetwork::renderVisNetwork({
-        validate(
-          need(
-            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
-            "First date input cannot be later than the second date input. Please adjust date selection"
-          )
-        )
-      })
-    } else {
+    if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
+      if (input$relationship_network_selection == "Lying Synchronicity") {
+        raw_graph_data <- synchronized_lying_total_time
+        
+      } else if (input$relationship_network_selection == "Feeding Sychronicity") {
+        raw_graph_data <- Feeding_drinking_at_the_same_time_total_time
+      } else {
+        raw_graph_data <- Feeding_drinking_neighbour_total_time
+      }
+      raw_graph_data_names <-  names(raw_graph_data)
+      raw_graph_data_names <- as.Date(raw_graph_data_names, format = "%Y-%m-%d")
+      
       range_days <- seq(as.Date(input$relationship_date_range[[1]]),
-        as.Date(input$relationship_date_range[[2]]),
-        by = "days"
-      )
+                        as.Date(input$relationship_date_range[[2]]),
+                        by = "days")
+      range_of_df <- raw_graph_data_names[which(raw_graph_data_names == input$relationship_date_range[[1]]):which(raw_graph_data_names == input$relationship_date_range[[2]])]
 
-      if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
-        if (input$relationship_network_selection == "Lying Synchronicity") {
-          raw_graph_data <- synchronized_lying_total_time
-        } else if (input$relationship_network_selection == "Feeding Sychronicity") {
-          raw_graph_data <- Feeding_drinking_at_the_same_time_total_time
-        } else {
-          raw_graph_data <- Feeding_drinking_neighbour_total_time
-        }
-        raw_graph_data_names <- names(raw_graph_data)
-        raw_graph_data_names <- as.Date(raw_graph_data_names, format = "%Y-%m-%d")
-
-        range_of_df <- raw_graph_data_names[which(raw_graph_data_names == input$relationship_date_range[[1]]):which(raw_graph_data_names == input$relationship_date_range[[2]])]
-
-        if (input$relationship_date_range[[1]] %!in% raw_graph_data_names && input$relationship_date_range[[2]] %!in% raw_graph_data_names) {
-          output$network_plot <- visNetwork::renderVisNetwork({
-            validate(
-              need(
-                input$relationship_date_range[[1]] %in% raw_graph_data_names,
-                paste0(
-                  "There is no data for the selected date range ",
-                  input$relationship_date_range[[1]],
-                  " to ",
-                  input$relationship_date_range[[2]],
-                  ". Please select a different date range."
-                )
-              ),
-            )
+      if (input$relationship_date_range[[1]] %!in% raw_graph_data_names && input$relationship_date_range[[2]] %!in% raw_graph_data_names){
+        output$network_plot <- visNetwork::renderVisNetwork({validate(
+          need(input$relationship_date_range[[1]] %in% raw_graph_data_names,
+               paste0("There is no data for the selected date range ",
+                      input$relationship_date_range[[1]],
+                      " to ",
+                      input$relationship_date_range[[2]],
+                      ". Please select a different date range.")),)
           })
-        } else {
-          if (all(range_days %in% range_of_df) == FALSE) {
-            showNotification(
-              type = "warning",
-              paste0("Date range contains dates with missing data.")
-            )
-          }
-
-          edges <- combine_edges(
-            raw_graph_data,
+      }
+      else {
+        
+        if( all(range_days %in% range_of_df) == FALSE ){
+          showNotification(type = "warning",
+                           paste0("Date range contains days with missing data."))
+        }
+        
+        edges <- combine_edges(
+          raw_graph_data,
+          input$relationship_date_range[[1]],
+          input$relationship_date_range[[2]],
+          threshold_selected
+        )
+        g <- .make_tidygraph(raw_graph_data, edges)
+        deg <- degree(g)
+        
+        nodes <- combine_nodes(edges, deg)
+      
+        if (mean(edges$width > 2)) {
+          edges$width <- edges$width / 2
+        }
+      
+        output$network_plot <- visNetwork::renderVisNetwork({
+          plot_network(nodes, edges)
+        })
+        
+        output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+       }
+      }
+    
+    else {
+      # Plot Displacement network
+      raw_graph_data <- master_feed_replacement_all
+      
+      if(input$relationship_date_range[[1]] %!in% unique(raw_graph_data$date) && input$relationship_date_range[[2]] %!in% unique(raw_graph_data$date)){
+        output$network_plot <- visNetwork::renderVisNetwork({validate(
+          need(input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
+               paste0("There is no data for the selected date range ",
+                      input$relationship_date_range[[1]],
+                      " to ",
+                      input$relationship_date_range[[2]],
+                      ". Please select a different date range.")),
+        )})
+      }
+      
+      else{
+        if (input$relationship_network_selection == "Displacement Star*") {
+          cow_id <- input$relationship_cow_selection
+  
+          edges <- combine_replace_edges_star(raw_graph_data,
             input$relationship_date_range[[1]],
             input$relationship_date_range[[2]],
-            threshold_selected
+            cow_id = cow_id,
+            CD_min = input$cd_range[[1]],
+            CD_max = input$cd_range[[2]]
           )
-          g <- .make_tidygraph(raw_graph_data, edges)
-          deg <- degree(g)
-
-          nodes <- combine_nodes(edges, deg)
-
+          edges$width <- edges$weight
           if (mean(edges$width > 2)) {
             edges$width <- edges$width / 2
           }
-
+          
+          nodes <- combine_replace_nodes_star(edges, cow_id)
+  
           output$network_plot <- visNetwork::renderVisNetwork({
-            plot_network(nodes, edges)
+            plot_network_disp_star(nodes, edges)
           })
-
-          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
-        }
-      } else {
-        # Plot Displacement network
-        raw_graph_data <- master_feed_replacement_all
-
-        if (input$relationship_date_range[[1]] %!in% unique(raw_graph_data$date) && input$relationship_date_range[[2]] %!in% unique(raw_graph_data$date)) {
-          output$network_plot <- visNetwork::renderVisNetwork({
-            validate(
-              need(
-                input$relationship_date_range[[1]] %in% unique(raw_graph_data$date),
-                paste0(
-                  "There is no data for the selected date range ",
-                  input$relationship_date_range[[1]],
-                  " to ",
-                  input$relationship_date_range[[2]],
-                  ". Please select a different date range."
-                )
-              ),
-            )
-          })
+          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
         } else {
-          range_of_df <- unique(master_feed_replacement_all$date)
-          range_of_df <- range_of_df[which(range_of_df == input$relationship_date_range[[1]]):which(range_of_df == input$relationship_date_range[[2]])]
-
-          if (all(range_days %in% range_of_df) == FALSE) {
-            showNotification(
-              type = "warning",
-              paste0("Date range contains dates with missing data.")
-            )
+          edges <- combine_replace_edges(raw_graph_data,
+            input$relationship_date_range[[1]],
+            input$relationship_date_range[[2]],
+            CD_min = input$cd_range[[1]],
+            CD_max = input$cd_range[[2]],
+            threshold_selected
+          )
+  
+          g <- .make_tidygraph(raw_graph_data, edges, directed = TRUE)
+          deg <- degree(g, mode = "all")
+  
+          nodes <- combine_replace_nodes(edges, deg)
+          
+          if (mean(edges$width > 2)) {
+            edges$width <- edges$width / 2
           }
-
-          if (input$relationship_network_selection == "Displacement Star*") {
-            cow_id <- input$relationship_cow_selection
-
-            edges <- combine_replace_edges_star(raw_graph_data,
-              input$relationship_date_range[[1]],
-              input$relationship_date_range[[2]],
-              cow_id = cow_id,
-              CD_min = input$cd_range[[1]],
-              CD_max = input$cd_range[[2]]
-            )
-            edges$width <- edges$weight
-            if (mean(edges$width > 2)) {
-              edges$width <- edges$width / 2
-            }
-
-            nodes <- combine_replace_nodes_star(edges, cow_id)
-
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp_star(nodes, edges)
-            })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
-          } else {
-            edges <- combine_replace_edges(raw_graph_data,
-              input$relationship_date_range[[1]],
-              input$relationship_date_range[[2]],
-              CD_min = input$cd_range[[1]],
-              CD_max = input$cd_range[[2]],
-              threshold_selected
-            )
-
-            g <- .make_tidygraph(raw_graph_data, edges, directed = TRUE)
-            deg <- degree(g, mode = "all")
-
-            nodes <- combine_replace_nodes(edges, deg)
-
-            if (mean(edges$width > 2)) {
-              edges$width <- edges$width / 2
-            }
-
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp(nodes, edges)
-            })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
-          }
+  
+          output$network_plot <- visNetwork::renderVisNetwork({
+            plot_network_disp(nodes, edges)
+          })
+          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
         }
       }
     }
