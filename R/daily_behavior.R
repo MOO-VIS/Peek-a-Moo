@@ -1,14 +1,16 @@
 
 #' Filter and format feeding, drinking, standing, and lying data for plotting
 #'
-#' @param dashboard_full_analysis 
+#' @param feeding dataframe
+#' @param drinking dataframe
+#' @param lying_standing dataframe
 #' @param cow_id integer id of the cow whose schedule is to be plotted
 #' @param date character string indicating the date of interest for plotting in the form "YYYY-MM-DD".
 #'
 #' @return a formatted data table for plotting
 #'
 #' @examples 
-#' daily_schedu_moo_data(dashboard_full_analysis=dashboard_full_analysis, cow_id = 6047, date = '2020-07-15')
+#' daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = 6047, date = '2020-07-15')
 daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, date) {
   cow_id <- as.numeric(cow_id)
   date <- as.character(date)
@@ -61,6 +63,48 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
   }
   
   df_blanks
+}
+
+#' Calculates the total value for feeding, drinking etc. for the selected cows and dates
+#'
+#' @param df dataframe output from daily_schedu_moo_data()
+#'
+#' @return a formatted data table for plotting donut chart
+#'
+#' @examples 
+#' daily_total_schedumoo(df)
+daily_total_schedumoo_plot <- function(df) {
+ 
+  #prep the dataframe
+  df <- df %>%
+    mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
+    select(c('Cow', 'Behaviour', 'time_for_total')) %>%
+    drop_na()
+  
+  #find unique list of cows
+  cows <- as.list(unique(df$Cow))
+  
+  #instantiate the plotly object
+  fig <- plot_ly()
+  labels = c('Drinking','Feeding','Lying','Standing')
+  
+  # loop to create a donut chart per each cow
+
+    df_filter <- df %>%
+      group_by(Behaviour) %>%
+      summarise(total = sum(time_for_total))
+    
+    values = df_filter$total
+    
+    fig <- fig %>% add_pie(labels = labels,
+                           values = values,
+                           hole = 0.6,
+                           domain = list(row = 0, column = 0))
+    
+  fig <- fig %>% layout(showlegend = T,
+                        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+                        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+  fig
 }
 
 
