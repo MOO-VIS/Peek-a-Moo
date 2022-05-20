@@ -74,10 +74,7 @@ relationships_tab <- tabItem(
       column(4, date_range_widget("relationship_date_range")),
       column(4, network_selection_widget("relationship_network_selection", multiple = FALSE)),
       column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE)),
-      column(12, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5))),
-      column(12, h5(br(), strong("Threshold: "), "% top connected cows are visible. (Not for Displacement Star*.)", 
-                    br(), strong("Competition Density: "), "For Displacement and Star* only.", 
-                    br(), strong("Cow selection: "), "The center cow in Displacement Star* and Dominance only."))
+      column(12, sliderInput("cd_range", "Competition Density (For Displacement network only.)", min = 0, max = 1, value = c(0.2, 0.5)))
     )
   ),
   fluidRow(

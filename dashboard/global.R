@@ -195,7 +195,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold"),
+    label = paste0("Threshold (% top connected cows are visible)"),
     choices = list(),
     selected = NULL,
     multiple = multiple,
