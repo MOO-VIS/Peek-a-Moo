@@ -203,7 +203,6 @@ shinyServer(function(input, output, session) {
           }
         }
       }
-    }
   })
 
   # render elo plot
