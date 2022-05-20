@@ -71,40 +71,68 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
 #'
 #' @return a formatted data table for plotting donut chart
 #'
-#' @examples 
+#' @examples
 #' daily_total_schedumoo(df)
 daily_total_schedumoo_plot <- function(df) {
- 
-  #prep the dataframe
+
+  # prep the dataframe
   df <- df %>%
     mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
-    select(c('Cow', 'Behaviour', 'time_for_total')) %>%
+    select(c("Cow", "Behaviour", "time_for_total")) %>%
     drop_na()
-  
-  #find unique list of cows
-  cows <- as.list(unique(df$Cow))
-  
-  #instantiate the plotly object
-  fig <- plot_ly()
-  labels = c('Drinking','Feeding','Lying','Standing')
-  
-  # loop to create a donut chart per each cow
 
-    df_filter <- df %>%
+  cows <- as.list(unique(df$Cow))
+  sum_bad_cow <- 0
+  
+  # check for missing data
+  for (i in cows) {
+    df_check <- df %>%
+      filter(Cow == i) %>%
       group_by(Behaviour) %>%
       summarise(total = sum(time_for_total))
-    
-    values = df_filter$total
-    
-    fig <- fig %>% add_pie(labels = labels,
-                           values = values,
-                           hole = 0.6,
-                           domain = list(row = 0, column = 0))
-    
-  fig <- fig %>% layout(showlegend = T,
-                        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-                        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-  fig
+
+    if (length(df_check$Behaviour) != 4) {
+      sum_bad_cow =+ 1
+    }
+  }
+  
+  if(sum_bad_cow > 0){
+      error_message1 <- validate(
+        need(
+          sum_bad_cow == 0,
+          paste0("Data for one or more behaviours is missing for the selected cow(s). Please change selection."),
+        )
+      )
+      return(error_message1)
+    } else {
+      
+      # instantiate the plotly object
+      labels <- c("Drinking", "Feeding", "Lying", "Standing")
+      colors <- c("rgb(3, 127, 252)", "rgb(157, 192, 131)", "rgb(250, 216, 120)", "rgb(211, 148, 147)")
+      fig <- plot_ly(marker = list(colors = colors))
+
+      # plot the donut chart
+
+      df_filter <- df %>%
+        group_by(Behaviour) %>%
+        summarise(total = sum(time_for_total))
+
+      values <- df_filter$total
+
+      fig <- fig %>% add_pie(
+        labels = labels,
+        values = values,
+        hole = 0.6,
+        domain = list(row = 0, column = 0)
+      )
+
+      fig <- fig %>% layout(
+        showlegend = FALSE,
+        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)
+      )
+      fig
+    }
 }
 
 
