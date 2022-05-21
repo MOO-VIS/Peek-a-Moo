@@ -4,7 +4,7 @@ plot_network <- function(nodes, edges) {
   visNetwork(nodes,
              edges,
              width = "100%", height = "800px"
-  ) |>
+  ) %>%
     visNodes(
       font = list(size = 30),
       shape = "circle",
@@ -14,29 +14,29 @@ plot_network <- function(nodes, edges) {
         border = "darkgray",
         highlight = list(background = "orange", border = "darkred")
       )
-    ) |>
+    ) %>%
     visEdges(
       smooth = list(enabled = TRUE, type = "horizontal"),
       color = list(color = "#D3D3D3", highlight = "orange", hover = "#2B7CE9")
-    )  |> 
+    )  %>% 
     visInteraction(hover = TRUE, 
                    tooltipDelay = 100, 
                    tooltipStay = 300, 
                    dragNodes = FALSE,
                    selectable = FALSE,
-                   selectConnectedEdges = FALSE) |>
-    visIgraphLayout(layout = "layout_in_circle") |>
+                   selectConnectedEdges = FALSE) %>%
+    visIgraphLayout(layout = "layout_in_circle") %>%
     visPhysics(stabilization = FALSE)
 }
 
 plot_network_disp <- function(nodes, edges) {
-  plot_network(nodes, edges) |>
+  plot_network(nodes, edges) %>%
     visNodes(
       shape = "dot"
-    ) |>
+    ) %>%
     visEdges(
       arrows = list(to = list(enabled = TRUE, scaleFactor = 0.8))
-    ) |>
+    ) %>%
     visOptions(
       nodesIdSelection = list(enabled = TRUE, main = "Select Focused Cow"),
       highlightNearest = list(
@@ -45,7 +45,7 @@ plot_network_disp <- function(nodes, edges) {
         hideColor = "rgba(0,0,0,0)",
         labelOnly = TRUE
       )
-    ) |> 
+    ) %>% 
     visInteraction(dragNodes = TRUE, 
                    multiselect = TRUE,
                    selectable = TRUE,
@@ -56,15 +56,18 @@ plot_network_disp_star <- function(nodes, edges) {
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
-  ) |>
+  ) %>%
     visNodes(
       font = list(size = 20),
       shape = "dot",
       shadow = TRUE,
       borderWidth = 2,
       color = list(hightlight = "#D2E5FF", highlight.border = "#2B7CE9")
-    ) |>
-    visEdges(arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5))) |>
+    ) %>%
+    visEdges(arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5))) %>%
+    visInteraction(hover = TRUE, 
+                   tooltipDelay = 100, 
+                   tooltipStay = 300) %>% 
     visPhysics(stabilization = FALSE)
 }
 
@@ -187,10 +190,12 @@ combine_replace_edges_star <- function(x,
     group_by(from, to) %>%
     summarise(weight = n()) %>%
     ungroup() %>%
-    mutate(type = case_when(
+    mutate(
+      type = case_when(
       from == cow_id ~ "actor",
       to == cow_id ~ "reactor"
-    )) %>%
+    ),
+      title = paste0("Actions: ", weight)) %>%
     arrange(from != cow_id)
 }
 
@@ -199,7 +204,7 @@ combine_nodes <- function(edges, deg) {
   nodes <- data.frame(id = unique(c(
     edges$from,
     edges$to
-  ))) |> 
+  ))) %>% 
     mutate(
       size = unname(deg) / max(unname(deg)) * 40, # Node size
       label = id
@@ -211,7 +216,7 @@ combine_replace_nodes <- function(edges, deg) {
   nodes <- data.frame(id = unique(c(
     edges$from,
     edges$to
-  ))) |> 
+  ))) %>% 
     mutate(
       size = unname(deg) / max(unname(deg)) * 40, # Node size
       title = paste0("Cow: ", id, "<br>Different Associations: ", unname(deg))
