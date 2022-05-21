@@ -1,6 +1,11 @@
 library(igraph)
 
-plot_network <- function(nodes, edges) {
+plot_network <- function(nodes, edges, threshold_id = "10%") {
+  ledges <- data.frame(color = c("#D3D3D3", "white"), 
+                       label = c(paste0("Edges with top ", threshold_id, " weights"), "Hidden edges"), 
+                       arrows =c("both", "both"), 
+                       font.align = "bottom") 
+  
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
@@ -19,6 +24,7 @@ plot_network <- function(nodes, edges) {
       smooth = list(enabled = TRUE, type = "horizontal"),
       color = list(color = "#D3D3D3", highlight = "orange", hover = "#2B7CE9")
     ) %>%
+    visLegend(addEdges = ledges, useGroups = FALSE) %>%
     visInteraction(
       hover = TRUE,
       tooltipDelay = 100,
@@ -35,8 +41,8 @@ plot_network <- function(nodes, edges) {
     )
 }
 
-plot_network_disp <- function(nodes, edges) {
-  plot_network(nodes, edges) %>%
+plot_network_disp <- function(nodes, edges, threshold_id = "10%") {
+  plot_network(nodes, edges, threshold_id = threshold_id) %>%
     visNodes(
       shape = "dot"
     ) %>%
@@ -80,7 +86,7 @@ plot_network_disp_star <- function(nodes, edges) {
     ) %>%
     visPhysics(stabilization = FALSE) %>%
     visExport(
-      type = "jpeg", name = "export-network",
+      type = "png", name = "export-network",
       float = "left", label = "Save network", background = "white", style = ""
     )
 }
