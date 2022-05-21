@@ -63,6 +63,9 @@ daily_tab <- tabItem(
   fluidRow(
     default_tabBox("Daily Behavior", "daily", width = 12)
   ),
+  fluidRow(
+    default_tabBox("Daily Behaviour Totals", "daily_total", width = 12)
+  ),
 )
 
 relationships_tab <- tabItem(
