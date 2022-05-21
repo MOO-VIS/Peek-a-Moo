@@ -8,7 +8,7 @@ sidebar <- dashboardSidebar(
     id = "sidemenu",
     menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
-    menuItem("Relationships", icon = icon("connectdevelop"), tabName = "relationships"),
+    menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Displacement Star", icon = icon("sun"), tabName = "star"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("warning"), tabName = "warnings"),
