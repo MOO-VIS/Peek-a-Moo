@@ -9,7 +9,6 @@ library(lubridate)
 library(png)
 library(grid)
 library(visNetwork)
-library(googleCloudStorageR)
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -68,48 +67,51 @@ source(here::here("R/bins.R"))
 source(here::here("R/THI_analysis.R"))
 
 # download data from GCP
-gcs_auth(json_file = here::here('auth/peek-a-moo.json'))
-
-objects <- gcs_list_objects()
-download_list <- grep("*.Rda", objects$name, value = TRUE)
-
-if(!dir.exists(here::here("data/"))) {
-  dir.create(here::here("data/"))
-}
-
-map(download_list, function(x) gcs_get_object(x,
-  saveToDisk = here::here(paste('data/', gsub(".*/","",x), sep = "")),
-  overwrite = TRUE))
+# gcs_auth(json_file = here::here('auth/peek-a-moo.json'))
+# 
+# gcs_global_bucket("peek-a-moo-data")
+# 
+# objects <- gcs_list_objects()
+# download_list <- grep("*.Rda", objects$name, value = TRUE)
+# 
+# if(!dir.exists(here::here("data/"))) {
+#   dir.create(here::here("data/"))
+# }
+# 
+# map(download_list, function(x) gcs_get_object(x,
+#                                               saveToDisk = here::here(paste('data/', gsub(".*/","",x), sep = "")),
+#                                               overwrite = TRUE))
 
 # load data if not already in memory
-if (!exists("THI")) {
-  load(here::here("data/Wali_trial_summarized_THI.Rda"))
-  load(here::here("data/Feeding_and_drinking_analysis.Rda"))
-  load(here::here("data/Insentec_warning.Rda"))
-  load(here::here("data/duration_for_each_bout.Rda"))
-  load(here::here("data/lying_standing_summary_by_date.Rda"))
-  load(here::here("data/synchronized_lying_total_time.Rda"))
-  load(here::here("data/Cleaned_drinking_original_data.Rda"))
-  load(here::here("data/Cleaned_feeding_original_data.Rda"))
-  load(here::here("data/non_nutritive_visits.Rda"))
-  load(here::here("data/feed_replacement_10mon_CD.Rda"))
-  load(here::here("data/bin_empty_total_time_summary.Rda"))
-  load(here::here("data/Feeding_drinking_at_the_same_time_total_time.Rda"))
-  load(here::here("data/Feeding_drinking_neighbour_total.Rda"))
-  load(here::here("data/Replacement_behaviour_by_date.Rda"))
-
-  THI <- master_summary
-
-  rm(master_summary)
-}
-# create dataframes for plots and tables
-standing_bout_df <- lying_standing_summary_by_date
-feed_drink_df <- Feeding_and_drinking_analysis
-non_nutritive_df <- convert_date_col(non_nutritive_visits)
-feeding_intake_df <- Feeding_and_drinking_analysis
-feed_df <- convert_date_col(Cleaned_feeding_original_data)
-max_date <- max(feed_drink_df[["date"]])
-replacement_df <- master_feed_replacement_all
+# if (!exists("THI")) {
+#   load(here::here("data/Wali_trial_summarized_THI.Rda"))
+#   load(here::here("data/Feeding_and_drinking_analysis.Rda"))
+#   load(here::here("data/Insentec_warning.Rda"))
+#   load(here::here("data/duration_for_each_bout.Rda"))
+#   load(here::here("data/lying_standing_summary_by_date.Rda"))
+#   load(here::here("data/synchronized_lying_total_time.Rda"))
+#   load(here::here("data/Cleaned_drinking_original_data.Rda"))
+#   load(here::here("data/Cleaned_feeding_original_data.Rda"))
+#   load(here::here("data/non_nutritive_visits.Rda"))
+#   load(here::here("data/feed_replacement_10mon_CD.Rda"))
+#   load(here::here("data/bin_empty_total_time_summary.Rda"))
+#   load(here::here("data/Feeding_drinking_at_the_same_time_total_time.Rda"))
+#   load(here::here("data/Feeding_drinking_neighbour_total.Rda"))
+#   load(here::here("data/Replacement_behaviour_by_date.Rda"))
+#   
+#   THI <- master_summary
+#   
+#   rm(master_summary)
+# }
+# 
+# # create dataframes for plots and tables
+# standing_bout_df <- lying_standing_summary_by_date
+# feed_drink_df <- Feeding_and_drinking_analysis
+# non_nutritive_df <- convert_date_col(non_nutritive_visits)
+# feeding_intake_df <- Feeding_and_drinking_analysis
+# feed_df <- convert_date_col(Cleaned_feeding_original_data)
+# max_date <- max(feed_drink_df[["date"]])
+# replacement_df <- master_feed_replacement_all
 
 #' Helper function for creating boxes with plot and data tab
 #'
