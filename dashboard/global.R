@@ -164,10 +164,10 @@ date_range_widget <- function(inputId) {
   )
 }
 
-cow_selection_widget <- function(inputId, multiple = TRUE) {
+cow_selection_widget <- function(inputId, multiple = TRUE, label = "Cows") {
   pickerInput(
     inputId = inputId,
-    label = "Cows",
+    label = label,
     choices = list(),
     selected = NULL,
     multiple = multiple,
