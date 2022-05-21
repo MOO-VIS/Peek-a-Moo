@@ -94,8 +94,7 @@ star_tab <- tabItem(
       title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(6, date_range_widget("star_date_range")),
       column(6, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
-      column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5))),
-      column(12, h5(br(), strong("Cow selection: "), "The center cow in Displacement Star* and Dominance only."))
+      column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5)))
     )
   ),
   fluidRow(
