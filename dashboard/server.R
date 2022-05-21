@@ -215,8 +215,8 @@ shinyServer(function(input, output, session) {
 
     output$elo_plot <- renderPlotly({
       plot_elo(raw_graph_data,
-        input$relationship_date_range[[1]],
-        input$relationship_date_range[[2]],
+        input$star_date_range[[1]],
+        input$star_date_range[[2]],
         cow_id = cow_id
       )
     })

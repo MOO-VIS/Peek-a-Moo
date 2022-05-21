@@ -29,6 +29,7 @@ plot_elo <- function(x, start_date, end_date, cow_id = NULL) {
     labs(x = 'Date', 
          y = 'Elo Rating',
          title = paste0('Daily Dominance Score of Cow ', cow_id)) +
+    ylim(min(x$Elo), max(x$Elo)) +
     theme_classic() + theme(legend.position = "none")
   
   ggplotly(plot)
