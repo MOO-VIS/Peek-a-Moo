@@ -63,6 +63,7 @@ source(here::here("R/notifications.R"))
 source(here::here("R/activities.R"))
 source(here::here("R/daily_behavior.R"))
 source(here::here("R/network.R"))
+source(here::here("R/elo.R"))
 source(here::here("R/bully_analysis.R"))
 source(here::here("R/bins.R"))
 source(here::here("R/THI_analysis.R"))
@@ -178,10 +179,10 @@ date_range_widget <- function(inputId) {
   )
 }
 
-cow_selection_widget <- function(inputId, multiple = TRUE) {
+cow_selection_widget <- function(inputId, multiple = TRUE, label = "Cows") {
   pickerInput(
     inputId = inputId,
-    label = "Cows",
+    label = label,
     choices = list(),
     selected = NULL,
     multiple = multiple,
@@ -209,7 +210,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold"),
+    label = paste0("Threshold (top % of connected cows)"),
     choices = list(),
     selected = NULL,
     multiple = multiple,
@@ -253,7 +254,7 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
   )
 }
 
-update_cow_selection_displacement <- function(relationship_type, date_obj, inputId, session) {
+update_cow_selection_displacement <- function(relationship_type = "Displacement Star*", date_obj, inputId, session) {
   if (relationship_type != "Displacement Star*") {
     update_cow_selection(date_obj, inputId, session)
   } else {
@@ -280,7 +281,7 @@ update_cow_selection_displacement <- function(relationship_type, date_obj, input
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
 update_network_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement", "Displacement Star*")
+  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement")
   network_choices <- as.data.frame(network)
   colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
 

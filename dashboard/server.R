@@ -165,16 +165,44 @@ shinyServer(function(input, output, session) {
   observe({
     update_threshold_selection(input$relationship_threshold_selection, "relationship_threshold_selection", session)
   })
+
   observe({
-    req(input$relationship_date_range)
-    req(input$relationship_network_selection)
+    req(input$star_date_range)
 
     update_cow_selection_displacement(
-      input$relationship_network_selection,
-      input$relationship_date_range,
-      "relationship_cow_selection",
-      session
+      date_obj = input$star_date_range,
+      inputId = "star_cow_selection",
+      session = session
     )
+  })
+
+  # render star network
+  observe({
+    req(input$star_date_range)
+    req(input$star_cow_selection)
+
+    raw_graph_data <- master_feed_replacement_all
+
+    cow_id <- input$star_cow_selection
+
+    edges <- combine_replace_edges_star(raw_graph_data,
+      input$star_date_range[[1]],
+      input$star_date_range[[2]],
+      cow_id = cow_id,
+      CD_min = input$star_cd_range[[1]],
+      CD_max = input$star_cd_range[[2]]
+    )
+    edges$width <- edges$weight
+    if (mean(edges$width > 2)) {
+      edges$width <- edges$width / 2
+    }
+
+    nodes <- combine_replace_nodes_star(edges, cow_id)
+
+    output$star_plot <- visNetwork::renderVisNetwork({
+      plot_network_disp_star(nodes, edges)
+    })
+    output$star_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
   })
 
   # render network
@@ -204,7 +232,7 @@ shinyServer(function(input, output, session) {
     } else {
 
       # select network to plot
-      if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
+      if (input$relationship_network_selection != "Displacement") {
         if (input$relationship_network_selection == "Lying Synchronicity") {
           raw_graph_data <- synchronized_lying_total_time
         } else if (input$relationship_network_selection == "Feeding Sychronicity") {
@@ -262,29 +290,8 @@ shinyServer(function(input, output, session) {
           )
         } else {
 
-          # plot the displacement network
-          if (input$relationship_network_selection == "Displacement Star*") {
-            cow_id <- input$relationship_cow_selection
-
-            edges <- combine_replace_edges_star(raw_graph_data,
-              input$relationship_date_range[[1]],
-              input$relationship_date_range[[2]],
-              cow_id = cow_id,
-              CD_min = input$cd_range[[1]],
-              CD_max = input$cd_range[[2]]
-            )
-            edges$width <- edges$weight
-            if (mean(edges$width > 2)) {
-              edges$width <- edges$width / 2
-            }
-
-            nodes <- combine_replace_nodes_star(edges, cow_id)
-
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp_star(nodes, edges)
-            })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
-          } else {
+          # Plot Displacement network
+            
             edges <- combine_replace_edges(raw_graph_data,
               input$relationship_date_range[[1]],
               input$relationship_date_range[[2]],
@@ -309,7 +316,29 @@ shinyServer(function(input, output, session) {
           }
         }
       }
-    }
+  })
+
+  # render elo plot
+  observe({
+    req(input$star_date_range)
+
+    cow_id <- input$star_cow_selection
+
+    raw_graph_data <- dominance_df
+
+    output$elo_plot <- renderPlotly({
+      plot_elo(raw_graph_data,
+        input$star_date_range[[1]],
+        input$star_date_range[[2]],
+        cow_id = cow_id
+      )
+    })
+
+    output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+      input$relationship_date_range[[1]],
+      input$relationship_date_range[[2]],
+      cow_id = cow_id
+    ))
   })
 
   # render activity plots
@@ -370,20 +399,35 @@ shinyServer(function(input, output, session) {
       "feed_intake"
     )
   })
-
+  
   observe({
     req(input$daily_date)
     req(input$daily_cow_selection)
-
+    
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- Cleaned_feeding_original_data
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
-
-    # Render daily behavior plot
+    
+    # Render daily behavior total plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
     output$daily_table <- format_dt_table(drop_na(df, Cow))
     output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
+  })
+  
+  observe({
+    req(input$daily_date)
+    req(input$daily_cow_selection)
+    
+    # Create feeding, drinking, and lying_standing dataframes
+    feeding <- Cleaned_feeding_original_data
+    drinking <- Cleaned_drinking_original_data
+    lying_standing <- duration_for_each_bout
+    
+    # Render daily behavior plot
+    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_total_table <- format_dt_table(df)
+    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(df))
   })
 
   observe({
