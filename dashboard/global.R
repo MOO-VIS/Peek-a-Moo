@@ -9,6 +9,7 @@ library(lubridate)
 library(png)
 library(grid)
 library(visNetwork)
+library(googleCloudStorageR)
 
 #' Helper function for converting dataframes to having dates in a single column
 #'

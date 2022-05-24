@@ -15,7 +15,7 @@ sidebar <- dashboardSidebar(
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("Source code",
       icon = icon("file-code"),
-      href = "https://github.com/MOO-VIS/Peek-a-Moo"
+      href = "https://github.com/UBC-AWP/Peek-a-Moo"
     )
   )
 )
@@ -174,4 +174,4 @@ body <- dashboardBody(
 
 ui <- fluidPage(dashboardPage(header, sidebar, body, skin = "blue"))
 
-ui <- secure_app(ui, enable_admin = TRUE, download = NULL)
+ui <- secure_app(ui, enable_admin = FALSE, download = NULL)

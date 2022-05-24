@@ -27,10 +27,11 @@ shinyServer(function(input, output, session) {
     reactiveValuesToList(res_auth)
   })
   
-  file_upload <- reactive({
+  file_download <- reactive({
     # download data from GCP
     gcs_auth(json_file = here::here('auth/peek-a-moo.json'))
     
+    print('set gcp bucket')
     gcs_global_bucket("peek-a-moo-data")
     
     objects <- gcs_list_objects()
@@ -50,10 +51,13 @@ shinyServer(function(input, output, session) {
         saveToDisk = here::here(paste('data/', gsub(".*/","",x), sep = "")),
         overwrite = TRUE))
     }
+    
   })
   
-  file_processing <- eventReactive(file_upload(), {
-  # file_processing <- reactive({
+  file_processing <- eventReactive(file_download(), {
+    
+    print("loading data")
+    
     # load data if not already in memory
     if (!exists("THI")) {
       load(here::here("data/Wali_trial_summarized_THI.Rda"), envir = .GlobalEnv)
@@ -71,6 +75,8 @@ shinyServer(function(input, output, session) {
       load(here::here("data/Feeding_drinking_neighbour_total.Rda"), envir = .GlobalEnv)
       load(here::here("data/Replacement_behaviour_by_date.Rda"), envir = .GlobalEnv)
     }
+    
+    print("making dataframes")
     
     master_summary <<- master_summary
     Feeding_and_drinking_analysis <<- Feeding_and_drinking_analysis
@@ -97,17 +103,17 @@ shinyServer(function(input, output, session) {
     
     THI <<- master_summary
     
+    print(master_summary)
+    
     rm(master_summary, envir = .GlobalEnv)
   })
 
-  restart <- eventReactive(file_processing(), {
-    session$reload()
+  obs_release <- eventReactive(file_processing(), {
+    ui_obs.resume()
   })
   
-  observeEvent(restart(), {
+  ui_obs <- observe(suspended = TRUE, {
   
-  # rm(master_summary, envir = .GlobalEnv)
-    
   # Warning section
   observe({
     warning_df <- combine_warnings(
@@ -442,5 +448,5 @@ shinyServer(function(input, output, session) {
       hunger_plot(df)
     })
   })
-})
+ })
 })
