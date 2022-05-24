@@ -1,5 +1,5 @@
 library(Rcpp)
-library(tidyverse)
+library(dplyr)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -7,7 +7,6 @@ library(plotly)
 library(igraph)
 library(lubridate)
 library(png)
-library(grid)
 library(visNetwork)
 
 #' Helper function for converting dataframes to having dates in a single column
@@ -157,7 +156,7 @@ date_range_widget <- function(inputId) {
   dateRangeInput(
     inputId = inputId,
     label = "Date Range",
-    start = lubridate::as_date("2021-5-1"),
+    start = lubridate::as_date("2021-1-1"),
     end = lubridate::as_date("2021-5-4"),
     min = lubridate::as_date("2020-7-13"),
     max = lubridate::as_date("2021-6-12")
