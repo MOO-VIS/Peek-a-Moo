@@ -156,7 +156,7 @@ date_range_widget <- function(inputId) {
   dateRangeInput(
     inputId = inputId,
     label = "Date Range",
-    start = lubridate::as_date("2021-1-1"),
+    start = lubridate::as_date("2021-4-1"),
     end = lubridate::as_date("2021-5-4"),
     min = lubridate::as_date("2020-7-13"),
     max = lubridate::as_date("2021-6-12")
