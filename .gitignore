@@ -40,3 +40,5 @@ vignettes/*.pdf
 
 # Don't upload the data to github
 data/
+reprocessed_data/
+auth/
