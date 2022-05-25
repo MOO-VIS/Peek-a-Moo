@@ -25,6 +25,9 @@ jobs:
         working-directory: 'src/'
         extra-packages: |
           shinymanager
+   
+    - name: make auth folder
+      run: mkdir -p auth
 
     - name: create-json
       id: create-auth-json
@@ -50,13 +53,19 @@ jobs:
         git commit -m "update password database"
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        add-paths: |
-          auth/*.sqlite
-        branch: database-update
-        branch-suffix: short-commit-hash
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: |
+            auth/*.sqlite
+          branch: database-update
+          branch-suffix: short-commit-hash
+
+    # - name: push changes
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     branch: ${{ github.ref }}
 
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12
