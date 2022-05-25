@@ -9,6 +9,8 @@ on:
   
   workflow_dispatch:
 
+permissions: write-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -53,6 +55,7 @@ jobs:
       uses: peter-evans/create-pull-request@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        title: Update Password Database
         add-paths: |
           auth/*.sqlite
         branch: database-update
