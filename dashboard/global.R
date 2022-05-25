@@ -84,6 +84,7 @@ source(here::here("R/THI_analysis.R"))
 #                                               overwrite = TRUE))
 
 # load data if not already in memory
+# uncomment if running locally and data is already downloaded
 # if (!exists("THI")) {
 #   load(here::here("data/Wali_trial_summarized_THI.Rda"))
 #   load(here::here("data/Feeding_and_drinking_analysis.Rda"))
@@ -105,7 +106,8 @@ source(here::here("R/THI_analysis.R"))
 #   rm(master_summary)
 # }
 # 
-# # create dataframes for plots and tables
+# create dataframes for plots and tables
+# uncomment if running locally and data is already downloaded
 # standing_bout_df <- lying_standing_summary_by_date
 # feed_drink_df <- Feeding_and_drinking_analysis
 # non_nutritive_df <- convert_date_col(non_nutritive_visits)
