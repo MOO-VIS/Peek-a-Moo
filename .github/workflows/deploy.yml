@@ -50,12 +50,12 @@ jobs:
         git commit -m "update password database"
 
     - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          add-paths: |
-            auth/*.sqlite
-          branch: database-update
+      uses: peter-evans/create-pull-request@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        add-paths: |
+          auth/*.sqlite
+        branch: database-update
 
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12
