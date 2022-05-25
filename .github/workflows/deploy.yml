@@ -1,9 +1,11 @@
 name: deploy
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'auth/**'
   
   workflow_dispatch:
 
@@ -46,12 +48,21 @@ jobs:
         git config --local user.name "github-actions[bot]"
         git add auth/database.sqlite 
         git commit -m "update password database"
-        
-    - name: push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+
+    - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          add-paths: |
+            auth/*.sqlite
+          branch: database-update
+          branch-suffix: short-commit-hash
+
+    # - name: push changes
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+    #     branch: ${{ github.ref }}
 
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12
@@ -59,6 +70,7 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "peek-a-moo-dev"
         heroku_email: "allyson@datallurgy.com"
+        appdir: "dashboard"
         buildpack: "vsv/heroku-buildpack-r"
         healthcheck: "https://peek-a-moo-dev.herokuapp.com"
         delay: 15

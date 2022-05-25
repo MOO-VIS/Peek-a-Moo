@@ -1,8 +1,8 @@
 name: prod-release
 
 on:
-  # release:
-  #   types: published
+  release:
+    types: published
   
   workflow_dispatch:
 
