@@ -68,8 +68,8 @@ jobs:
         heroku_email: "allyson@datallurgy.com"
         appdir: "dashboard"
         buildpack: "vsv/heroku-buildpack-r"
-        healthcheck: "https://peek-a-moo-dev.herokuapp.com"
-        delay: 15
-        rollbackonhealthcheckfailed: true
+        # healthcheck: "https://peek-a-moo-dev.herokuapp.com"
+        # delay: 15
+        # rollbackonhealthcheckfailed: true
       env:
         HD_PASSPHRASE: ${{secrets.SHINYMANAGER_PASSPHRASE}}
