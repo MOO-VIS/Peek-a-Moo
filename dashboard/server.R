@@ -19,8 +19,7 @@ shinyServer(function(input, output, session) {
       credentials
       # here::here("auth/database.sqlite"),
       # passphrase = passphrase
-    ),
-    keep_token = TRUE
+    )
   )
   
   output$auth_output <- renderPrint({
