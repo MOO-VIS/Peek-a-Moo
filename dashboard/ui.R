@@ -194,4 +194,21 @@ body <- dashboardBody(
 
 ui <- fluidPage(dashboardPage(header, sidebar, body, skin = "blue"))
 
-ui <- secure_app(ui, enable_admin = FALSE, download = NULL)
+ui <- secure_app(ui,
+                   # add image on top ?
+                   tags_top = 
+                     tags$div(
+                       tags$h4("Demo", style = "align:center"),
+                       tags$img(
+                         src = "https://www.r-project.org/logo/Rlogo.png", width = 100
+                       )),
+                   # add information on bottom ?
+                   tags_bottom = tags$div(
+                     tags$p(
+                       "For any question, please  contact ",
+                       tags$a(
+                         href = "mailto:someone@example.com?Subject=Shiny%20aManager",
+                         target="_top", "administrator"
+                       ))),
+                 enable_admin = FALSE,
+                 download = NULL)
