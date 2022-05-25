@@ -19,7 +19,8 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
     group_by(date) %>%
     summarise(.,
               across(where(is.character), ~"Herd Average"),
-              across(where(is.numeric), mean, na.rm=TRUE))
+              across(where(is.numeric), mean, na.rm=TRUE),
+              across(where(is.numeric), round, 0))
   
   # filter by cow and add summary rows
   df <- df %>%
@@ -27,8 +28,9 @@ process_range_data <- function(df, agg_type, cow_selection, date_range){
     group_by(Cow, date) %>%
     summarise(.,
               across(where(is.character), ~"Herd Average"),
-              across(where(is.numeric), mean, na.rm=TRUE)) %>%
-    bind_rows(herd_average) 
+              across(where(is.numeric), mean, na.rm=TRUE),
+              across(where(is.numeric), round, 0)) %>%
+    bind_rows(herd_average)
   
   # convert Cow to factor
   df$Cow <- factor(df$Cow) %>%

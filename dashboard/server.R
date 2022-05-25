@@ -271,7 +271,7 @@ shinyServer(function(input, output, session) {
           }
 
           output$network_plot <- visNetwork::renderVisNetwork({
-            plot_network(nodes, edges)
+            plot_network(nodes, edges, threshold_id)
           })
 
           output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
@@ -310,7 +310,7 @@ shinyServer(function(input, output, session) {
             }
 
             output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp(nodes, edges)
+              plot_network_disp(nodes, edges, threshold_id)
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
           }
