@@ -70,6 +70,7 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "peek-a-moo-dev"
         heroku_email: "allyson@datallurgy.com"
+        appdir: "dashboard"
         buildpack: "vsv/heroku-buildpack-r"
         healthcheck: "https://peek-a-moo-dev.herokuapp.com"
         delay: 15
