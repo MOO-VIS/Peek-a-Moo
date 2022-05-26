@@ -1,18 +1,13 @@
 library(igraph)
 
 plot_network <- function(nodes, edges, threshold_id = "10%") {
-  ledges <- data.frame(color = c("#D3D3D3", "white"), 
-                       label = c(paste0("Edges with top ", threshold_id, " weights"), "Hidden edges"), 
-                       arrows =c("both", "both"), 
-                       font.align = "bottom") 
-  
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
   ) %>%
     visNodes(
       font = list(size = 30),
-      shape = "circle",
+      shape = "dot",
       shadow = TRUE,
       borderWidth = 1,
       color = list(
@@ -24,11 +19,10 @@ plot_network <- function(nodes, edges, threshold_id = "10%") {
       smooth = list(enabled = TRUE, type = "horizontal"),
       color = list(color = "#D3D3D3", highlight = "orange", hover = "#2B7CE9")
     ) %>%
-    visLegend(addEdges = ledges, useGroups = FALSE) %>%
     visInteraction(
       hover = TRUE,
-      tooltipDelay = 100,
-      tooltipStay = 300,
+      tooltipDelay = 0,
+      tooltipStay = 500,
       dragNodes = FALSE,
       selectable = FALSE,
       selectConnectedEdges = FALSE
@@ -119,11 +113,13 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
     )) %>%
     mutate(
       width = as.integer(weight_bins) - 1,
-      color.opacity = case_when(
-        width >= 1 ~ 1,
-        width < 1 ~ 0
-      )
-    )
+      # color.opacity = case_when(
+      #   width >= 1 ~ 1,
+      #   width < 1 ~ 0
+      # ),
+      title = paste0("Synchronicities between ", from, " and ", to, ": ", weight, " secs")
+    ) %>%
+    filter(width >= 1)
 
   # return the edgelist
   edgelist
@@ -221,15 +217,33 @@ combine_replace_edges_star <- function(x,
 }
 
 # create nodes list from edges list
-combine_nodes <- function(edges, deg) {
-  nodes <- data.frame(id = unique(c(
-    edges$from,
-    edges$to
-  ))) %>%
-    mutate(
-      size = unname(deg) / max(unname(deg)) * 40, # Node size
-      label = id
+combine_nodes <- function(df,
+                          from_date = NULL,
+                          to_date = NULL, 
+                          size) {
+  df <- df %>%
+    purrr::map_df(adjacency_to_long, .id = "date") %>%
+    dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    rename(weight = value) %>%
+    filter(
+      date >= from_date,
+      date <= to_date
     )
+  
+  nodes <- data.frame(id = unique(c(
+    df$from,
+    df$to
+  ))) %>%
+  mutate(
+    #size = unname(deg) / max(unname(deg)) * 10, # Node size
+    label = id
+  )
+  
+  nodes$size <- size[match(nodes$id, names(size))]
+  
+  nodes[is.na(nodes)] <- 2
+  
+  return(nodes)
 }
 
 # create nodes list from edges list (displacement)

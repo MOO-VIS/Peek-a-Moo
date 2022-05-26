@@ -150,8 +150,12 @@ shinyServer(function(input, output, session) {
 
           g <- .make_tidygraph(raw_graph_data, edges)
           deg <- degree(g)
+          size <- deg / max(deg) * 40
 
-          nodes <- combine_nodes(edges, deg)
+          nodes <- combine_nodes(raw_graph_data,
+                                 input$relationship_date_range[[1]],
+                                 input$relationship_date_range[[2]],
+                                 size)
 
           if (mean(edges$width > 2)) {
             edges$width <- edges$width / 2
