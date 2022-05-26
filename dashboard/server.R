@@ -107,12 +107,13 @@ server <- function(input, output, session) {
   
   # Warning section
   observe({
+    
     warning_df <- combine_warnings(
       food_cuttoff = input$food_intake,
       water_cuttoff = input$water_intake,
       bin_cuttoff = input$bin_volume
     )
-
+    
     output$warning_table <- format_dt_table(warning_df, page_length = 20)
 
     output$warning_plot <- DT::renderDataTable(
@@ -341,10 +342,10 @@ server <- function(input, output, session) {
     #' @param y_col The column of interest
     #' @param var_name The name of the UI output variable
     plot_cow_date_range <- function(df, y_col, var_name) {
-
+    
       # filter table
       df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
-
+      
       # generate table
       output[[paste0(var_name, "_table")]] <- format_dt_table(df)
 
