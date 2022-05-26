@@ -202,7 +202,7 @@ ui <- secure_app(ui,
                        tags$img(
                          src = "../loading_cow1.gif", width = 100),
                        tags$p(
-                         "General visitors can enter using 'guest' as the user name and password."
+                         "General visitors can contact Borbala for user name and password."
                        )),
                    # add information on bottom ?
                    tags_bottom = tags$div(
