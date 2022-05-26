@@ -1,3 +1,3 @@
 helpers.installPackages('shinydashboard', 'shinyWidgets', 'shinymanager', 
     'Rcpp', 'dplyr', 'lubridate', 'plotly', 'igraph', 'png', 'visNetwork', 
-    'googleCloudStorageR', 'here')
+    'googleCloudStorageR', 'here', 'shinycssloaders')
