@@ -131,6 +131,7 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
 format_dt_table <- function(df, page_length = 5) {
   DT::renderDataTable(
     df,
+    server = FALSE,
     extensions = "Buttons",
     options = list(
       scrollX = TRUE,
