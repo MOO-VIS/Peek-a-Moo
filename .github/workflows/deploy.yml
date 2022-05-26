@@ -62,7 +62,6 @@ jobs:
         
     - name: touch files to commit to heroku
       run: |
-        touch -a auth/peek-a-moo.json
         touch -a auth/database.sqlite
         
     - name: deploy to heroku  
