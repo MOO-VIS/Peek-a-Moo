@@ -11,7 +11,18 @@ credentials <- data.frame(
 )
 
 # Set up shiny server
-shinyServer(function(input, output, session) {
+server <- function(input, output, session) {
+  
+  # # authentication module
+  # res_auth <- callModule(
+  #   module = auth_server,
+  #   id = "auth",
+  #   check_credentials = check_credentials(
+  #     credentials #,
+  #     # here::here("auth/database.sqlite"),
+  #     # passphrase = passphrase
+  #     )
+  # )
   
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
@@ -492,4 +503,4 @@ shinyServer(function(input, output, session) {
     })
   })
  })
-})
+}
