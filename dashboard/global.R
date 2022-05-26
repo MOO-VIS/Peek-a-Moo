@@ -88,6 +88,7 @@ feeding_intake_df <- Feeding_and_drinking_analysis
 feed_df <- convert_date_col(Cleaned_feeding_original_data)
 max_date <- max(feed_drink_df[["date"]])
 replacement_df <- master_feed_replacement_all
+dominance_df <- elo_24h_na_filled
 
 max_date <- max(feed_drink_df[["date"]])
 min_date <- min(feed_drink_df[["date"]])
