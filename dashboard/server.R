@@ -297,9 +297,9 @@ shinyServer(function(input, output, session) {
     lying_standing <- duration_for_each_bout
     
     # Render daily behavior plot
-    behaviour <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_table <- format_dt_table(drop_na(behaviour, Cow))
-    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(behaviour))
+    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_table <- format_dt_table(drop_na(df, Cow))
+    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
   })
   
   observe({
@@ -320,9 +320,9 @@ shinyServer(function(input, output, session) {
     lying_standing <- duration_for_each_bout
     
     # Render daily total behavior plot
-    behaviour <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_total_table <- format_dt_table(behaviour)
-    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(behaviour))
+    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_total_table <- format_dt_table(df)
+    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(df))
   })
 
   observe({
