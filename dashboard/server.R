@@ -296,25 +296,33 @@ shinyServer(function(input, output, session) {
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
     
-    # Render daily behavior total plot
-    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_table <- format_dt_table(drop_na(df, Cow))
-    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
+    # Render daily behavior plot
+    behaviour <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_table <- format_dt_table(drop_na(behaviour, Cow))
+    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(behaviour))
   })
   
   observe({
     req(input$daily_date)
     req(input$daily_cow_selection)
     
+    if (!is.null(input$daily_date)) {
+      showNotification(
+        type = "warning",
+        paste0("Timezone for csv download for this tab is in UTC (7 hrs ahead of PST)."),
+        duration = 10
+      )
+    }
+    
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- Cleaned_feeding_original_data
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
     
-    # Render daily behavior plot
-    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_total_table <- format_dt_table(df)
-    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(df))
+    # Render daily total behavior plot
+    behaviour <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    output$daily_total_table <- format_dt_table(behaviour)
+    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(behaviour))
   })
 
   observe({
