@@ -259,7 +259,9 @@ combine_replace_nodes <- function(edges, deg) {
 }
 
 # create nodes list from edges list (star version)
-combine_replace_nodes_star <- function(edges, cow_id = NULL) {
+combine_replace_nodes_star <- function(edges, cow_id = NULL,
+                                       from_date = NULL,
+                                       to_date = NULL) {
   nodes_size_to <- edges %>%
     group_by(to) %>%
     summarise(deg = sum(weight)) %>%
@@ -278,10 +280,11 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL) {
     edges$from,
     edges$to
   ))) %>%
+    left_join(combine_elo_star(from_date, to_date), by = "id") %>%
     mutate(
       color.background = case_when(
         id == cow_id ~ "orange",
-        id != cow_id ~ "#D2E5FF"
+        id != cow_id ~ as.character(Elo_bins)
       ),
       color.border = case_when(
         id == cow_id ~ "darkred",
@@ -296,10 +299,39 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL) {
         id != cow_id ~ log(deg + 1) * 10
       ),
       title = case_when(
-        id == cow_id ~ paste0("Center Cow"),
-        id != cow_id ~ paste0("Cow: ", id, "<br>Displacements with Center: ", deg),
+        id == cow_id ~ paste0("Center Cow",
+                              "<br>Mean Elo: ", Elo_mean),
+        id != cow_id ~ paste0("Cow: ", id, 
+                              "<br>Displacements with Center: ", deg,
+                              "<br>Mean Elo: ", Elo_mean)
       )
     )
+}
+
+# Fiter elo score data
+combine_elo_star <- function(from_date = NULL,
+                             to_date = NULL) {
+  # set defaults
+  from_date <- from_date %||% -Inf
+  to_date <- to_date %||% Inf
+  
+  combo_df <- dominance_df %>%
+    mutate(Date = as.Date(Date),
+           id = as.numeric(Cow)) %>%
+    select(-c(Cow, present)) %>%
+    filter(
+      Date >= from_date,
+      Date <= to_date
+    ) %>%
+    group_by(id) %>%
+    summarise(Elo_mean = round(mean(Elo), 2)) %>%
+    ungroup() %>%
+    mutate(Elo_bins = cut(Elo_mean,
+                           breaks = 5,
+                           labels = c("#cfe2f3", "#9fc5e8", "#6fa8dc", "#3d85c6", "#0b5394"),
+                           include.lowest = TRUE, 
+                           ordered = TRUE
+    ))
 }
 
 .make_tidygraph <- function(x, edgelist = NULL, directed = FALSE) {

@@ -84,7 +84,10 @@ shinyServer(function(input, output, session) {
       edges$width <- edges$width / 2
     }
 
-    nodes <- combine_replace_nodes_star(edges, cow_id)
+    nodes <- combine_replace_nodes_star(edges, 
+                                        cow_id,
+                                        input$star_date_range[[1]],
+                                        input$star_date_range[[2]])
 
     output$star_plot <- visNetwork::renderVisNetwork({
       plot_network_disp_star(nodes, edges)
