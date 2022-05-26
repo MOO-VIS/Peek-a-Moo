@@ -43,7 +43,22 @@ jobs:
         GUEST_PW: ${{secrets.SHINYMANAGER_GUEST}}
         ADMIN_PW: ${{secrets.SHINYMANAGER_ADMIN}}
         USER_PW: ${{secrets.SHINYMANAGER_USER}}
-       
+
+    - name: deploy to heroku  
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "peek-a-moo-dev"
+        heroku_email: "allyson@datallurgy.com"
+        # appdir: "dashboard"
+        buildpack: "vsv/heroku-buildpack-r"
+        procfile: "web: R --file=dashboard/run.R --gui-none --no-save"
+        # healthcheck: "https://peek-a-moo-dev.herokuapp.com"
+        # delay: 15
+        # rollbackonhealthcheckfailed: true
+      env:
+        HD_PASSPHRASE: ${{secrets.SHINYMANAGER_PASSPHRASE}}
+        
     - name: commit files
       run: |
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
@@ -59,18 +74,3 @@ jobs:
         add-paths: |
           auth/*.sqlite
         branch: database-update
-
-    - name: deploy to heroku  
-      uses: akhileshns/heroku-deploy@v3.12.12
-      with:
-        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-        heroku_app_name: "peek-a-moo-dev"
-        heroku_email: "allyson@datallurgy.com"
-        # appdir: "dashboard"
-        buildpack: "vsv/heroku-buildpack-r"
-        procfile: "web: R --file=/dashboard/run.R --gui-none --no-save"
-        # healthcheck: "https://peek-a-moo-dev.herokuapp.com"
-        # delay: 15
-        # rollbackonhealthcheckfailed: true
-      env:
-        HD_PASSPHRASE: ${{secrets.SHINYMANAGER_PASSPHRASE}}
