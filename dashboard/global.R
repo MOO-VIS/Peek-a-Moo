@@ -1,10 +1,9 @@
 library(Rcpp)
 library(dplyr)
 library(tidyr)
-library(stringr)
-library(forcats)
-library(tibble)
 library(purrr)
+library(forcats)
+library(stringr)
 library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
@@ -20,7 +19,7 @@ library(visNetwork)
 #'
 #' @return Dataframe with dates in a single date column
 convert_date_col <- function(df) {
-  enframe(df, name = "date") %>%
+  tibble::enframe(df, name = "date") %>%
     mutate(date = as.Date(date)) %>%
     unnest(value)
 }
