@@ -74,6 +74,7 @@ if (!exists("THI")) {
   load("../data/Feeding_drinking_at_the_same_time_total_time.Rda")
   load("../data/Feeding_drinking_neighbour_total.Rda")
   load("../data/Replacement_behaviour_by_date.Rda")
+  load("../data/_10-mon__elo_all_replacements_long_noNA.rda")
   
   THI <- master_summary
   
