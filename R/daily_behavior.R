@@ -106,25 +106,27 @@ daily_total_schedumoo_plot <- function(df) {
       return(error_message1)
     } else {
       
-      # instantiate the plotly object
+      # instantiate the plotting objects
       labels <- c("Drinking", "Feeding", "Lying", "Standing")
       colors <- c("rgb(3, 127, 252)", "rgb(157, 192, 131)", "rgb(250, 216, 120)", "rgb(211, 148, 147)")
-      fig <- plot_ly(marker = list(colors = colors))
-
-      # plot the donut chart
-
       df_filter <- df %>%
         group_by(Behaviour) %>%
         summarise(total = sum(time_for_total))
-
       values <- df_filter$total
-
-      fig <- fig %>% add_pie(
-        labels = labels,
-        values = values,
-        hole = 0.6,
-        domain = list(row = 0, column = 0)
-      )
+      vals <- paste(values, sep = "")
+      
+      
+      # plot the donut chart
+      fig <- plot_ly(marker = list(colors = colors), textinfo = "text", text = vals)
+      fig <- fig %>%
+        add_trace(
+          type = "pie",
+          name = "",
+          values = values,
+          labels = labels,
+          hovertemplate = "<extra></extra>%{label}",
+          hole = 0.5,
+          domain = list(row = 0, column = 0))
 
       fig <- fig %>% layout(
         showlegend = FALSE,
