@@ -147,6 +147,16 @@ format_dt_table <- function(df, page_length = 5) {
   )
 }
 
+#' #' Helper function to format dates to strings for export
+#' #'
+#' #' @param df The dataframe to convert
+#' #'
+#' #' @return df with converted column
+#' format_dt_table <- function(df) {
+#'   df <- df %>%
+#'     mutate(df$Time = as.character(Time))
+#' }
+
 # widget helper functions:
 aggregation_widget <- function(inputId) {
   radioButtons(
