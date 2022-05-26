@@ -305,7 +305,7 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 
 
 `%||%` <- function(x, y) {
-  if (is_null(x)) y else x
+  if (is.null(x)) y else x
 }
 
 #' Helper function for catching if there are missing date inputs in the networks
