@@ -13,6 +13,7 @@ library(lubridate)
 library(png)
 library(visNetwork)
 library(googleCloudStorageR)
+library(reshape2)
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
