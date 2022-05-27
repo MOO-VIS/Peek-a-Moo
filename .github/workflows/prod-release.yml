@@ -17,4 +17,6 @@ jobs:
           heroku_app_name: ""
           heroku_email: "allyson@datallurgy.com"
           justlogin: true
+        env:
+          HD_PASSPHRASE: ${{secrets.SHINYMANAGER_PASSPHRASE}}
       - run: heroku pipelines:promote -a peek-a-moo-dev
