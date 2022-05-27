@@ -59,7 +59,7 @@ daily_tab <- tabItem(
       title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_widget("daily_date")),
       column(4, cow_selection_widget("daily_cow_selection")),
-      column(4, h5(br(), "Please select a valid date and cow(s) to view the plot below"))
+      column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below"))
     )
   ),
   fluidRow(

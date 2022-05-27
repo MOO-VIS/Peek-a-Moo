@@ -164,6 +164,7 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
 format_dt_table <- function(df, page_length = 5) {
   DT::renderDataTable(
     df,
+    server = FALSE,
     extensions = "Buttons",
     options = list(
       scrollX = TRUE,
@@ -173,6 +174,16 @@ format_dt_table <- function(df, page_length = 5) {
     )
   )
 }
+
+#' #' Helper function to format dates to strings for export
+#' #'
+#' #' @param df The dataframe to convert
+#' #'
+#' #' @return df with converted column
+#' format_dt_table <- function(df) {
+#'   df <- df %>%
+#'     mutate(df$Time = as.character(Time))
+#' }
 
 # widget helper functions:
 aggregation_widget <- function(inputId) {

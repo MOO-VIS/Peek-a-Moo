@@ -313,9 +313,11 @@ server <- function(input, output, session) {
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
     
-    # Render daily behavior total plot
+    # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_table <- format_dt_table(drop_na(df, Cow))
+    df_1 <- df %>%
+      mutate(Time = as.character(df$Time))
+    output$daily_table <- format_dt_table(drop_na(df_1, Cow))
     output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
   })
   
@@ -328,9 +330,15 @@ server <- function(input, output, session) {
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
     
-    # Render daily behavior plot
+    # Render daily total behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_total_table <- format_dt_table(df)
+    df_1 <- df %>%
+      mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
+      select(c("Cow", "Behaviour", "time_for_total")) %>%
+      drop_na() %>%
+      group_by(Behaviour) %>%
+      summarise(Total_Time = sum(time_for_total))
+    output$daily_total_table <- format_dt_table(df_1)
     output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(df))
   })
 
@@ -349,10 +357,10 @@ server <- function(input, output, session) {
   observe({
     req(input$relationship_date_range)
 
-    df <- THI_analysis(THI)
+    df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
     output$THI_table <- format_dt_table(df)
     output$THI_plot <- renderPlotly({
-      plot_THI_analysis(df, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      plot_THI_analysis(df)
     })
   })
 
