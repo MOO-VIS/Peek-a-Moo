@@ -7,7 +7,7 @@ passphrase <- Sys.getenv("PASSPHRASE")
 
 # Init DB using credentials data
 credentials <- data.frame(
-  user = c("guest", "shiny", "shinymanager"),
+  user = c("guest", "user", "admin"),
   password = c(guest_pw, user_pw, admin_pw),
   admin = c(FALSE, FALSE, TRUE),
   stringsAsFactors = FALSE
