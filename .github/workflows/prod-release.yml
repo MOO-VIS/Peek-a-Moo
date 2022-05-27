@@ -18,5 +18,5 @@ jobs:
           heroku_email: "allyson@datallurgy.com"
           justlogin: true 
       - run: |
-          heroku config:set PASSPHRASE=${{secrets.SHINYMANAGER_PASSPHRASE}} -app 'peek-a-moo'
+          heroku config:set PASSPHRASE=${{secrets.SHINYMANAGER_PASSPHRASE}} -app=peek-a-moo
           heroku pipelines:promote -a peek-a-moo-dev
