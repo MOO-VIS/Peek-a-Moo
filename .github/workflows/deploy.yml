@@ -51,6 +51,7 @@ jobs:
         add-paths: |
           auth/*.sqlite
         branch: database-update
+        branch-suffix: short-commit-hash
         
     - name: touch files to commit to heroku
       run: |
