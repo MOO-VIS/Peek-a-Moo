@@ -30,7 +30,7 @@ server <- function(input, output, session) {
       bin_cuttoff = input$bin_volume
     )
     
-    output$warning_table <- format_dt_table(warning_df, page_length = 20, user = user(), user = user())
+    output$warning_table <- format_dt_table(warning_df, page_length = 20, user = user())
 
     output$warning_plot <- DT::renderDataTable(
       {
