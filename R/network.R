@@ -282,11 +282,16 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
   ))) %>%
     left_join(combine_elo_star(from_date, to_date), by = "id") %>%
     mutate(
-      color.background = case_when(
-        id == cow_id ~ "orange",
-        id != cow_id ~ as.character(Elo_bins)
-      ),
+      color.background = as.character(Elo_bins),
       color.border = case_when(
+        id == cow_id ~ "darkred",
+        id != cow_id ~ "#2B7CE9"
+      ),
+      color.hover.background = case_when(
+        id == cow_id ~ "orange",
+        id != cow_id ~ "#D2E5FF"
+      ),
+      color.hover.border = case_when(
         id == cow_id ~ "darkred",
         id != cow_id ~ "#2B7CE9"
       ),
