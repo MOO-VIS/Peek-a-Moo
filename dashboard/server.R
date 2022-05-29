@@ -52,6 +52,9 @@ shinyServer(function(input, output, session) {
   observe({
     update_threshold_selection(input$relationship_threshold_selection, "relationship_threshold_selection", session)
   })
+  observe({
+    update_layout_selection(input$relationship_layout_selection, "relationship_layout_selection", session)
+  })
 
   observe({
     req(input$relationship_date_range)
@@ -133,12 +136,20 @@ shinyServer(function(input, output, session) {
           if (mean(edges$width > 2)) {
             edges$width <- edges$width / 2
           }
-
-          output$network_plot <- visNetwork::renderVisNetwork({
-            plot_network(nodes, edges, threshold_id)
-          })
-
-          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+          
+          if (input$relationship_layout_selection == "Circle") {
+            output$network_plot <- visNetwork::renderVisNetwork({
+              plot_network(nodes, edges, threshold_id)
+            })
+            
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+          } else {
+            output$network_plot <- visNetwork::renderVisNetwork({
+              plot_network(nodes, edges, threshold_id, layouts = "layout_with_fr")
+            })
+            
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+          }
         }
       } else {
         # displacement network setup

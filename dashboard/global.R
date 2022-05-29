@@ -206,6 +206,20 @@ threshold_selection_widget <- function(inputId, multiple = FALSE) {
   )
 }
 
+layout_selection_widget <- function(inputId, multiple = FALSE) {
+  pickerInput(
+    inputId = inputId,
+    label = paste0("Layout type"),
+    choices = list(),
+    selected = NULL,
+    multiple = multiple,
+    options = list(
+      "actions-box" = TRUE,
+      "none-selected-text" = "Select layout type"
+    )
+  )
+}
+
 date_widget <- function(inputId) {
   dateInput(
     inputId = inputId,
@@ -293,6 +307,24 @@ update_threshold_selection <- function(date_obj, inputId, session, select_all = 
     session = session,
     inputId = inputId,
     choices = threshold_choices,
+    selected = NULL
+  )
+}
+
+#' Helper function for updating layout option
+#'
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+update_layout_selection <- function(date_obj, inputId, session, select_all = FALSE) {
+  layouts <- c("Circle", "Force-directed")
+  layouts_choices <- as.data.frame(layouts)
+  colnames(layouts_choices) <- paste0(length(layouts_choices[[1]]), " layouts")
+
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = layouts_choices,
     selected = NULL
   )
 }

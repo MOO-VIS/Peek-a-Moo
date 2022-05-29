@@ -70,11 +70,15 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(4, date_range_widget("relationship_date_range")),
-      column(4, network_selection_widget("relationship_network_selection", multiple = FALSE)),
+      column(3, date_range_widget("relationship_date_range")),
+      column(3, network_selection_widget("relationship_network_selection", multiple = FALSE)),
       conditionalPanel(
         condition = "input.relationship_network_selection != 'Displacement Star*'",
-        column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE))
+        column(3, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Feeding Sychronicity' || input.relationship_network_selection == 'Lying Synchronicity' || input.relationship_network_selection == 'Feeding Neighbours'",
+        column(3, layout_selection_widget("relationship_layout_selection", multiple = FALSE))
       ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement'",
@@ -82,7 +86,7 @@ relationships_tab <- tabItem(
       ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement Star*'",
-        column(4, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
+        column(3, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
         column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       )
     )

@@ -1,6 +1,6 @@
 library(igraph)
 
-plot_network <- function(nodes, edges, threshold_id = "10%") {
+plot_network <- function(nodes, edges, threshold_id = "10%", layouts = "layout_in_circle") {
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
@@ -27,7 +27,7 @@ plot_network <- function(nodes, edges, threshold_id = "10%") {
       selectable = FALSE,
       selectConnectedEdges = FALSE
     ) %>%
-    visIgraphLayout(layout = "layout_in_circle") %>%
+    visIgraphLayout(layout = layouts) %>%
     visPhysics(stabilization = FALSE) %>%
     visExport(
       type = "png", name = "export-network",
