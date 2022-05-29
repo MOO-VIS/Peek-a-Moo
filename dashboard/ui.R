@@ -9,7 +9,6 @@ sidebar <- dashboardSidebar(
     menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
-    menuItem("Displacement Star", icon = icon("sun"), tabName = "star"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("warning"), tabName = "warnings"),
     menuItem("Source code",
@@ -73,10 +72,18 @@ relationships_tab <- tabItem(
       title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_range_widget("relationship_date_range")),
       column(4, network_selection_widget("relationship_network_selection", multiple = FALSE)),
-      column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE)),
+      conditionalPanel(
+        condition = "input.relationship_network_selection != 'Displacement Star*'",
+        column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE))
+      ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement'",
         column(12, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Displacement Star*'",
+        column(4, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
+        column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       )
     )
   ),
@@ -86,27 +93,13 @@ relationships_tab <- tabItem(
                    output_fun = visNetworkOutput)
   ),
   fluidRow(
-    default_tabBox("THI", "THI", width = 12)
-  )
-)
-
-star_tab <- tabItem(
-  "star",
-  fluidRow(
-    box(
-      title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(6, date_range_widget("star_date_range")),
-      column(6, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
-      column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Displacement Star*'",
+      default_tabBox("Dominance", "elo", width = 12)
     )
   ),
   fluidRow(
-    default_tabBox("Star Network", "star", 
-                   width = 12, 
-                   output_fun = visNetworkOutput)
-  ),
-  fluidRow(
-    default_tabBox("Dominance", "elo", width = 12)
+    default_tabBox("THI", "THI", width = 12)
   )
 )
 
@@ -185,7 +178,6 @@ body <- dashboardBody(
     activities_tab,
     daily_tab,
     relationships_tab,
-    star_tab,
     bins_tab,
     warnings_tab
   )

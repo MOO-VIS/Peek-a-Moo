@@ -266,7 +266,7 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
 update_network_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement")
+  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement", "Displacement Star*")
   network_choices <- as.data.frame(network)
   colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
 
