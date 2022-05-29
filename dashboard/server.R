@@ -139,13 +139,13 @@ shinyServer(function(input, output, session) {
           
           if (input$relationship_layout_selection == "Circle") {
             output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network(nodes, edges, threshold_id)
+              plot_network(nodes, edges)
             })
             
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
           } else {
             output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network(nodes, edges, threshold_id, layouts = "layout_with_fr")
+              plot_network(nodes, edges, layouts = "layout_with_fr")
             })
             
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
@@ -185,7 +185,7 @@ shinyServer(function(input, output, session) {
             }
 
             output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp(nodes, edges, threshold_id)
+              plot_network_disp(nodes, edges)
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
           } else {

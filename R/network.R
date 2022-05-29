@@ -1,6 +1,6 @@
 library(igraph)
 
-plot_network <- function(nodes, edges, threshold_id = "10%", layouts = "layout_in_circle") {
+plot_network <- function(nodes, edges, layouts = "layout_in_circle") {
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
@@ -35,8 +35,8 @@ plot_network <- function(nodes, edges, threshold_id = "10%", layouts = "layout_i
     )
 }
 
-plot_network_disp <- function(nodes, edges, threshold_id = "10%") {
-  plot_network(nodes, edges, threshold_id = threshold_id) %>%
+plot_network_disp <- function(nodes, edges) {
+  plot_network(nodes, edges) %>%
     visNodes(
       shape = "dot"
     ) %>%

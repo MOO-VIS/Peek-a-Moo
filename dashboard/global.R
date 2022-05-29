@@ -318,7 +318,7 @@ update_threshold_selection <- function(date_obj, inputId, session, select_all = 
 update_layout_selection <- function(date_obj, inputId, session, select_all = FALSE) {
   layouts <- c("Circle", "Force-directed")
   layouts_choices <- as.data.frame(layouts)
-  colnames(layouts_choices) <- paste0(length(layouts_choices[[1]]), " layouts")
+  colnames(layouts_choices) <- paste0(length(layouts_choices[[1]]), " layout types")
 
   # update widget
   updatePickerInput(
