@@ -126,19 +126,18 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
 }
 
 # combine dataframe for displacement data and create edges list (displacement)
-combine_replace_edges <- function(x,
+combine_replace_df <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
                                   CD_min = NULL,
-                                  CD_max = NULL,
-                                  threshold = 0.9) {
-
+                                  CD_max = NULL) {
+  
   # set defaults
   from_date <- from_date %||% -Inf
   to_date <- to_date %||% Inf
   CD_min <- CD_min %||% 0
   CD_max <- CD_max %||% 1
-
+  
   combo_df <- as.data.frame(x) %>%
     mutate(date = as.Date(date)) %>%
     rename(
@@ -155,7 +154,17 @@ combine_replace_edges <- function(x,
     ) %>%
     group_by(from, to) %>%
     summarise(weight = n()) %>%
-    ungroup() %>%
+    ungroup()
+}
+
+combine_replace_edges <- function(x,
+                                  from_date = NULL,
+                                  to_date = NULL,
+                                  CD_min = NULL,
+                                  CD_max = NULL,
+                                  threshold = 0.9) {
+    
+  edgelist <- combine_replace_df(x, from_date, to_date, CD_min, CD_max) %>%
     mutate(weight_bins = cut(weight,
       breaks = c(
         min(weight),
@@ -166,12 +175,13 @@ combine_replace_edges <- function(x,
     )) %>%
     mutate(
       width = as.integer(weight_bins) - 1,
-      color.opacity = case_when(
-        width >= 1 ~ 1,
-        width < 1 ~ 0
-      ),
+      # color.opacity = case_when(
+      #   width >= 1 ~ 1,
+      #   width < 1 ~ 0
+      # ),
       title = paste0("Displacements: ", weight)
-    )
+    ) %>%
+    filter(width >= 1)
 }
 
 # combine dataframe for displacement data and create edges list (star version)
@@ -237,7 +247,8 @@ combine_nodes <- function(df,
   mutate(
     #size = unname(deg) / max(unname(deg)) * 10, # Node size
     label = id
-  )
+  ) %>%
+    arrange(id)
   
   nodes$size <- size[match(nodes$id, names(size))]
   
@@ -247,15 +258,33 @@ combine_nodes <- function(df,
 }
 
 # create nodes list from edges list (displacement)
-combine_replace_nodes <- function(edges, deg) {
+combine_replace_nodes <- function(x,
+                                  from_date = NULL,
+                                  to_date = NULL,
+                                  cow_id = NULL,
+                                  CD_min = NULL,
+                                  CD_max = NULL,
+                                  deg = NULL) {
+  df <- combine_replace_df(x, from_date, to_date, CD_min, CD_max)
+  
   nodes <- data.frame(id = unique(c(
-    edges$from,
-    edges$to
-  ))) %>%
+    df$from,
+    df$to
+  )))
+  
+  nodes$degree <- deg[match(nodes$id, names(deg))]
+  nodes[is.na(nodes)] <- 0
+  
+  size <- deg / max(deg) * 40
+  nodes$size <- size[match(nodes$id, names(size))]
+  nodes[is.na(nodes)] <- 2
+
+  nodes <- nodes %>%
     mutate(
-      size = unname(deg) / max(unname(deg)) * 40, # Node size
-      title = paste0("Cow: ", id, "<br>Different Associations: ", unname(deg))
+      title = paste0("Cow: ", id, "<br>Different Associations: ", degree)
     )
+  
+  return(nodes)
 }
 
 # create nodes list from edges list (star version)
