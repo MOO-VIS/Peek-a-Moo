@@ -21,13 +21,43 @@ server <- function(input, output, session) {
     res_auth$user[[1]]
   })
   
+# Call to determine user access
+
+config <- NULL
+data_config <- NULL
+
+observeEvent(user(),{  
   if(is.null(user()) == TRUE){
-    config = c()
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "t"
+    )
   } else if (user() == 'guest') {
-    config = c('toImage')
+    config <<- c("toImage", "zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 1,
+      dom = 't'
+    )
+  } else if ((user() == 'user')){
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "Bftip"
+    )
   } else {
-    config = c()
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "Bftip",
+      buttons = c("csv")
+    )
   }
+})  
   
   # Warning section
   observe({
@@ -38,7 +68,7 @@ server <- function(input, output, session) {
       bin_cuttoff = input$bin_volume
     )
     
-    output$warning_table <- format_dt_table(warning_df, page_length = 20, user = user())
+    output$warning_table <- format_dt_table(warning_df, page_length = 20, data_config = data_config)
 
     output$warning_plot <- DT::renderDataTable(
       {
@@ -118,7 +148,7 @@ server <- function(input, output, session) {
     output$star_plot <- visNetwork::renderVisNetwork({
       plot_network_disp_star(nodes, edges)
     })
-    output$star_table <- format_dt_table(edges %>% select(c(from, to, weight, type)), user = user())
+    output$star_table <- format_dt_table(edges %>% select(c(from, to, weight, type)), data_config = data_config)
   })
 
   # render network
@@ -190,7 +220,7 @@ server <- function(input, output, session) {
             plot_network(nodes, edges, threshold_id)
           })
 
-          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), user = user())
+          output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
         }
       } else {
         # displacement network setup
@@ -228,7 +258,7 @@ server <- function(input, output, session) {
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp(nodes, edges, threshold_id)
             })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), user = user())
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           }
         }
       }
@@ -246,7 +276,7 @@ server <- function(input, output, session) {
       plot_elo(raw_graph_data,
         input$star_date_range[[1]],
         input$star_date_range[[2]],
-        cow_id = cow_id) |>
+        cow_id = cow_id) %>%
         config(modeBarButtonsToRemove = config)
     })
 
@@ -254,7 +284,7 @@ server <- function(input, output, session) {
       input$relationship_date_range[[1]],
       input$relationship_date_range[[2]],
       cow_id = cow_id
-    ), user = user())
+    ), data_config = data_config)
   })
 
   # render activity plots
@@ -271,11 +301,11 @@ server <- function(input, output, session) {
       df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
       
       # generate table
-      output[[paste0(var_name, "_table")]] <- format_dt_table(df, user = user())
+      output[[paste0(var_name, "_table")]] <- format_dt_table(df, data_config = data_config)
 
       # generate plot
       output[[paste0(var_name, "_plot")]] <- renderPlotly({
-        cow_date_range_plot(df, {{ y_col }}, input$show_average) |>
+        cow_date_range_plot(df, {{ y_col }}, input$show_average) %>%
           config(modeBarButtonsToRemove = config)
       })
     }
@@ -330,10 +360,11 @@ server <- function(input, output, session) {
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
     df_1 <- df %>%
       mutate(Time = as.character(df$Time))
-    output$daily_table <- format_dt_table(drop_na(df_1, Cow), user = user())
-    output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) |>
-        config(modeBarButtonsToRemove = config)})
+    output$daily_table <- format_dt_table(drop_na(df_1, Cow), data_config = data_config)
+    output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) %>%
+        config(modeBarButtonsToRemove = config)
   })
+})
   
   observe({
     req(input$daily_date)
@@ -352,8 +383,8 @@ server <- function(input, output, session) {
       drop_na() %>%
       group_by(Behaviour) %>%
       summarise(Total_Time = sum(time_for_total))
-    output$daily_total_table <- format_dt_table(df_1, user = user())
-    output$daily_total_plot <- renderPlotly({daily_total_schedumoo_plot(df) |>
+    output$daily_total_table <- format_dt_table(df_1, data_config = data_config)
+    output$daily_total_plot <- renderPlotly({daily_total_schedumoo_plot(df) %>%
         config(modeBarButtonsToRemove = config)})
   })
 
@@ -363,12 +394,12 @@ server <- function(input, output, session) {
 
 
     df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
-    output$bullying_table <- format_dt_table(df, user = user())
+    output$bullying_table <- format_dt_table(df, data_config = data_config)
     output$bullying_plot <- renderPlotly({
       plot_bully_analysis(df,
                           input$relationship_cow_selection,
                           input$relationship_date_range[[1]],
-                          input$relationship_date_range[[2]]) |>
+                          input$relationship_date_range[[2]]) %>%
         config(modeBarButtonsToRemove = config)
     })
   })
@@ -377,9 +408,9 @@ server <- function(input, output, session) {
     req(input$relationship_date_range)
 
     df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
-    output$THI_table <- format_dt_table(df, user = user())
+    output$THI_table <- format_dt_table(df, data_config = data_config)
     output$THI_plot <- renderPlotly({
-      plot_THI_analysis(df) |>
+      plot_THI_analysis(df) %>%
         config(modeBarButtonsToRemove = config)
     })
   })
@@ -409,7 +440,7 @@ server <- function(input, output, session) {
       )
     })
     # CSV output
-    output$feed_bin_table <- format_dt_table(bin_df, user = user())
+    output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
   })
 
   observe({
@@ -419,9 +450,9 @@ server <- function(input, output, session) {
     df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
       parse_hunger_df(input$activity_bin_selection)
 
-    output$hunger_table <- format_dt_table(df, user = user())
+    output$hunger_table <- format_dt_table(df, data_config = data_config)
     output$hunger_plot <- renderPlotly({
-      hunger_plot(df) |>
+      hunger_plot(df) %>%
         config(modeBarButtonsToRemove = config)
     })
   })
