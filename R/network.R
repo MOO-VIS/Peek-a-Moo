@@ -1,18 +1,13 @@
 library(igraph)
 
-plot_network <- function(nodes, edges, threshold_id = "10%") {
-  ledges <- data.frame(color = c("#D3D3D3", "white"), 
-                       label = c(paste0("Edges with top ", threshold_id, " weights"), "Hidden edges"), 
-                       arrows =c("both", "both"), 
-                       font.align = "bottom") 
-  
+plot_network <- function(nodes, edges, layouts = "layout_in_circle") {
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
   ) %>%
     visNodes(
       font = list(size = 30),
-      shape = "circle",
+      shape = "dot",
       shadow = TRUE,
       borderWidth = 1,
       color = list(
@@ -24,16 +19,15 @@ plot_network <- function(nodes, edges, threshold_id = "10%") {
       smooth = list(enabled = TRUE, type = "horizontal"),
       color = list(color = "#D3D3D3", highlight = "orange", hover = "#2B7CE9")
     ) %>%
-    visLegend(addEdges = ledges, useGroups = FALSE) %>%
     visInteraction(
       hover = TRUE,
-      tooltipDelay = 100,
-      tooltipStay = 300,
+      tooltipDelay = 0,
+      tooltipStay = 500,
       dragNodes = FALSE,
       selectable = FALSE,
       selectConnectedEdges = FALSE
     ) %>%
-    visIgraphLayout(layout = "layout_in_circle") %>%
+    visIgraphLayout(layout = layouts) %>%
     visPhysics(stabilization = FALSE) %>%
     visExport(
       type = "png", name = "export-network",
@@ -41,8 +35,8 @@ plot_network <- function(nodes, edges, threshold_id = "10%") {
     )
 }
 
-plot_network_disp <- function(nodes, edges, threshold_id = "10%") {
-  plot_network(nodes, edges, threshold_id = threshold_id) %>%
+plot_network_disp <- function(nodes, edges) {
+  plot_network(nodes, edges) %>%
     visNodes(
       shape = "dot"
     ) %>%
@@ -81,8 +75,8 @@ plot_network_disp_star <- function(nodes, edges) {
     visEdges(arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5))) %>%
     visInteraction(
       hover = TRUE,
-      tooltipDelay = 100,
-      tooltipStay = 300
+      tooltipDelay = 0,
+      tooltipStay = 500
     ) %>%
     visPhysics(stabilization = FALSE) %>%
     visExport(
@@ -119,30 +113,31 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
     )) %>%
     mutate(
       width = as.integer(weight_bins) - 1,
-      color.opacity = case_when(
-        width >= 1 ~ 1,
-        width < 1 ~ 0
-      )
-    )
+      # color.opacity = case_when(
+      #   width >= 1 ~ 1,
+      #   width < 1 ~ 0
+      # ),
+      title = paste0("Synchronicities between ", from, " and ", to, ": ", weight, " secs")
+    ) %>%
+    filter(width >= 1)
 
   # return the edgelist
   edgelist
 }
 
 # combine dataframe for displacement data and create edges list (displacement)
-combine_replace_edges <- function(x,
+combine_replace_df <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
                                   CD_min = NULL,
-                                  CD_max = NULL,
-                                  threshold = 0.9) {
-
+                                  CD_max = NULL) {
+  
   # set defaults
   from_date <- from_date %||% -Inf
   to_date <- to_date %||% Inf
   CD_min <- CD_min %||% 0
   CD_max <- CD_max %||% 1
-
+  
   combo_df <- as.data.frame(x) %>%
     mutate(date = as.Date(date)) %>%
     rename(
@@ -159,7 +154,17 @@ combine_replace_edges <- function(x,
     ) %>%
     group_by(from, to) %>%
     summarise(weight = n()) %>%
-    ungroup() %>%
+    ungroup()
+}
+
+combine_replace_edges <- function(x,
+                                  from_date = NULL,
+                                  to_date = NULL,
+                                  CD_min = NULL,
+                                  CD_max = NULL,
+                                  threshold = 0.9) {
+    
+  edgelist <- combine_replace_df(x, from_date, to_date, CD_min, CD_max) %>%
     mutate(weight_bins = cut(weight,
       breaks = c(
         min(weight),
@@ -170,12 +175,13 @@ combine_replace_edges <- function(x,
     )) %>%
     mutate(
       width = as.integer(weight_bins) - 1,
-      color.opacity = case_when(
-        width >= 1 ~ 1,
-        width < 1 ~ 0
-      ),
+      # color.opacity = case_when(
+      #   width >= 1 ~ 1,
+      #   width < 1 ~ 0
+      # ),
       title = paste0("Displacements: ", weight)
-    )
+    ) %>%
+    filter(width >= 1)
 }
 
 # combine dataframe for displacement data and create edges list (star version)
@@ -220,32 +226,85 @@ combine_replace_edges_star <- function(x,
     arrange(from != cow_id)
 }
 
+# combine dataframe for displacement data and create edges list (paired version)
+combine_replace_edges_paired <- function(x,
+                                       from_date = NULL,
+                                       to_date = NULL,
+                                       cow_id_1 = NULL,
+                                       cow_id_2 = NULL,
+                                       CD_min = NULL,
+                                       CD_max = NULL) {
+  
+  paired_df <- combine_replace_edges_star(x, from_date, to_date, cow_id_1, CD_min, CD_max) %>% 
+    filter(from == cow_id_2 | to == cow_id_2) %>%
+    mutate(label = title)
+}
+
 # create nodes list from edges list
-combine_nodes <- function(edges, deg) {
-  nodes <- data.frame(id = unique(c(
-    edges$from,
-    edges$to
-  ))) %>%
-    mutate(
-      size = unname(deg) / max(unname(deg)) * 40, # Node size
-      label = id
+combine_nodes <- function(df,
+                          from_date = NULL,
+                          to_date = NULL, 
+                          size) {
+  df <- df %>%
+    purrr::map_df(adjacency_to_long, .id = "date") %>%
+    dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    rename(weight = value) %>%
+    filter(
+      date >= from_date,
+      date <= to_date
     )
+  
+  nodes <- data.frame(id = unique(c(
+    df$from,
+    df$to
+  ))) %>%
+  mutate(
+    #size = unname(deg) / max(unname(deg)) * 10, # Node size
+    label = id
+  ) %>%
+    arrange(id)
+  
+  nodes$size <- size[match(nodes$id, names(size))]
+  
+  nodes[is.na(nodes)] <- 2
+  
+  return(nodes)
 }
 
 # create nodes list from edges list (displacement)
-combine_replace_nodes <- function(edges, deg) {
+combine_replace_nodes <- function(x,
+                                  from_date = NULL,
+                                  to_date = NULL,
+                                  cow_id = NULL,
+                                  CD_min = NULL,
+                                  CD_max = NULL,
+                                  deg = NULL) {
+  df <- combine_replace_df(x, from_date, to_date, CD_min, CD_max)
+  
   nodes <- data.frame(id = unique(c(
-    edges$from,
-    edges$to
-  ))) %>%
+    df$from,
+    df$to
+  )))
+  
+  nodes$degree <- deg[match(nodes$id, names(deg))]
+  nodes[is.na(nodes)] <- 0
+  
+  size <- deg / max(deg) * 40
+  nodes$size <- size[match(nodes$id, names(size))]
+  nodes[is.na(nodes)] <- 2
+
+  nodes <- nodes %>%
     mutate(
-      size = unname(deg) / max(unname(deg)) * 40, # Node size
-      title = paste0("Cow: ", id, "<br>Different Associations: ", unname(deg))
+      title = paste0("Cow: ", id, "<br>Different Associations: ", degree)
     )
+  
+  return(nodes)
 }
 
 # create nodes list from edges list (star version)
-combine_replace_nodes_star <- function(edges, cow_id = NULL) {
+combine_replace_nodes_star <- function(edges, cow_id = NULL,
+                                       from_date = NULL,
+                                       to_date = NULL) {
   nodes_size_to <- edges %>%
     group_by(to) %>%
     summarise(deg = sum(weight)) %>%
@@ -264,12 +323,18 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL) {
     edges$from,
     edges$to
   ))) %>%
+    left_join(combine_elo_star(from_date, to_date), by = "id") %>%
     mutate(
-      color.background = case_when(
+      color.background = as.character(Elo_bins),
+      color.border = case_when(
+        id == cow_id ~ "darkred",
+        id != cow_id ~ "#2B7CE9"
+      ),
+      color.hover.background = case_when(
         id == cow_id ~ "orange",
         id != cow_id ~ "#D2E5FF"
       ),
-      color.border = case_when(
+      color.hover.border = case_when(
         id == cow_id ~ "darkred",
         id != cow_id ~ "#2B7CE9"
       ),
@@ -282,10 +347,39 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL) {
         id != cow_id ~ log(deg + 1) * 10
       ),
       title = case_when(
-        id == cow_id ~ paste0("Center Cow"),
-        id != cow_id ~ paste0("Cow: ", id, "<br>Displacements with Center: ", deg),
+        id == cow_id ~ paste0("Center Cow",
+                              "<br>Mean Elo: ", Elo_mean),
+        id != cow_id ~ paste0("Cow: ", id, 
+                              "<br>Displacements with Center: ", deg,
+                              "<br>Mean Elo: ", Elo_mean)
       )
     )
+}
+
+# Fiter elo score data
+combine_elo_star <- function(from_date = NULL,
+                             to_date = NULL) {
+  # set defaults
+  from_date <- from_date %||% -Inf
+  to_date <- to_date %||% Inf
+  
+  combo_df <- dominance_df %>%
+    mutate(Date = as.Date(Date),
+           id = as.numeric(Cow)) %>%
+    select(-c(Cow, present)) %>%
+    filter(
+      Date >= from_date,
+      Date <= to_date
+    ) %>%
+    group_by(id) %>%
+    summarise(Elo_mean = round(mean(Elo), 2)) %>%
+    ungroup() %>%
+    mutate(Elo_bins = cut(Elo_mean,
+                           breaks = 5,
+                           labels = c("#cfe2f3", "#9fc5e8", "#6fa8dc", "#3d85c6", "#0b5394"),
+                           include.lowest = TRUE, 
+                           ordered = TRUE
+    ))
 }
 
 .make_tidygraph <- function(x, edgelist = NULL, directed = FALSE) {
@@ -339,7 +433,7 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
   `%!in%` <- Negate(`%in%`)
 
-  if (!(network %in% c("Displacement", "Displacement Star*"))) {
+  if (!(network %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
     df_dates <- names(df)
     df_dates <- as.Date(df_dates, format = "%Y-%m-%d")
   } else {

@@ -10,7 +10,7 @@ sidebar <- dashboardSidebar(
     id = "sidemenu",
     menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
-    menuItem("Relationships", icon = icon("connectdevelop"), tabName = "relationships"),
+    menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("Source code",
@@ -75,10 +75,31 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(4, date_range_widget("relationship_date_range")),
-      column(4, network_selection_widget("relationship_network_selection", multiple = FALSE)),
-      column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE)),
-      column(12, sliderInput("cd_range", "Competition Density (Displacement network only.)", min = 0, max = 1, value = c(0.2, 0.5)))
+      column(3, date_range_widget("relationship_date_range")),
+      column(3, network_selection_widget("relationship_network_selection", multiple = FALSE)),
+      conditionalPanel(
+        condition = "input.relationship_network_selection != 'Displacement Star*' && input.relationship_network_selection != 'Displacement Paired'",
+        column(3, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Feeding Sychronicity' || input.relationship_network_selection == 'Lying Synchronicity' || input.relationship_network_selection == 'Feeding Neighbours'",
+        column(3, layout_selection_widget("relationship_layout_selection", multiple = FALSE))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Displacement'",
+        column(12, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Displacement Star*'",
+        column(3, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
+        column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+      ),
+      conditionalPanel(
+        condition = "input.relationship_network_selection == 'Displacement Paired'",
+        column(3, cow_selection_widget("paired_cow_selection_1", multiple = FALSE, label = "First Cow of Interest")),
+        column(3, cow_selection_widget("paired_cow_selection_2", multiple = FALSE, label = "Second Cow of Interest")),
+        column(12, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+      )
     )
   ),
   fluidRow(
@@ -87,27 +108,13 @@ relationships_tab <- tabItem(
                    output_fun = visNetworkOutput)
   ),
   fluidRow(
-    default_tabBox("THI", "THI", width = 12)
-  )
-)
-
-star_tab <- tabItem(
-  "star",
-  fluidRow(
-    box(
-      title = "Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(6, date_range_widget("star_date_range")),
-      column(6, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
-      column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5)))
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Displacement Star*' || input.relationship_network_selection == 'Displacement Paired'",
+      default_tabBox("Dominance", "elo", width = 12)
     )
   ),
   fluidRow(
-    default_tabBox("Star Network", "star", 
-                   width = 12, 
-                   output_fun = visNetworkOutput)
-  ),
-  fluidRow(
-    default_tabBox("Dominance", "elo", width = 12)
+    default_tabBox("THI", "THI", width = 12)
   )
 )
 
@@ -186,7 +193,6 @@ body <- dashboardBody(
     activities_tab,
     daily_tab,
     relationships_tab,
-    star_tab,
     bins_tab,
     warnings_tab
   )
