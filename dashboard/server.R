@@ -1,15 +1,82 @@
-# Set up shiny server
-shinyServer(function(input, output, session) {
+library(shinymanager)
 
+passphrase <- Sys.getenv("PASSPHRASE")
+
+# credentials <- data.frame(
+#   user = c("guest", "user", "admin"), # mandatory
+#   password = c("guest", "shiny", "shinymanager"), # mandatory
+#   admin = c(FALSE, FALSE, TRUE),
+#   stringsAsFactors = FALSE
+# )
+
+# Set up shiny server
+server <- function(input, output, session) {
+  
+  # check_credentials directly on sqlite db
+  res_auth <- secure_server(
+    check_credentials = check_credentials(
+      # credentials
+      "../auth/database.sqlite",
+      passphrase = passphrase
+    )
+  )
+  
+  output$auth_output <- renderPrint({
+    reactiveValuesToList(res_auth)
+  })
+  
+  user <- reactive({
+    res_auth$user[[1]]
+  })
+  
+# Call to determine user access
+
+config <- NULL
+data_config <- NULL
+
+observeEvent(user(),{  
+  if(is.null(user()) == TRUE){
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "t"
+    )
+  } else if (user() == 'guest') {
+    config <<- c("toImage", "zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 1,
+      dom = 't'
+    )
+  } else if ((user() == 'user')){
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "Bftip"
+    )
+  } else {
+    config <<- c("zoomIn2d", "zoomOut2d")
+    data_config <<- list(
+      scrollX = TRUE,
+      pageLength = 5,
+      dom = "Bftip",
+      buttons = c("csv")
+    )
+  }
+})  
+  
   # Warning section
   observe({
+    
     warning_df <- combine_warnings(
       food_cuttoff = input$food_intake,
       water_cuttoff = input$water_intake,
       bin_cuttoff = input$bin_volume
     )
-
-    output$warning_table <- format_dt_table(warning_df, page_length = 20)
+    
+    output$warning_table <- format_dt_table(warning_df, page_length = 20, data_config = data_config)
 
     output$warning_plot <- DT::renderDataTable(
       {
@@ -172,7 +239,7 @@ shinyServer(function(input, output, session) {
               plot_network(nodes, edges, layouts = "layout_with_fr")
             })
             
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           }
         }
       } else {
@@ -218,7 +285,7 @@ shinyServer(function(input, output, session) {
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp(nodes, edges)
             })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           } else if (input$relationship_network_selection == "Displacement Star*") {
             
             cow_id <- input$star_cow_selection
@@ -245,7 +312,7 @@ shinyServer(function(input, output, session) {
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp_star(nodes, edges)
             })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)), data_config = data_config)
           } else {
             cow_id_1 <- input$paired_cow_selection_1
             cow_id_2 <- input$paired_cow_selection_2
@@ -273,7 +340,7 @@ shinyServer(function(input, output, session) {
                 visEdges(length = 200) %>%
                 visInteraction(hover = FALSE)
             })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           }
         }
       }
@@ -321,7 +388,7 @@ shinyServer(function(input, output, session) {
                                                  input$relationship_date_range[[2]],
                                                  cow_id_1 = cow_id_1,
                                                  cow_id_2 = cow_id_2
-      ))
+      ), data_config = data_config)
     }
   })
 
@@ -334,16 +401,17 @@ shinyServer(function(input, output, session) {
     #' @param y_col The column of interest
     #' @param var_name The name of the UI output variable
     plot_cow_date_range <- function(df, y_col, var_name) {
-
+    
       # filter table
       df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
-
+      
       # generate table
-      output[[paste0(var_name, "_table")]] <- format_dt_table(df)
+      output[[paste0(var_name, "_table")]] <- format_dt_table(df, data_config = data_config)
 
       # generate plot
       output[[paste0(var_name, "_plot")]] <- renderPlotly({
-        cow_date_range_plot(df, {{ y_col }}, input$show_average)
+        cow_date_range_plot(df, {{ y_col }}, input$show_average) %>%
+          config(modeBarButtonsToRemove = config)
       })
     }
 
@@ -383,20 +451,46 @@ shinyServer(function(input, output, session) {
       "feed_intake"
     )
   })
-
+  
   observe({
     req(input$daily_date)
     req(input$daily_cow_selection)
-
+    
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- Cleaned_feeding_original_data
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
-
+    
     # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    output$daily_table <- format_dt_table(drop_na(df, Cow))
-    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
+    df_1 <- df %>%
+      mutate(Time = as.character(df$Time))
+    output$daily_table <- format_dt_table(drop_na(df_1, Cow), data_config = data_config)
+    output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) %>%
+        config(modeBarButtonsToRemove = config)
+  })
+})
+  
+  observe({
+    req(input$daily_date)
+    req(input$daily_cow_selection)
+    
+    # Create feeding, drinking, and lying_standing dataframes
+    feeding <- Cleaned_feeding_original_data
+    drinking <- Cleaned_drinking_original_data
+    lying_standing <- duration_for_each_bout
+    
+    # Render daily total behavior plot
+    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
+    df_1 <- df %>%
+      mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
+      select(c("Cow", "Behaviour", "time_for_total")) %>%
+      drop_na() %>%
+      group_by(Behaviour) %>%
+      summarise(Total_Time = sum(time_for_total))
+    output$daily_total_table <- format_dt_table(df_1, data_config = data_config)
+    output$daily_total_plot <- renderPlotly({daily_total_schedumoo_plot(df) %>%
+        config(modeBarButtonsToRemove = config)})
   })
 
   observe({
@@ -405,19 +499,24 @@ shinyServer(function(input, output, session) {
 
 
     df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
-    output$bullying_table <- format_dt_table(df)
+    output$bullying_table <- format_dt_table(df, data_config = data_config)
     output$bullying_plot <- renderPlotly({
-      plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      plot_bully_analysis(df,
+                          input$relationship_cow_selection,
+                          input$relationship_date_range[[1]],
+                          input$relationship_date_range[[2]]) %>%
+        config(modeBarButtonsToRemove = config)
     })
   })
 
   observe({
     req(input$relationship_date_range)
 
-    df <- THI_analysis(THI)
-    output$THI_table <- format_dt_table(df)
+    df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+    output$THI_table <- format_dt_table(df, data_config = data_config)
     output$THI_plot <- renderPlotly({
-      plot_THI_analysis(df, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      plot_THI_analysis(df) %>%
+        config(modeBarButtonsToRemove = config)
     })
   })
 
@@ -446,7 +545,7 @@ shinyServer(function(input, output, session) {
       )
     })
     # CSV output
-    output$feed_bin_table <- format_dt_table(bin_df)
+    output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
   })
 
   observe({
@@ -456,9 +555,10 @@ shinyServer(function(input, output, session) {
     df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
       parse_hunger_df(input$activity_bin_selection)
 
-    output$hunger_table <- format_dt_table(df)
+    output$hunger_table <- format_dt_table(df, data_config = data_config)
     output$hunger_plot <- renderPlotly({
-      hunger_plot(df)
+      hunger_plot(df) %>%
+        config(modeBarButtonsToRemove = config)
     })
   })
-})
+}
