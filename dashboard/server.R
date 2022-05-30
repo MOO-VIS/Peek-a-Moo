@@ -233,7 +233,7 @@ observeEvent(user(),{
               plot_network(nodes, edges)
             })
             
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           } else {
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network(nodes, edges, layouts = "layout_with_fr")
@@ -369,7 +369,7 @@ observeEvent(user(),{
                                                  input$relationship_date_range[[1]],
                                                  input$relationship_date_range[[2]],
                                                  cow_id_1 = cow_id
-      ))
+      ), data_config = data_config)
     } else if (input$relationship_network_selection == "Displacement Paired") {
       cow_id_1 <- input$paired_cow_selection_1
       cow_id_2 <- input$paired_cow_selection_2
