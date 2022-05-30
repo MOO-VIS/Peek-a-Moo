@@ -75,8 +75,8 @@ plot_network_disp_star <- function(nodes, edges) {
     visEdges(arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5))) %>%
     visInteraction(
       hover = TRUE,
-      tooltipDelay = 100,
-      tooltipStay = 300
+      tooltipDelay = 0,
+      tooltipStay = 500
     ) %>%
     visPhysics(stabilization = FALSE) %>%
     visExport(
@@ -224,6 +224,20 @@ combine_replace_edges_star <- function(x,
       title = paste0("Actions: ", weight)
     ) %>%
     arrange(from != cow_id)
+}
+
+# combine dataframe for displacement data and create edges list (paired version)
+combine_replace_edges_paired <- function(x,
+                                       from_date = NULL,
+                                       to_date = NULL,
+                                       cow_id_1 = NULL,
+                                       cow_id_2 = NULL,
+                                       CD_min = NULL,
+                                       CD_max = NULL) {
+  
+  paired_df <- combine_replace_edges_star(x, from_date, to_date, cow_id_1, CD_min, CD_max) %>% 
+    filter(from == cow_id_2 | to == cow_id_2) %>%
+    mutate(label = title)
 }
 
 # create nodes list from edges list
@@ -419,7 +433,7 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
   `%!in%` <- Negate(`%in%`)
 
-  if (!(network %in% c("Displacement", "Displacement Star*"))) {
+  if (!(network %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
     df_dates <- names(df)
     df_dates <- as.Date(df_dates, format = "%Y-%m-%d")
   } else {

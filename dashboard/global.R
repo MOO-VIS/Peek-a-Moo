@@ -275,12 +275,40 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
   }
 }
 
+update_2nd_cow_selection_displacement <- function(date_obj, 
+                                                  inputId, 
+                                                  session,
+                                                  cow_id_1 = NULL,
+                                                  CD_min = NULL,
+                                                  CD_max = NULL) {
+  # find cows that exist in date range
+  edges <- combine_replace_edges_star(replacement_df, date_obj[1], date_obj[2], 
+                                            cow_id_1, CD_min, CD_max)
+  
+  cow_choices  <- data.frame(id = unique(c(
+      edges$from,
+      edges$to
+    ))) %>%
+    filter(id != cow_id_1)
+  
+  colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " paired cows correlated to ", cow_id_1)
+    
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = cow_choices,
+    selected = NULL
+  )
+}
+
 #' Helper function for updating network selection picker input widgets
 #'
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
 update_network_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", "Displacement", "Displacement Star*")
+  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", 
+               "Displacement", "Displacement Star*", "Displacement Paired")
   network_choices <- as.data.frame(network)
   colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
 

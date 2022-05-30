@@ -65,6 +65,30 @@ shinyServer(function(input, output, session) {
       session = session
     )
   })
+  
+  observe({
+    req(input$relationship_date_range)
+    
+    update_cow_selection_displacement(
+      date_obj = input$relationship_date_range,
+      inputId = "paired_cow_selection_1",
+      session = session
+    )
+  })
+  
+  observe({
+    req(input$relationship_date_range)
+    req(input$paired_cow_selection_1)
+    
+    update_2nd_cow_selection_displacement(
+      date_obj = input$relationship_date_range,
+      inputId = "paired_cow_selection_2",
+      session = session,
+      cow_id_1 = input$paired_cow_selection_1,
+      CD_min = input$paired_cd_range[[1]],
+      CD_max = input$paired_cd_range[[2]]
+    )
+  })
 
   # render network
   observe({
@@ -93,7 +117,7 @@ shinyServer(function(input, output, session) {
     } else {
 
       # select network to plot
-      if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*"))) {
+      if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Lying Synchronicity") {
           raw_graph_data <- synchronized_lying_total_time
         } else if (input$relationship_network_selection == "Feeding Sychronicity") {
@@ -195,7 +219,7 @@ shinyServer(function(input, output, session) {
               plot_network_disp(nodes, edges)
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
-          } else {
+          } else if (input$relationship_network_selection == "Displacement Star*") {
             
             cow_id <- input$star_cow_selection
             
@@ -222,6 +246,34 @@ shinyServer(function(input, output, session) {
               plot_network_disp_star(nodes, edges)
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)))
+          } else {
+            cow_id_1 <- input$paired_cow_selection_1
+            cow_id_2 <- input$paired_cow_selection_2
+            
+            edges <- combine_replace_edges_paired(raw_graph_data,
+                                                input$relationship_date_range[[1]],
+                                                input$relationship_date_range[[2]],
+                                                cow_id_1 = cow_id_1,
+                                                cow_id_2 = cow_id_2,
+                                                CD_min = input$paired_cd_range[[1]],
+                                                CD_max = input$paired_cd_range[[2]]
+            )
+            
+            edges$width <- edges$weight
+            
+            nodes <- data.frame(id = unique(c(
+              edges$from,
+              edges$to
+            ))) %>%
+              mutate(label = paste(id))
+            
+            output$network_plot <- visNetwork::renderVisNetwork({
+              plot_network_disp_star(nodes, edges) %>%
+                visNodes(shape = "circle") %>%
+                visEdges(length = 200) %>%
+                visInteraction(hover = FALSE)
+            })
+            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)))
           }
         }
       }
@@ -231,24 +283,46 @@ shinyServer(function(input, output, session) {
   # render elo plot
   observe({
     req(input$relationship_date_range)
-
-    cow_id <- input$star_cow_selection
-
+    req(input$relationship_network_selection)
+    
     raw_graph_data <- dominance_df
-
-    output$elo_plot <- renderPlotly({
-      plot_elo(raw_graph_data,
-        input$relationship_date_range[[1]],
-        input$relationship_date_range[[2]],
-        cow_id = cow_id
-      )
-    })
-
-    output$elo_table <- format_dt_table(elo_df(raw_graph_data,
-      input$relationship_date_range[[1]],
-      input$relationship_date_range[[2]],
-      cow_id = cow_id
-    ))
+    
+    if (input$relationship_network_selection == "Displacement Star*") {
+      cow_id <- input$star_cow_selection
+      
+      output$elo_plot <- renderPlotly({
+        plot_elo(raw_graph_data,
+                 input$relationship_date_range[[1]],
+                 input$relationship_date_range[[2]],
+                 cow_id = cow_id
+        )
+      })
+      
+      output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+                                                 input$relationship_date_range[[1]],
+                                                 input$relationship_date_range[[2]],
+                                                 cow_id_1 = cow_id
+      ))
+    } else if (input$relationship_network_selection == "Displacement Paired") {
+      cow_id_1 <- input$paired_cow_selection_1
+      cow_id_2 <- input$paired_cow_selection_2
+      
+      output$elo_plot <- renderPlotly({
+        plot_elo_paired(raw_graph_data,
+                 input$relationship_date_range[[1]],
+                 input$relationship_date_range[[2]],
+                 cow_id_1 = cow_id_1,
+                 cow_id_2 = cow_id_2
+        )
+      })
+      
+      output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+                                                 input$relationship_date_range[[1]],
+                                                 input$relationship_date_range[[2]],
+                                                 cow_id_1 = cow_id_1,
+                                                 cow_id_2 = cow_id_2
+      ))
+    }
   })
 
   # render activity plots
