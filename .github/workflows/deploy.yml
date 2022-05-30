@@ -12,6 +12,7 @@ on:
       - '.github/workflows/**'
   
   workflow_dispatch:
+  workflow_call:
 
 permissions: write-all
 
