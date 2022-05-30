@@ -21,6 +21,14 @@ server <- function(input, output, session) {
     res_auth$user[[1]]
   })
   
+  if(is.null(user()) == TRUE){
+    config = c()
+  } else if (user() == 'guest') {
+    config = c('toImage')
+  } else {
+    config = c()
+  }
+  
   # Warning section
   observe({
     
@@ -238,8 +246,8 @@ server <- function(input, output, session) {
       plot_elo(raw_graph_data,
         input$star_date_range[[1]],
         input$star_date_range[[2]],
-        cow_id = cow_id
-      )
+        cow_id = cow_id) |>
+        config(modeBarButtonsToRemove = config)
     })
 
     output$elo_table <- format_dt_table(elo_df(raw_graph_data,
@@ -267,7 +275,8 @@ server <- function(input, output, session) {
 
       # generate plot
       output[[paste0(var_name, "_plot")]] <- renderPlotly({
-        cow_date_range_plot(df, {{ y_col }}, input$show_average)
+        cow_date_range_plot(df, {{ y_col }}, input$show_average) |>
+          config(modeBarButtonsToRemove = config)
       })
     }
 
@@ -322,7 +331,8 @@ server <- function(input, output, session) {
     df_1 <- df %>%
       mutate(Time = as.character(df$Time))
     output$daily_table <- format_dt_table(drop_na(df_1, Cow), user = user())
-    output$daily_plot <- renderPlotly(daily_schedu_moo_plot(df))
+    output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) |>
+        config(modeBarButtonsToRemove = config)})
   })
   
   observe({
@@ -343,7 +353,8 @@ server <- function(input, output, session) {
       group_by(Behaviour) %>%
       summarise(Total_Time = sum(time_for_total))
     output$daily_total_table <- format_dt_table(df_1, user = user())
-    output$daily_total_plot <- renderPlotly(daily_total_schedumoo_plot(df))
+    output$daily_total_plot <- renderPlotly({daily_total_schedumoo_plot(df) |>
+        config(modeBarButtonsToRemove = config)})
   })
 
   observe({
@@ -354,7 +365,11 @@ server <- function(input, output, session) {
     df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
     output$bullying_table <- format_dt_table(df, user = user())
     output$bullying_plot <- renderPlotly({
-      plot_bully_analysis(df, input$relationship_cow_selection, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      plot_bully_analysis(df,
+                          input$relationship_cow_selection,
+                          input$relationship_date_range[[1]],
+                          input$relationship_date_range[[2]]) |>
+        config(modeBarButtonsToRemove = config)
     })
   })
 
@@ -364,7 +379,8 @@ server <- function(input, output, session) {
     df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
     output$THI_table <- format_dt_table(df, user = user())
     output$THI_plot <- renderPlotly({
-      plot_THI_analysis(df)
+      plot_THI_analysis(df) |>
+        config(modeBarButtonsToRemove = config)
     })
   })
 
@@ -405,7 +421,8 @@ server <- function(input, output, session) {
 
     output$hunger_table <- format_dt_table(df, user = user())
     output$hunger_plot <- renderPlotly({
-      hunger_plot(df)
+      hunger_plot(df) |>
+        config(modeBarButtonsToRemove = config)
     })
   })
 }
