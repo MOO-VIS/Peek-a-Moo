@@ -129,7 +129,7 @@ daily_total_schedumoo_plot <- function(df) {
           domain = list(row = 0, column = 0))
 
       fig <- fig %>% layout(
-        showlegend = FALSE,
+        showlegend = TRUE,
         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)
       )
