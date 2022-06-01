@@ -14,6 +14,7 @@ library(png)
 library(visNetwork)
 library(googleCloudStorageR)
 library(reshape2)
+library(shinyBS)
 
 #load in plot/table creation scripts
 source("../R/notifications.R")
@@ -239,7 +240,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold (top % of connected cows)"),
+    label = paste0("Threshold"),
     choices = list(),
     selected = NULL,
     multiple = multiple,
@@ -450,4 +451,10 @@ bin_selection_widget <- function(inputId) {
       "none-selected-text" = "Select bins"
     )
   )
+}
+
+#' style setter for value boxes
+#'
+style_func <- function(msg = 'Hello', style="font-size: 100%;"){
+  tags$p( msg , style = style )
 }

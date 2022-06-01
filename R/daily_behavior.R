@@ -73,7 +73,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
 #'
 #' @examples
 #' daily_total_schedumoo(df)
-daily_total_schedumoo_plot <- function(df) {
+daily_total_schedumoo_info <- function(df) {
 
   # prep the dataframe
   df <- df %>%
@@ -97,44 +97,19 @@ daily_total_schedumoo_plot <- function(df) {
   }
   
   if(sum_bad_cow > 0){
-      error_message1 <- validate(
-        need(
-          sum_bad_cow == 0,
-          paste0("Data for one or more behaviours is missing for the selected cow(s). Please change selection."),
-        )
+        showNotification( type = "warning",
+        paste0("Date range contains days with missing data.")
       )
-      return(error_message1)
-    } else {
+  }
       
-      # instantiate the plotting objects
-      labels <- c("Drinking", "Feeding", "Lying", "Standing")
-      colors <- c("rgb(3, 127, 252)", "rgb(157, 192, 131)", "rgb(250, 216, 120)", "rgb(211, 148, 147)")
-      df_filter <- df %>%
-        group_by(Behaviour) %>%
-        summarise(total = sum(time_for_total))
-      values <- df_filter$total
-      vals <- paste(values, sep = "")
-      
-      
-      # plot the donut chart
-      fig <- plot_ly(marker = list(colors = colors), textinfo = "text", text = vals)
-      fig <- fig %>%
-        add_trace(
-          type = "pie",
-          name = "",
-          values = values,
-          labels = labels,
-          hovertemplate = "<extra></extra>%{label}",
-          hole = 0.5,
-          domain = list(row = 0, column = 0))
+    # instantiate summary df
+    df_filter <- df %>%
+      group_by(Behaviour) %>%
+      summarise(total = sum(time_for_total))
+    values <- df_filter$total
+    
+    return(values)
 
-      fig <- fig %>% layout(
-        showlegend = TRUE,
-        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)
-      )
-      fig
-    }
 }
 
 

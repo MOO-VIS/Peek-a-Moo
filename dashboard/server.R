@@ -1,6 +1,6 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+ passphrase <- Sys.getenv("PASSPHRASE")
 
 # credentials <- data.frame(
 #   user = c("guest", "user", "admin"), # mandatory
@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
+       # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -469,30 +469,43 @@ observeEvent(user(),{
     output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) %>%
         config(modeBarButtonsToRemove = config)
   })
+    totals <- daily_total_schedumoo_info(df)
+    
+    output$total_standing <- renderValueBox({
+      valueBox(
+        style_func( paste0(format(totals[4],big.mark=','), " s"), "font-size: 60%;"  ),
+        "Total standing time", 
+        icon = icon('circle-arrow-up', lib = 'glyphicon', style="font-size: 40px;"),
+        color = 'yellow'
+      )
+    })
+    output$total_lying <- renderValueBox({
+      valueBox(
+        style_func( paste0(format(totals[3],big.mark=','), " s"), "font-size: 60%;"  ),
+        "Total lying time", 
+        icon = icon('circle-arrow-down', lib = 'glyphicon', style="font-size: 40px;"),
+        color = 'yellow'
+      )
+    })
+    output$total_feeding <- renderValueBox({
+      valueBox(
+        style_func( paste0(format(totals[2],big.mark=','), " s"), "font-size: 60%;"  ),
+        "Total feeding time", 
+        icon = icon('grain', lib = 'glyphicon', style="font-size: 40px;"),
+        color = 'yellow'
+      )
+    })
+    output$total_drinking <- renderValueBox({
+      valueBox(
+        style_func( paste0(format(totals[1],big.mark=','), " s"), "font-size: 60%;"  ),
+        "Total drinking time", 
+        icon = icon('tint', lib = 'glyphicon', style="font-size: 40px;"),
+        color = 'yellow'
+      )
+    })
 })
   
-  observe({
-    req(input$daily_date)
-    req(input$daily_cow_selection)
-    
-    # Create feeding, drinking, and lying_standing dataframes
-    feeding <- Cleaned_feeding_original_data
-    drinking <- Cleaned_drinking_original_data
-    lying_standing <- duration_for_each_bout
-    
-    # Render daily total behavior plot
-    df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
-    df_1 <- df %>%
-      mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
-      select(c("Cow", "Behaviour", "time_for_total")) %>%
-      drop_na() %>%
-      group_by(Behaviour) %>%
-      summarise(Total_Time = sum(time_for_total))
-    output$daily_total_table <- format_dt_table(df_1, data_config = data_config)
-    output$daily_total_plot <- renderPlotly({daily_total_schedumoo_plot(df) %>%
-        config(modeBarButtonsToRemove = config)})
-  })
-
+  #Render Relationship tab plots
   observe({
     req(input$relationship_cow_selection)
     req(input$relationship_date_range)
@@ -527,7 +540,7 @@ observeEvent(user(),{
   })
 
 
-  # feed bin tab
+  # Render Feed bin tab
   observe({
     req(input$bin_date)
     req(input$activity_bin_selection)
