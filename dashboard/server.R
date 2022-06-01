@@ -92,18 +92,19 @@ observeEvent(user(),{
         dom = "ft"
       )
     )
-
-    # Warning notifications menu
-    output$notifications <- renderMenu({
-      get_warning_dropdown(warning_df)
-    })
-    observeEvent(input$linkClicked, {
-      updateTabItems(session, "sidemenu", selected = "warnings")
-      output$dropdown <- renderMenu({
-        get_warning_dropdown(warning_df)
-      })
-    })
   })
+
+  # contact menu
+    output$contact <- renderMenu({
+      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "Feedback and suggestions",
+                          messageItem(
+                            from = "Contact us",
+                            message =  "sample@sample.com",
+                            icon = icon("envelope"),
+                            href = "mailto:sample@sample.com"
+                          ))
+                          
+    })
 
 
   # update cow selections based on selected dates

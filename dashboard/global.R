@@ -141,10 +141,11 @@ filter_cows <- function(df, col, cow_selection) {
 #' @param output_fun Function for producing the plot output, defaults to plotlyOutput
 #'
 #' @return tabBox
-default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput) {
+default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
     height = height,
+    popover,
     tabPanel("Data", shinycssloaders::withSpinner(
       image = "loading_cow_table.gif",
       DT::dataTableOutput(paste0(var_name, "_table"))

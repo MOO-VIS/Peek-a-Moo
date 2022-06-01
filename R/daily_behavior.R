@@ -35,7 +35,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
     filter(Cow %in% cow_id) %>%
     mutate(Cow = paste0('Cow ', as.character(Cow))) %>%
     mutate(event_id = row_number()) %>%
-    # Trim events starting before the beginning of the day of interest or after the end of the day of interest
+    #Trim events starting before the beginning of the day of interest or after the end of the day of interest
     mutate(Start = case_when(
       floor_date(Start, 'day') < as.POSIXct(date, tz = 'America/Los_Angeles') ~
         as.POSIXct(date, tz = 'America/Los_Angeles'),
@@ -69,12 +69,12 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
 #'
 #' @param df dataframe output from daily_schedu_moo_data()
 #'
-#' @return a formatted data table for plotting donut chart
+#' @return a df of all behaviours for a day
 #'
 #' @examples
-#' daily_total_schedumoo(df)
+#' daily_total_schedumoo_info(df)
 daily_total_schedumoo_info <- function(df) {
-
+  
   # prep the dataframe
   df <- df %>%
     mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
@@ -97,8 +97,8 @@ daily_total_schedumoo_info <- function(df) {
   }
   
   if(sum_bad_cow > 0){
-        showNotification( type = "warning",
-        paste0("Date range contains days with missing data.")
+        showNotification(type = "warning",
+        paste0("Behaviour data incomplete for some cow(s).")
       )
   }
       
@@ -172,3 +172,4 @@ daily_schedu_moo_plot <- function(df) {
   
   fig
 }
+
