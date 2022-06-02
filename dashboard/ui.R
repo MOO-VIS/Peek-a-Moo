@@ -2,7 +2,7 @@ library(shinymanager)
 
 header <- dashboardHeader(
   title = tags$a(href='https://awp.landfood.ubc.ca/',
-                 tags$img(src='logo.png', height = '50', width ='210')),
+                 tags$img(src='logo_white.png', height = '50', width ='210')),
   dropdownMenuOutput("contact"),
   dropdownMenuOutput("github")
 )
@@ -335,16 +335,7 @@ body <- dashboardBody(
       }"
     )
   ),
-  tags$head(tags$style(HTML(
-    '.headerStyling { 
-        font-size: 28px;
-        line-height: 50px;
-        text-align: left;
-        padding: 0 10px;
-        overflow: hidden;
-        color: white;
-      }
-    '))),
+  custom_theme(),
   tags$script(HTML('
       $(document).ready(function() {
         $("header").find("nav").append(\'<span class="headerStyling"> Dairy Cow Dashboard </span>\');

@@ -16,7 +16,7 @@ library(googleCloudStorageR)
 library(reshape2)
 library(shinyBS)
 
-#load in plot/table creation scripts
+# load in plot/table creation scripts
 source("../R/notifications.R")
 source("../R/activities.R")
 source("../R/daily_behavior.R")
@@ -38,27 +38,27 @@ convert_date_col <- function(df) {
 }
 
 # download data from GCP
-  gcs_auth(json_file = '../auth/peek-a-moo.json')
+gcs_auth(json_file = '../auth/peek-a-moo.json')
 
-  gcs_global_bucket("peek-a-moo-data")
+gcs_global_bucket("peek-a-moo-data")
 
-  objects <- gcs_list_objects()
-  download_list <- grep("*.Rda", objects$name, value = TRUE)
+objects <- gcs_list_objects()
+download_list <- grep("*.Rda", objects$name, value = TRUE)
 
-  if (!dir.exists("../data/")) {
-    dir.create("../data/")
-    map(download_list, function(x) gcs_get_object(x,
-      saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-      overwrite = TRUE))
-  }
+if (!dir.exists("../data/")) {
+  dir.create("../data/")
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
 
-  check_files = list.files('../data/')
+check_files = list.files('../data/')
 
-  if (!length(check_files) > 0) {
-    map(download_list, function(x) gcs_get_object(x,
-      saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-      overwrite = TRUE))
-  }
+if (!length(check_files) > 0) {
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
 
 # load data if not already in memory
 if (!exists("THI")) {
@@ -104,7 +104,7 @@ min_date <- min(feed_drink_df[["date"]])
 #' @return Filtered dataframe with only dates within selected range
 filter_dates <- function(df, col, date_obj) {
   if (is.null(date_obj)) date_obj <- list(min_date, max_date)
-  
+
   if (length(date_obj) > 1) {
     df %>%
       filter({{ col }} >= date_obj[[1]]) %>%
@@ -321,24 +321,26 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
   }
 }
 
-update_2nd_cow_selection_displacement <- function(date_obj, 
-                                                  inputId, 
+update_2nd_cow_selection_displacement <- function(date_obj,
+                                                  inputId,
                                                   session,
                                                   cow_id_1 = NULL,
                                                   CD_min = NULL,
                                                   CD_max = NULL) {
   # find cows that exist in date range
-  edges <- combine_replace_edges_star(replacement_df, date_obj[1], date_obj[2], 
-                                            cow_id_1, CD_min, CD_max)
-  
-  cow_choices  <- data.frame(id = unique(c(
-      edges$from,
-      edges$to
-    ))) %>%
+  edges <- combine_replace_edges_star(
+    replacement_df, date_obj[1], date_obj[2],
+    cow_id_1, CD_min, CD_max
+  )
+
+  cow_choices <- data.frame(id = unique(c(
+    edges$from,
+    edges$to
+  ))) %>%
     filter(id != cow_id_1)
-  
+
   colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " paired cows correlated to ", cow_id_1)
-    
+
   # update widget
   updatePickerInput(
     session = session,
@@ -353,8 +355,10 @@ update_2nd_cow_selection_displacement <- function(date_obj,
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
 update_network_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  network <- c("Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours", 
-               "Displacement", "Displacement Star*", "Displacement Paired")
+  network <- c(
+    "Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours",
+    "Displacement", "Displacement Star*", "Displacement Paired"
+  )
   network_choices <- as.data.frame(network)
   colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
 
@@ -375,7 +379,7 @@ update_threshold_selection <- function(date_obj, inputId, session, select_all = 
   threshold <- c("5%", "10%", "25%")
   threshold_choices <- as.data.frame(threshold)
   colnames(threshold_choices) <- paste0(length(threshold_choices[[1]]), " thresholds")
-  
+
   # update widget
   updatePickerInput(
     session = session,
@@ -402,7 +406,7 @@ update_layout_selection <- function(date_obj, inputId, session, select_all = FAL
     selected = NULL
   )
 }
-      
+
 #' Widget for Bin Weight Selection
 #'
 #' @param inputId The id of the picker input widget to update
@@ -456,6 +460,56 @@ bin_selection_widget <- function(inputId) {
 
 #' style setter for value boxes
 #'
-style_func <- function(msg = 'Hello', style="font-size: 100%;"){
-  tags$p( msg , style = style )
+style_func <- function(msg = "Hello", style = "font-size: 100%;") {
+  tags$p(msg, style = style)
+}
+
+#' Custom theme setting function
+#'
+custom_theme <- function() {
+  theme <- tags$head(tags$style(HTML(
+    ".headerStyling { 
+        font-size: 28px;
+        line-height: 50px;
+        text-align: left;
+        padding: 0 10px;
+        overflow: hidden;
+        color: white;
+      }
+      .skin-blue .main-header .logo {
+        background-color: #94B4D6;
+      }
+      .skin-blue .main-header .logo:hover {
+        background-color: #94B4D6;
+      }
+      .skin-blue .main-header .navbar {
+        background-color: #94B4D6;
+      }
+        .skin-blue .main-sidebar {
+        background-color: #013551;
+        }
+      .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+        background-color: #012a41;
+      }
+         .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
+        background-color: #012a41;
+         }
+    .content-wrapper, .right-side {
+      background-color: #f0fbff;
+    }
+    .box.box-solid.box-primary>.box-header {
+    color:#fff;
+     background:#94B4D6
+                    }
+    .box.box-solid.box-primary  {
+    border-bottom-color:#94B4D6;
+    border-left-color:#94B4D6;
+    border-right-color:#94B4D6;
+    border-top-color:#94B4D6;
+    } .nav-tabs-custom>.nav-tabs>li.active {
+    border-top-color: #94B4D6;
+}"
+  )))
+
+  return(theme)
 }
