@@ -355,24 +355,51 @@ ui <- fluidPage(dashboardPage(header, sidebar, body))
 ui <- secure_app(ui,
   tags_top =
     tags$div(
+      tags$style(HTML(".btn-primary {
+    color: #ffffff;
+    background-color: #94B4D6;
+    border-color: #94B4D6;
+    } .btn-primary:hover {
+    color: #ffffff;
+    background-color: #85a2c1;
+    border-color: #85a2c1;
+} .btn-primary:focus {
+    color: #ffffff;
+    background-color: #85a2c1;
+    border-color: #85a2c1;
+}  .btn-primary:active:hover {
+    color: #ffffff;
+    background-color: #85a2c1;
+    border-color: #85a2c1;
+} a {color:#85a2c1; 
+} a:hover {color:#85a2c1; 
+} a:focus {color:#85a2c1;
+} body {
+    font-family:Helvetica;}")),
       tags$h2("Peek-a-Moo\nDashboard", style = "align:center"),
       tags$img(
         src = "../loading_cow1.gif", width = 100
       ),
       tags$p(
-        "General visitors can contact the administrator for user name and password."
+        "General visitors please contact the administrator for login in credentials."
       )
     ),
-  tags_bottom = tags$div(
+  tags_bottom = 
+  tags$div(
+    tags$style(HTML(".btn-primary {
+    color: #ffffff;
+    background-color: #94B4D6;
+    border-color: #94B4D6;
+}")),
     tags$p(
-      "For any questions, please  contact ",
+      "For any questions, please contact ",
       tags$a(
         href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
         target = "_top", "administrator")
     ),
     tags$div(
       HTML("<center>"),
-      tags$img(src = "../logo.png", width = 300),
+      tags$img(src = "../logo.png", width = 250),
       HTML("</center>"))
   ),
   background = "center / cover no-repeat url('../cow_pasture.jpg');",
