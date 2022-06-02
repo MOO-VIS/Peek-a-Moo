@@ -377,10 +377,14 @@ ui <- secure_app(ui,
       "For any questions, please  contact ",
       tags$a(
         href = "mailto:someone@example.com?Subject=Shiny%20aManager",
-        target = "_top", "administrator"
-      )
-    )
+        target = "_top", "administrator")
+    ),
+    tags$div(
+      HTML("<center>"),
+      tags$img(src = "../logo.png", width = 300),
+      HTML("</center>"))
   ),
+  background = "center / cover no-repeat url('../cow_pasture.jpg');",
   enable_admin = FALSE,
   download = NULL
 )
