@@ -1,7 +1,8 @@
 library(shinymanager)
 
 header <- dashboardHeader(
-  title = "Dairy Cow Dashboard",
+  title = tags$a(href='https://awp.landfood.ubc.ca/',
+                 tags$img(src='logo.png', height = '50', width ='210')),
   dropdownMenuOutput("contact")
 )
 
@@ -333,6 +334,21 @@ body <- dashboardBody(
       }"
     )
   ),
+  tags$head(tags$style(HTML(
+    '.myClass { 
+        font-size: 28px;
+        line-height: 50px;
+        text-align: left;
+        padding: 0 15px;
+        overflow: hidden;
+        color: white;
+      }
+    '))),
+  tags$script(HTML('
+      $(document).ready(function() {
+        $("header").find("nav").append(\'<span class="myClass"> Dairy Cow Dashboard </span>\');
+      })
+     ')),
   tabItems(
     activities_tab,
     daily_tab,
