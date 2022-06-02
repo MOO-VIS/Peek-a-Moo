@@ -360,18 +360,22 @@ ui <- secure_app(ui,
         src = "../loading_cow1.gif", width = 100
       ),
       tags$p(
-        "General visitors can contact dashboard admin for user name and password."
+        "General visitors can contact the administrator for user name and password."
       )
     ),
   tags_bottom = tags$div(
     tags$p(
       "For any questions, please  contact ",
       tags$a(
-        href = "mailto:someone@example.com?Subject=Shiny%20aManager",
-        target = "_top", "administrator"
-      )
-    )
+        href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
+        target = "_top", "administrator")
+    ),
+    tags$div(
+      HTML("<center>"),
+      tags$img(src = "../logo.png", width = 300),
+      HTML("</center>"))
   ),
+  background = "center / cover no-repeat url('../cow_pasture.jpg');",
   enable_admin = FALSE,
   download = NULL
 )
