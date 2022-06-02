@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-       # credentials
+     #   credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -96,14 +96,25 @@ observeEvent(user(),{
 
   # contact menu
     output$contact <- renderMenu({
-      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "Feedback and suggestions",
+      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "Feedback and questions",
                           messageItem(
                             from = "Contact us",
-                            message =  "sample@sample.com",
+                            message =  "animal.welfare@ubc.ca",
                             icon = icon("envelope"),
-                            href = "mailto:sample@sample.com"
+                            href = "mailto:animal.welfare@ubc.ca"
                           ))
-                          
+    })
+    
+  # github issues contribute  
+    output$github <- renderMenu({
+      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "See an issue or want to contribute?",
+                   messageItem(
+                     from = "Issues / Contributions",
+                     message =  "Visit our GitHub repository",
+                     icon = icon("github", lib = "font-awesome"),
+                     href = "https://github.com/UBC-AWP/Peek-a-Moo"
+                   ),
+                   icon = icon("github", lib = "font-awesome"))
     })
 
 

@@ -3,7 +3,8 @@ library(shinymanager)
 header <- dashboardHeader(
   title = tags$a(href='https://awp.landfood.ubc.ca/',
                  tags$img(src='logo.png', height = '50', width ='210')),
-  dropdownMenuOutput("contact")
+  dropdownMenuOutput("contact"),
+  dropdownMenuOutput("github")
 )
 
 sidebar <- dashboardSidebar(
@@ -222,8 +223,8 @@ bins_tab <- tabItem(
         column(4, date_widget("bin_date"), ),
         column(8, bin_selection_widget("activity_bin_selection")),
         bsPopover(
-          id = "button_bins", title = "Activity Patterns Tab",
-          content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+          id = "button_bins", title = "Bins Tab",
+          content = paste("This tab shows weight status and interaction information for the feedbins.",
             "",
             "<b>Customizations:</b>",
             "<u>Date</u> - the date for the plots to showcase",
@@ -309,13 +310,13 @@ warnings_tab <- tabItem(
       )
     ),
     bsPopover(
-      id = "button_warning", title = "Activity Patterns Tab",
-      content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+      id = "button_warning", title = "Warnings Tab",
+      content = paste("This tab shows the detected Instatec warnings for the dataset.",
         "",
         "<b>Customizations:</b>",
-        "<u>Aggregate</u> - aggregates the data on the daily, or monthly level.",
-        "<u>Date Range</u> - timeline for the plots.",
-        "<u>Cows</u> - cow(s) to showcase in the plots.",
+        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below",
+        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below",
+        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below",
         sep = "<br>"
       ),
       placement = "right",
@@ -335,18 +336,18 @@ body <- dashboardBody(
     )
   ),
   tags$head(tags$style(HTML(
-    '.myClass { 
+    '.headerStyling { 
         font-size: 28px;
         line-height: 50px;
         text-align: left;
-        padding: 0 15px;
+        padding: 0 10px;
         overflow: hidden;
         color: white;
       }
     '))),
   tags$script(HTML('
       $(document).ready(function() {
-        $("header").find("nav").append(\'<span class="myClass"> Dairy Cow Dashboard </span>\');
+        $("header").find("nav").append(\'<span class="headerStyling"> Dairy Cow Dashboard </span>\');
       })
      ')),
   tabItems(
