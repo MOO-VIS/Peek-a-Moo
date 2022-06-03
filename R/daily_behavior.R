@@ -1,4 +1,3 @@
-
 #' Filter and format feeding, drinking, standing, and lying data for plotting
 #'
 #' @param feeding dataframe
@@ -35,7 +34,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
     filter(Cow %in% cow_id) %>%
     mutate(Cow = paste0('Cow ', as.character(Cow))) %>%
     mutate(event_id = row_number()) %>%
-    # Trim events starting before the beginning of the day of interest or after the end of the day of interest
+    #Trim events starting before the beginning of the day of interest or after the end of the day of interest
     mutate(Start = case_when(
       floor_date(Start, 'day') < as.POSIXct(date, tz = 'America/Los_Angeles') ~
         as.POSIXct(date, tz = 'America/Los_Angeles'),
@@ -69,12 +68,12 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
 #'
 #' @param df dataframe output from daily_schedu_moo_data()
 #'
-#' @return a formatted data table for plotting donut chart
+#' @return a df of all behaviours for a day
 #'
 #' @examples
-#' daily_total_schedumoo(df)
-daily_total_schedumoo_plot <- function(df) {
-
+#' daily_total_schedumoo_info(df)
+daily_total_schedumoo_info <- function(df) {
+  
   # prep the dataframe
   df <- df %>%
     mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
@@ -97,44 +96,19 @@ daily_total_schedumoo_plot <- function(df) {
   }
   
   if(sum_bad_cow > 0){
-      error_message1 <- validate(
-        need(
-          sum_bad_cow == 0,
-          paste0("Data for one or more behaviours is missing for the selected cow(s). Please change selection."),
-        )
+        showNotification(type = "warning",
+        paste0("Behaviour data incomplete for some cow(s).")
       )
-      return(error_message1)
-    } else {
+  }
       
-      # instantiate the plotting objects
-      labels <- c("Drinking", "Feeding", "Lying", "Standing")
-      colors <- c("rgb(3, 127, 252)", "rgb(157, 192, 131)", "rgb(250, 216, 120)", "rgb(211, 148, 147)")
-      df_filter <- df %>%
-        group_by(Behaviour) %>%
-        summarise(total = sum(time_for_total))
-      values <- df_filter$total
-      vals <- paste(values, sep = "")
-      
-      
-      # plot the donut chart
-      fig <- plot_ly(marker = list(colors = colors), textinfo = "text", text = vals)
-      fig <- fig %>%
-        add_trace(
-          type = "pie",
-          name = "",
-          values = values,
-          labels = labels,
-          hovertemplate = "<extra></extra>%{label}",
-          hole = 0.5,
-          domain = list(row = 0, column = 0))
+    # instantiate summary df
+    df_filter <- df %>%
+      group_by(Behaviour) %>%
+      summarise(total = sum(time_for_total))
+    values <- df_filter$total
+    
+    return(values)
 
-      fig <- fig %>% layout(
-        showlegend = FALSE,
-        xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-        yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE)
-      )
-      fig
-    }
 }
 
 
@@ -156,10 +130,10 @@ daily_schedu_moo_plot <- function(df) {
     )
   
   # Set plotting colours
-  standing_colour <- 'rgb(211, 148, 147)'
-  lying_colour <- 'rgb(250, 216, 120)'
-  drinking_colour <- 'rgb(3, 127, 252)'
-  feeding_colour <- 'rgb(157, 192, 131)'
+  standing_colour <- '#ffb3b3'
+  lying_colour <- '#ffd37b'
+  drinking_colour <- '#4ea0cc'
+  feeding_colour <- '#bfc7a3'
   
   
   # Plot traces for standing, lying, feeding, and drinking events.
@@ -197,3 +171,4 @@ daily_schedu_moo_plot <- function(df) {
   
   fig
 }
+
