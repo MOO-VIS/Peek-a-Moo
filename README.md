@@ -1,5 +1,5 @@
 <!-- badges: start -->
-[![deploy](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml) [![prod-release](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml/badge.svg?branch=main)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml) 
+[![deploy to dev](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml) [![promote dev to prod](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml) [![update passwords](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml)
 <!-- badges: end -->
 
 # Peek-a-Moo

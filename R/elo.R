@@ -46,11 +46,21 @@ plot_elo <- function(x, start_date, end_date, cow_id = NULL) {
 #'
 #' @return An interactive plotly plot. 
 plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
-  df <- elo_df(x, start_date, end_date, cow_id_1, cow_id_2)
+  df <- elo_df(x, start_date, end_date, cow_id_1, cow_id_2) %>%
+    group_by(Cow) %>%
+    mutate(Elo_mean = mean(Elo)) %>%
+    arrange(desc(Elo_mean)) %>%
+    ungroup() %>%
+    mutate(Color = case_when(
+      Elo_mean == max(Elo_mean) ~ "#F8766D",
+      Elo_mean == min(Elo_mean) ~ "#00BFC4"
+    )) %>%
+    arrange(Cow)
   
   plot <- ggplot(df, aes(x = Date, y = Elo, colour = Cow)) +
     geom_line() +
     scale_x_date(date_labels = "%d-%B-%y") +
+    scale_color_manual(values = unique(df$Color)) +
     labs(x = 'Date', 
          y = 'Elo Rating',
          title = paste0('Daily Dominance Score of Cow ', cow_id_1, ' vs. ', cow_id_2)) +

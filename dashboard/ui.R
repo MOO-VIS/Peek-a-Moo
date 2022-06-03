@@ -141,35 +141,39 @@ relationships_tab <- tabItem(
   fluidRow(
     box(
       title = p(
-        "Customizations",
+        "Global Customizations",
         tags$style(type = "text/css", "#button_network{border-radius: 0px;border-width: 0px}"),
         bsButton("button_network", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
       ),
-      width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(3, date_range_widget("relationship_date_range")),
-      column(3, network_selection_widget("relationship_network_selection", multiple = FALSE)),
+      title = "Global Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      column(6, date_range_widget("relationship_date_range")),
+      column(6, network_selection_widget("relationship_network_selection", multiple = TRUE))
+    ),
+    box(
+      title = "Network Customizations", width = 12, solidHeader = TRUE, collapsible = TRUE,
       conditionalPanel(
-        condition = "input.relationship_network_selection != 'Displacement Star*' && input.relationship_network_selection != 'Displacement Paired'",
-        column(3, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE))
+        condition = "input.relationship_network_selection == 'Neighbour' || input.relationship_network_selection == 'Synchronicity' || input.relationship_network_selection == 'Displacement'",
+        column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE)),
+        column(4, layout_selection_widget("relationship_layout_selection", multiple = FALSE))
       ),
       conditionalPanel(
-        condition = "input.relationship_network_selection == 'Feeding Sychronicity' || input.relationship_network_selection == 'Lying Synchronicity' || input.relationship_network_selection == 'Feeding Neighbours'",
-        column(3, layout_selection_widget("relationship_layout_selection", multiple = FALSE))
+        condition = "input.relationship_network_selection == 'Synchronicity'",
+        column(4, cow_selection_widget("synchronicity_cow_selection", label = "Cow of Interest"))
       ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement'",
-        column(12, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+        column(4, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement Star*'",
-        column(3, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
-        column(12, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+        column(4, cow_selection_widget("star_cow_selection", multiple = FALSE, label = "Cow of Interest")),
+        column(8, sliderInput("star_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement Paired'",
-        column(3, cow_selection_widget("paired_cow_selection_1", multiple = FALSE, label = "First Cow of Interest")),
-        column(3, cow_selection_widget("paired_cow_selection_2", multiple = FALSE, label = "Second Cow of Interest")),
-        column(12, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
+        column(4, cow_selection_widget("paired_cow_selection_1", multiple = FALSE, label = "First Cow of Interest")),
+        column(4, cow_selection_widget("paired_cow_selection_2", multiple = FALSE, label = "Second Cow of Interest")),
+        column(4, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       bsPopover(
         id = "button_network", title = "Relationships Tab",
@@ -196,15 +200,39 @@ relationships_tab <- tabItem(
     )
   ),
   fluidRow(
-    default_tabBox("Social Network", "network",
-      width = 12,
-      output_fun = visNetworkOutput
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Neighbour'",
+      default_tabBox("Feeding Neighbours", "neighbour", 
+                     width = 12, 
+                     output_fun = visNetworkOutput)
+    )
+  ),
+  fluidRow(
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Synchronicity'",
+      default_tabBox("Feeding Synchronicity", "feeding", 
+                     width = 6, 
+                     output_fun = visNetworkOutput),
+      default_tabBox("Lying Synchronicity", "lying", 
+                     width = 6, 
+                     output_fun = visNetworkOutput)
+    )
+  ),
+  fluidRow(
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Displacement'",
+      default_tabBox("Social Network", "network_disp",
+                     width = 12,
+                     output_fun = visNetworkOutput)
     )
   ),
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Displacement Star*' || input.relationship_network_selection == 'Displacement Paired'",
-      default_tabBox("Dominance", "elo", width = 12)
+      default_tabBox("Social Network", "network", 
+                     width = 6, 
+                     output_fun = visNetworkOutput),
+      default_tabBox("Dominance", "elo", width = 6)
     )
   ),
   fluidRow(

@@ -1,4 +1,4 @@
-name: prod-release
+name: promote dev to prod
 
 on:
   release:

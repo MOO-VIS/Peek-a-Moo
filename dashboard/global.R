@@ -229,21 +229,19 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
     label = "Network",
-    choices = list(),
+    choices = c("Neighbour", "Synchronicity", "Displacement", "Displacement Star*", "Displacement Paired"),
     selected = NULL,
     multiple = multiple,
-    options = list(
-      "actions-box" = TRUE,
-      "none-selected-text" = "Select network"
-    )
+    options = pickerOptions(maxOptions = 1,
+                            noneSelectedText = "Select network")
   )
 }
 
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold"),
-    choices = list(),
+    label = paste0("Threshold (top % of connected cows)"),
+    choices = c("5%", "10%", "25%", "All"),
     selected = NULL,
     multiple = multiple,
     options = list(
@@ -257,7 +255,7 @@ layout_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
     label = paste0("Layout type"),
-    choices = list(),
+    choices = c("Circle", "Force-directed"),
     selected = NULL,
     multiple = multiple,
     options = list(
@@ -297,6 +295,25 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
     inputId = inputId,
     choices = cow_choices,
     selected = NULL
+  )
+}
+
+update_cow_selection_synchronicity <- function(date_obj, inputId, session, select_all = FALSE) {
+  
+  # find cows that exist in date range
+  cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
+    select(Cow) %>%
+    unique() %>%
+    arrange(desc(Cow))
+  colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
+  
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = cow_choices,
+    selected = NULL,
+    options = pickerOptions(maxOptions = 1)
   )
 }
 
@@ -350,64 +367,7 @@ update_2nd_cow_selection_displacement <- function(date_obj,
     selected = NULL
   )
 }
-
-#' Helper function for updating network selection picker input widgets
-#'
-#' @param inputId The id of the picker input widget to update
-#' @param session The current server session
-update_network_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  network <- c(
-    "Feeding Sychronicity", "Lying Synchronicity", "Feeding Neighbours",
-    "Displacement", "Displacement Star*", "Displacement Paired"
-  )
-  network_choices <- as.data.frame(network)
-  colnames(network_choices) <- paste0(length(network_choices[[1]]), " network choices")
-
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = network_choices,
-    selected = NULL
-  )
-}
-
-#' Helper function for updating threshold selection picker input widgets
-#'
-#' @param inputId The id of the picker input widget to update
-#' @param session The current server session
-update_threshold_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  threshold <- c("5%", "10%", "25%")
-  threshold_choices <- as.data.frame(threshold)
-  colnames(threshold_choices) <- paste0(length(threshold_choices[[1]]), " thresholds")
-
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = threshold_choices,
-    selected = NULL
-  )
-}
-
-#' Helper function for updating layout option
-#'
-#' @param inputId The id of the picker input widget to update
-#' @param session The current server session
-update_layout_selection <- function(date_obj, inputId, session, select_all = FALSE) {
-  layouts <- c("Circle", "Force-directed")
-  layouts_choices <- as.data.frame(layouts)
-  colnames(layouts_choices) <- paste0(length(layouts_choices[[1]]), " layout types")
-
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = layouts_choices,
-    selected = NULL
-  )
-}
-
+      
 #' Widget for Bin Weight Selection
 #'
 #' @param inputId The id of the picker input widget to update
