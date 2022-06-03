@@ -1,6 +1,6 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+ passphrase <- Sys.getenv("PASSPHRASE")
 
 # credentials <- data.frame(
 #   user = c("guest", "user", "admin"), # mandatory
@@ -354,7 +354,8 @@ observeEvent(user(),{
                  input$relationship_date_range[[1]],
                  input$relationship_date_range[[2]],
                  cow_id = cow_id
-        )
+        ) %>%
+          config(modeBarButtonsToRemove = config)
       })
       
       output$elo_table <- format_dt_table(elo_df(raw_graph_data,
@@ -372,7 +373,8 @@ observeEvent(user(),{
                  input$relationship_date_range[[2]],
                  cow_id_1 = cow_id_1,
                  cow_id_2 = cow_id_2
-        )
+        ) %>%
+          config(modeBarButtonsToRemove = config)
       })
       
       output$elo_table <- format_dt_table(elo_df(raw_graph_data,
@@ -519,7 +521,7 @@ observeEvent(user(),{
   })
 
 
-  # feed bin tab
+  # Feed bin tab
   observe({
     req(input$bin_date)
     req(input$activity_bin_selection)
