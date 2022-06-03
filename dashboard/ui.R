@@ -103,10 +103,13 @@ daily_tab <- tabItem(
     )
   ),
   fluidRow(
-    tags$style(".small-box.bg-yellow { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-red { background-color: #ffb3b3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_standing", width = 3),
+    tags$style(".small-box.bg-yellow { background-color: #ffd37b !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_lying", width = 3),
+    tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
+    tags$style(".small-box.bg-blue { background-color: #4ea0cc !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -399,7 +402,8 @@ ui <- secure_app(ui,
     ),
     tags$div(
       HTML("<center>"),
-      tags$img(src = "../logo.png", width = 250),
+      tags$img(src = "../logo.png",
+               width = 250),
       HTML("</center>"))
   ),
   background = "center / cover no-repeat url('../cow_pasture.jpg');",

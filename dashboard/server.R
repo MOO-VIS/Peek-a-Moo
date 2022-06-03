@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-    #    credentials
+     #   credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -62,7 +62,7 @@ observeEvent(user(),{
       scrollX = TRUE,
       pageLength = 5,
       dom = "Bftip",
-      buttons = c("csv")
+      buttons = list(list(extend = "csv", title = "Data_Download"))
     )
   }
 })  
@@ -488,7 +488,7 @@ observeEvent(user(),{
         style_func( paste0(format(totals[4],big.mark=','), " s"), "font-size: 60%;"  ),
         "Total standing time", 
         icon = icon('circle-arrow-up', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'yellow'
+        color = 'red'
       )
     })
     output$total_lying <- renderValueBox({
@@ -504,7 +504,7 @@ observeEvent(user(),{
         style_func( paste0(format(totals[2],big.mark=','), " s"), "font-size: 60%;"  ),
         "Total feeding time", 
         icon = icon('grain', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'yellow'
+        color = 'green'
       )
     })
     output$total_drinking <- renderValueBox({
@@ -512,7 +512,7 @@ observeEvent(user(),{
         style_func( paste0(format(totals[1],big.mark=','), " s"), "font-size: 60%;"  ),
         "Total drinking time", 
         icon = icon('tint', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'yellow'
+        color = 'blue'
       )
     })
 })
