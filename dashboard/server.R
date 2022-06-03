@@ -1,13 +1,13 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+# passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
+credentials <- data.frame(
+  user = c("guest", "user", "admin"), # mandatory
+  password = c("guest", "shiny", "shinymanager"), # mandatory
+  admin = c(FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      credentials
+      # "../auth/database.sqlite",
+      # passphrase = passphrase
     )
   )
   
@@ -190,6 +190,7 @@ observeEvent(user(),{
                                                       network = input$relationship_network_selection,
                                                       threshold_selected,
                                                       layouts_type,
+                                                      selected_nodes = NULL,
                                                       data_config)[[1]]
           
           output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
@@ -197,6 +198,7 @@ observeEvent(user(),{
                                                        network = input$relationship_network_selection, 
                                                        threshold_selected, 
                                                        layouts_type,
+                                                       selected_nodes = NULL,
                                                        data_config)[[2]]
         } else {
           selected_nodes <- input$synchronicity_cow_selection
