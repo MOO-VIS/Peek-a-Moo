@@ -58,7 +58,8 @@ plot_network_three <- function(raw_graph_data,
                                network = NULL, 
                                threshold_selected, 
                                layouts_type, 
-                               selected_nodes = NULL) {
+                               selected_nodes = NULL,
+                               data_config = NULL) {
   if (!(is.null(missing_date_range_check(date_range,
                                          df = raw_graph_data,
                                          network

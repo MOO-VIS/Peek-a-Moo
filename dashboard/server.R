@@ -1,13 +1,13 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+# passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
+credentials <- data.frame(
+  user = c("guest", "user", "admin"), # mandatory
+  password = c("guest", "shiny", "shinymanager"), # mandatory
+  admin = c(FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      credentials
+      # "../auth/database.sqlite",
+      # passphrase = passphrase
     )
   )
   
@@ -189,13 +189,15 @@ observeEvent(user(),{
                                                       input$relationship_date_range,
                                                       network = input$relationship_network_selection,
                                                       threshold_selected,
-                                                      layouts_type)[[1]]
+                                                      layouts_type,
+                                                      data_config)[[1]]
           
           output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
                                                        input$relationship_date_range, 
                                                        network = input$relationship_network_selection, 
                                                        threshold_selected, 
-                                                       layouts_type)[[2]]
+                                                       layouts_type,
+                                                       data_config)[[2]]
         } else {
           selected_nodes <- input$synchronicity_cow_selection
           
@@ -204,28 +206,32 @@ observeEvent(user(),{
                                                     network = input$relationship_network_selection, 
                                                     threshold_selected, 
                                                     layouts_type,
-                                                    selected_nodes)[[1]]
+                                                    selected_nodes,
+                                                    data_config)[[1]]
           
           output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
                                                      input$relationship_date_range, 
                                                      network = input$relationship_network_selection, 
                                                      threshold_selected, 
                                                      layouts_type,
-                                                     selected_nodes)[[2]]
+                                                     selected_nodes,
+                                                     data_config)[[2]]
           
           output$lying_plot <- plot_network_three(synchronized_lying_total_time, 
                                                   input$relationship_date_range, 
                                                   network = input$relationship_network_selection, 
                                                   threshold_selected, 
                                                   layouts_type,
-                                                  selected_nodes)[[1]]
+                                                  selected_nodes,
+                                                  data_config)[[1]]
           
           output$lying_table <- plot_network_three(synchronized_lying_total_time, 
                                                    input$relationship_date_range, 
                                                    network = input$relationship_network_selection, 
                                                    threshold_selected, 
                                                    layouts_type,
-                                                   selected_nodes)[[2]]
+                                                   selected_nodes,
+                                                   data_config)[[2]]
         }
       } else {
         # displacement network setup
