@@ -485,7 +485,7 @@ observeEvent(user(),{
     
     output$total_standing <- renderValueBox({
       valueBox(
-        style_func( paste0(format(totals[4],big.mark=','), " s"), "font-size: 60%;"  ),
+        tags$p(paste0(format(totals[4],big.mark=','), " s"), style = "font-size: 60%;"),
         "Total standing time", 
         icon = icon('circle-arrow-up', lib = 'glyphicon', style="font-size: 40px;"),
         color = 'red'
@@ -493,7 +493,7 @@ observeEvent(user(),{
     })
     output$total_lying <- renderValueBox({
       valueBox(
-        style_func( paste0(format(totals[3],big.mark=','), " s"), "font-size: 60%;"  ),
+        tags$p(paste0(format(totals[3],big.mark=','), " s"), style = "font-size: 60%;"),
         "Total lying time", 
         icon = icon('circle-arrow-down', lib = 'glyphicon', style="font-size: 40px;"),
         color = 'yellow'
@@ -501,7 +501,7 @@ observeEvent(user(),{
     })
     output$total_feeding <- renderValueBox({
       valueBox(
-        style_func( paste0(format(totals[2],big.mark=','), " s"), "font-size: 60%;"  ),
+        tags$p(paste0(format(totals[2],big.mark=','), " s"), style = "font-size: 60%;"),
         "Total feeding time", 
         icon = icon('grain', lib = 'glyphicon', style="font-size: 40px;"),
         color = 'green'
@@ -509,7 +509,7 @@ observeEvent(user(),{
     })
     output$total_drinking <- renderValueBox({
       valueBox(
-        style_func( paste0(format(totals[1],big.mark=','), " s"), "font-size: 60%;"  ),
+        tags$p(paste0(format(totals[1],big.mark=','), " s"), style = "font-size: 60%;"),
         "Total drinking time", 
         icon = icon('tint', lib = 'glyphicon', style="font-size: 40px;"),
         color = 'blue'

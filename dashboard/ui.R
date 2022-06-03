@@ -1,8 +1,10 @@
 library(shinymanager)
 
 header <- dashboardHeader(
-  title = tags$a(href='https://awp.landfood.ubc.ca/',
-                 tags$img(src='logo_white.png', height = '50', width ='210')),
+  title = tags$a(
+    href = "https://awp.landfood.ubc.ca/",
+    tags$img(src = "logo_white.png", height = "50", width = "210")
+  ),
   dropdownMenuOutput("contact"),
   dropdownMenuOutput("github")
 )
@@ -15,13 +17,11 @@ sidebar <- dashboardSidebar(
     menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
-    menuItem("Source code",
-      icon = icon("file-code"),
-      href = "https://github.com/UBC-AWP/Peek-a-Moo"
-    )
+    menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
   )
 )
 
+#Activities tab
 activities_tab <- tabItem(
   "activities",
   fluidRow(
@@ -73,7 +73,7 @@ activities_tab <- tabItem(
   )
 )
 
-
+#Daily tab
 daily_tab <- tabItem(
   "daily_behavior",
   fluidRow(
@@ -126,8 +126,7 @@ daily_tab <- tabItem(
       width = 12,
       popover = bsPopover(
         id = "button_daily_plot", title = "Data note:",
-        content = paste("Behaviour totals may not match those on the activity patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."
-        ),
+        content = paste("Behaviour totals may not match those on the activity patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."),
         placement = "right",
         trigger = "hover",
         options = list(container = "body")
@@ -136,6 +135,7 @@ daily_tab <- tabItem(
   )
 )
 
+#Realtionships tab
 relationships_tab <- tabItem(
   "relationships",
   fluidRow(
@@ -212,6 +212,7 @@ relationships_tab <- tabItem(
   )
 )
 
+#Bins tab
 bins_tab <- tabItem(
   "bins",
   fluidRow(
@@ -276,6 +277,7 @@ bins_tab <- tabItem(
   )
 )
 
+#Warnings tab
 warnings_tab <- tabItem(
   "warnings",
   box(
@@ -330,6 +332,14 @@ warnings_tab <- tabItem(
   default_tabBox("Warnings", "warning", width = 12, output_fun = DT::dataTableOutput)
 )
 
+# FAQ tab
+FAQ_tab <- tabItem(
+  "FAQ",
+  tags$style(HTML("#shiny-tab-FAQ{ padding-left: 20px; padding-right: 20px; }")),
+  methodologies_data()
+)
+
+# Dashboard body and combining tabs
 body <- dashboardBody(
   tags$script(
     HTML(
@@ -349,12 +359,14 @@ body <- dashboardBody(
     daily_tab,
     relationships_tab,
     bins_tab,
-    warnings_tab
+    warnings_tab,
+    FAQ_tab
   )
 )
 
 ui <- fluidPage(dashboardPage(header, sidebar, body))
 
+# Authentication page
 ui <- secure_app(ui,
   tags_top =
     tags$div(
@@ -387,25 +399,29 @@ ui <- secure_app(ui,
         "General visitors please contact the administrator for login in credentials."
       )
     ),
-  tags_bottom = 
-  tags$div(
-    tags$style(HTML(".btn-primary {
+  tags_bottom =
+    tags$div(
+      tags$style(HTML(".btn-primary {
     color: #ffffff;
     background-color: #94B4D6;
     border-color: #94B4D6;
 }")),
-    tags$p(
-      "For any questions, please contact ",
-      tags$a(
-        href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
-        target = "_top", "administrator")
+      tags$p(
+        "For any questions, please contact ",
+        tags$a(
+          href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
+          target = "_top", "administrator"
+        )
+      ),
+      tags$div(
+        HTML("<center>"),
+        tags$img(
+          src = "../logo.png",
+          width = 250
+        ),
+        HTML("</center>")
+      )
     ),
-    tags$div(
-      HTML("<center>"),
-      tags$img(src = "../logo.png",
-               width = 250),
-      HTML("</center>"))
-  ),
   background = "center / cover no-repeat url('../cow_pasture.jpg');",
   enable_admin = FALSE,
   download = NULL

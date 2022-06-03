@@ -25,6 +25,7 @@ source("../R/elo.R")
 source("../R/bully_analysis.R")
 source("../R/bins.R")
 source("../R/THI_analysis.R")
+source("../R/FAQ.R")
 
 #' Helper function for converting dataframes to having dates in a single column
 #'
@@ -456,12 +457,6 @@ bin_selection_widget <- function(inputId) {
       "none-selected-text" = "Select bins"
     )
   )
-}
-
-#' style setter for value boxes
-#'
-style_func <- function(msg = "Hello", style = "font-size: 100%;") {
-  tags$p(msg, style = style)
 }
 
 #' Custom theme setting function

@@ -1,4 +1,3 @@
-
 #' Filter and format feeding, drinking, standing, and lying data for plotting
 #'
 #' @param feeding dataframe
