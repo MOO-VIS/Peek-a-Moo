@@ -144,8 +144,7 @@ relationships_tab <- tabItem(
         "Global Customizations",
         tags$style(type = "text/css", "#button_network{border-radius: 0px;border-width: 0px}"),
         bsButton("button_network", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ),
-      title = "Global Customizations", width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+      ), width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(6, date_range_widget("relationship_date_range")),
       column(6, network_selection_widget("relationship_network_selection", multiple = TRUE))
     ),
