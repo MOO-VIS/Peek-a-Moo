@@ -109,7 +109,7 @@ daily_tab <- tabItem(
     valueBoxOutput("total_lying", width = 3),
     tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
-    tags$style(".small-box.bg-blue { background-color: #4ea0cc !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-blue { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -249,6 +249,14 @@ relationships_tab <- tabItem(
       ),
       default_tabBox("Dominance", "elo", width = 6)
     )
+  ),
+  fluidRow(
+    tags$style(".small-box.bg-light-blue { background-color: #CA929D !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("mean_THI", width = 4),
+    tags$style(".small-box.bg-navy { background-color: #F7766D !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("max_THI", width = 4),
+    tags$style(".small-box.bg-purple { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
     default_tabBox("THI", "THI", width = 12)

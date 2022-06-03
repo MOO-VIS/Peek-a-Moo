@@ -132,7 +132,7 @@ daily_schedu_moo_plot <- function(df) {
   # Set plotting colours
   standing_colour <- '#ffb3b3'
   lying_colour <- '#ffd37b'
-  drinking_colour <- '#4ea0cc'
+  drinking_colour <- '#94B4D6'
   feeding_colour <- '#bfc7a3'
   
   

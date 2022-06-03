@@ -1,13 +1,13 @@
 library(shinymanager)
 
- passphrase <- Sys.getenv("PASSPHRASE")
+# passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
+credentials <- data.frame(
+  user = c("guest", "user", "admin"), # mandatory
+  password = c("guest", "shiny", "shinymanager"), # mandatory
+  admin = c(FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     #   credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+        credentials
+     # "../auth/database.sqlite",
+    #  passphrase = passphrase
     )
   )
   
@@ -536,6 +536,31 @@ observeEvent(user(),{
     output$THI_plot <- renderPlotly({
       plot_THI_analysis(df) %>%
         config(modeBarButtonsToRemove = config)
+    })
+    
+    output$mean_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(mean(df$THI_mean),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Average THI", 
+        icon = icon('thermometer-half', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'light-blue'
+      )
+  })
+    output$max_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(max(df$THI_max),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Max THI", 
+        icon = icon('thermometer-full', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'navy'
+      )
+    })
+    output$min_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(min(df$THI_min),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Min THI", 
+        icon = icon('thermometer-empty', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'purple'
+      )
     })
   })
 
