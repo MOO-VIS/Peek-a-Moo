@@ -100,7 +100,7 @@ plot_network_three <- function(raw_graph_data,
       plot_network(nodes, edges, layouts_type, selected_nodes)
     })
     
-    table <- format_dt_table(edges %>% select(c(from, to, weight)))
+    table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
     
     out <- list(plot, table)
     
