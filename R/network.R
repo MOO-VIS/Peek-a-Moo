@@ -1,6 +1,19 @@
 library(igraph)
 
-plot_network <- function(nodes, edges, layouts = "layout_in_circle") {
+plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes = NULL) {
+  if (layouts_type == "Circle") {
+    layouts = "layout_in_circle"
+  } else {
+    layouts = "layout_with_fr"
+  }
+  
+  if (is.null(selected_nodes) || length(selected_nodes) > 1) {
+    list_nodesIdSelection = list(enabled = TRUE)
+  } else {
+    list_nodesIdSelection = list(enabled = TRUE, 
+                                 selected = selected_nodes)
+  }
+  
   visNetwork(nodes,
     edges,
     width = "100%", height = "800px"
@@ -11,9 +24,8 @@ plot_network <- function(nodes, edges, layouts = "layout_in_circle") {
       shadow = TRUE,
       borderWidth = 1,
       color = list(
-        border = "darkgray",
-        highlight = list(background = "orange", border = "darkred")
-      )
+        border = "darkgray"
+        )
     ) %>%
     visEdges(
       smooth = list(enabled = TRUE, type = "horizontal"),
@@ -23,22 +35,87 @@ plot_network <- function(nodes, edges, layouts = "layout_in_circle") {
       hover = TRUE,
       tooltipDelay = 0,
       tooltipStay = 500,
-      dragNodes = FALSE,
-      selectable = FALSE,
-      selectConnectedEdges = FALSE
+      dragNodes = TRUE,
+      selectable = TRUE,
+      selectConnectedEdges = FALSE,
+      navigationButtons = TRUE
+    ) %>%
+    visOptions(
+      nodesIdSelection = list_nodesIdSelection,
+      highlightNearest = list(
+        enabled = T,
+        degree = 0,
+        hideColor = "rgba(0,0,0,0)",
+        labelOnly = TRUE
+      )
     ) %>%
     visIgraphLayout(layout = layouts) %>%
-    visPhysics(stabilization = FALSE) %>%
-    visExport(
-      type = "png", name = "export-network",
-      float = "left", label = "Save network", background = "white", style = ""
-    )
+    visPhysics(stabilization = FALSE)
 }
 
-plot_network_disp <- function(nodes, edges) {
-  plot_network(nodes, edges) %>%
+plot_network_three <- function(raw_graph_data, 
+                               date_range, 
+                               network = NULL, 
+                               threshold_selected, 
+                               layouts_type, 
+                               selected_nodes = NULL) {
+  if (!(is.null(missing_date_range_check(date_range,
+                                         df = raw_graph_data,
+                                         network
+  )))) {
+    warning_output <- missing_date_range_check(date_range,
+                                                    df = raw_graph_data,
+                                                    network
+    )
+
+    out <- list(warning_output, NULL)
+    
+    return(out)
+  } else {
+    
+    # plot the network (not displacement)
+    edges <- combine_edges(
+      raw_graph_data,
+      date_range[[1]],
+      date_range[[2]],
+      threshold_selected
+    )
+    
+    g <- .make_tidygraph(raw_graph_data, edges)
+    deg <- degree(g)
+    size <- deg / max(deg) * 40
+    
+    nodes <- combine_nodes(
+      raw_graph_data,
+      date_range[[1]],
+      date_range[[2]],
+      size
+    )
+    
+    if (mean(edges$width > 2)) {
+      edges$width <- edges$width / 2
+    }
+    
+    plot <- visNetwork::renderVisNetwork({
+      plot_network(nodes, edges, layouts_type, selected_nodes)
+    })
+    
+    table <- format_dt_table(edges %>% select(c(from, to, weight)))
+    
+    out <- list(plot, table)
+    
+    return(out)
+  }
+}
+
+plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
+  
+  plot_network(nodes, edges, layouts_type) %>%
     visNodes(
-      shape = "dot"
+      shape = "dot",
+      color = list(
+        highlight = list(background = "orange", border = "darkred")
+      )
     ) %>%
     visEdges(
       arrows = list(to = list(enabled = TRUE, scaleFactor = 0.8))
@@ -55,7 +132,6 @@ plot_network_disp <- function(nodes, edges) {
     visInteraction(
       dragNodes = TRUE,
       multiselect = TRUE,
-      selectable = TRUE,
       selectConnectedEdges = TRUE
     )
 }
@@ -78,11 +154,7 @@ plot_network_disp_star <- function(nodes, edges) {
       tooltipDelay = 0,
       tooltipStay = 500
     ) %>%
-    visPhysics(stabilization = FALSE) %>%
-    visExport(
-      type = "png", name = "export-network",
-      float = "left", label = "Save network", background = "white", style = ""
-    )
+    visPhysics(stabilization = FALSE)
 }
 
 combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) {
@@ -102,24 +174,38 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
     ) %>%
     group_by(from, to) %>%
     summarise(weight = sum(weight, na.rm = TRUE)) %>%
-    ungroup() %>%
-    mutate(weight_bins = cut(weight,
-      breaks = c(
-        min(weight),
-        quantile(weight, threshold),
-        max(weight)
-      ),
-      include.lowest = TRUE, ordered = TRUE
-    )) %>%
-    mutate(
-      width = as.integer(weight_bins) - 1,
-      # color.opacity = case_when(
-      #   width >= 1 ~ 1,
-      #   width < 1 ~ 0
-      # ),
-      title = paste0("Synchronicities between ", from, " and ", to, ": ", weight, " secs")
-    ) %>%
-    filter(width >= 1)
+    ungroup() 
+  
+  if (threshold != 0) {
+    edgelist <- edgelist %>%
+      mutate(weight_bins = cut(weight,
+                               breaks = c(
+                                 min(weight),
+                                 quantile(weight, threshold),
+                                 max(weight)
+                               ),
+                               include.lowest = TRUE, ordered = TRUE
+      )) %>%
+      mutate(
+        width = as.integer(weight_bins) - 1,
+        # color.opacity = case_when(
+        #   width >= 1 ~ 1,
+        #   width < 1 ~ 0
+        # ),
+        title = paste0(from, " and ", to, ": ", weight, " secs")
+      ) %>%
+      filter(width >= 1)
+  } else {
+    edgelist <- edgelist %>%
+      mutate(
+        width = weight / mean(weight),
+        # color.opacity = case_when(
+        #   width >= 1 ~ 1,
+        #   width < 1 ~ 0
+        # ),
+        title = paste0(from, " and ", to, ": ", weight, " secs")
+      )
+  }
 
   # return the edgelist
   edgelist
@@ -163,25 +249,39 @@ combine_replace_edges <- function(x,
                                   CD_min = NULL,
                                   CD_max = NULL,
                                   threshold = 0.9) {
-    
-  edgelist <- combine_replace_df(x, from_date, to_date, CD_min, CD_max) %>%
-    mutate(weight_bins = cut(weight,
-      breaks = c(
-        min(weight),
-        quantile(weight, threshold),
-        max(weight)
-      ),
-      include.lowest = TRUE, ordered = TRUE
-    )) %>%
-    mutate(
-      width = as.integer(weight_bins) - 1,
-      # color.opacity = case_when(
-      #   width >= 1 ~ 1,
-      #   width < 1 ~ 0
-      # ),
-      title = paste0("Displacements: ", weight)
-    ) %>%
-    filter(width >= 1)
+  
+  combo_df <- combine_replace_df(x, from_date, to_date, CD_min, CD_max)
+  
+  if (threshold != 0) {
+    edgelist <- combo_df %>%
+      mutate(weight_bins = cut(weight,
+                               breaks = c(
+                                 min(weight),
+                                 quantile(weight, threshold),
+                                 max(weight)
+                               ),
+                               include.lowest = TRUE, ordered = TRUE
+      )) %>%
+      mutate(
+        width = as.integer(weight_bins) - 1,
+        # color.opacity = case_when(
+        #   width >= 1 ~ 1,
+        #   width < 1 ~ 0
+        # ),
+        title = paste0("Displacements: ", weight)
+      ) %>%
+      filter(width >= 1)
+  } else {
+    edgelist <- combo_df %>%
+      mutate(
+        width = weight / mean(weight),
+        # color.opacity = case_when(
+        #   width >= 1 ~ 1,
+        #   width < 1 ~ 0
+        # ),
+        title = paste0(from, " and ", to, ": ", weight, " secs")
+      )
+  }
 }
 
 # combine dataframe for displacement data and create edges list (star version)
@@ -354,6 +454,29 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
                               "<br>Mean Elo: ", Elo_mean)
       )
     )
+}
+
+# create nodes list from edges list (star version)
+combine_replace_nodes_paired <- function(edges,
+                                       from_date = NULL,
+                                       to_date = NULL) {
+  
+  nodes <- data.frame(id = unique(c(
+    edges$from,
+    edges$to
+  ))) %>%
+    left_join(combine_elo_star(from_date, to_date), by = "id") %>%
+    #arrange(id) %>%
+    arrange(desc(Elo_mean)) %>%
+    mutate(
+      label = paste(id)
+    )
+  
+  if (nrow(nodes) > 0) {
+    nodes$color <- c("#F8766D", "#00BFC4")
+  }
+  
+  return(nodes)
 }
 
 # Fiter elo score data
