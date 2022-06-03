@@ -1,6 +1,6 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+ passphrase <- Sys.getenv("PASSPHRASE")
 
 # credentials <- data.frame(
 #   user = c("guest", "user", "admin"), # mandatory
@@ -113,14 +113,12 @@ observeEvent(user(),{
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
+  
   observe({
-    update_network_selection(input$relationship_network_selection, "relationship_network_selection", session)
-  })
-  observe({
-    update_threshold_selection(input$relationship_threshold_selection, "relationship_threshold_selection", session)
-  })
-  observe({
-    update_layout_selection(input$relationship_layout_selection, "relationship_layout_selection", session)
+    update_cow_selection_synchronicity(
+      input$relationship_date_range, 
+      "synchronicity_cow_selection", 
+      session)
   })
 
   observe({
@@ -165,9 +163,10 @@ observeEvent(user(),{
     `%!in%` <- Negate(`%in%`)
 
     threshold_id <- input$relationship_threshold_selection
-    threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75))
-    rownames(threshold_df) <- c("5%", "10%", "25%")
+    threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75, 0))
+    rownames(threshold_df) <- c("5%", "10%", "25%", "All")
     threshold_selected <- threshold_df[threshold_id, ]
+    layouts_type <- input$relationship_layout_selection
 
     # check for erroneous start date
     if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
@@ -185,62 +184,56 @@ observeEvent(user(),{
 
       # select network to plot
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
-        if (input$relationship_network_selection == "Lying Synchronicity") {
-          raw_graph_data <- synchronized_lying_total_time
-        } else if (input$relationship_network_selection == "Feeding Sychronicity") {
-          raw_graph_data <- Feeding_drinking_at_the_same_time_total_time
-        } else {
-          raw_graph_data <- Feeding_drinking_neighbour_total_time
-        }
-
-        # check for missing data in network
-
-        if (!(is.null(missing_date_range_check(input$relationship_date_range,
-          df = raw_graph_data,
-          network = input$relationship_network_selection
-        )))) {
-          output$network_plot <- missing_date_range_check(input$relationship_date_range,
-            df = raw_graph_data,
-            network = input$relationship_network_selection
-          )
-        } else {
-
-          # plot the network (not displacement)
-          edges <- combine_edges(
-            raw_graph_data,
-            input$relationship_date_range[[1]],
-            input$relationship_date_range[[2]],
-            threshold_selected
-          )
-
-          g <- .make_tidygraph(raw_graph_data, edges)
-          deg <- degree(g)
-          size <- deg / max(deg) * 40
-
-          nodes <- combine_nodes(
-            raw_graph_data,
-            input$relationship_date_range[[1]],
-            input$relationship_date_range[[2]],
-            size
-          )
-
-          if (mean(edges$width > 2)) {
-            edges$width <- edges$width / 2
-          }
+        if (input$relationship_network_selection == "Neighbour") {
+          output$neighbour_plot <- plot_network_three(Feeding_drinking_neighbour_total_time,
+                                                      input$relationship_date_range,
+                                                      network = input$relationship_network_selection,
+                                                      threshold_selected,
+                                                      layouts_type,
+                                                      selected_nodes = NULL,
+                                                      data_config)[[1]]
           
-          if (input$relationship_layout_selection == "Circle") {
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network(nodes, edges)
-            })
-            
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
-          } else {
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network(nodes, edges, layouts = "layout_with_fr")
-            })
-            
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
-          }
+          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
+                                                       input$relationship_date_range, 
+                                                       network = input$relationship_network_selection, 
+                                                       threshold_selected, 
+                                                       layouts_type,
+                                                       selected_nodes = NULL,
+                                                       data_config)[[2]]
+        } else {
+          selected_nodes <- input$synchronicity_cow_selection
+          
+          output$feeding_plot <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+                                                    input$relationship_date_range, 
+                                                    network = input$relationship_network_selection, 
+                                                    threshold_selected, 
+                                                    layouts_type,
+                                                    selected_nodes,
+                                                    data_config)[[1]]
+          
+          output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+                                                     input$relationship_date_range, 
+                                                     network = input$relationship_network_selection, 
+                                                     threshold_selected, 
+                                                     layouts_type,
+                                                     selected_nodes,
+                                                     data_config)[[2]]
+          
+          output$lying_plot <- plot_network_three(synchronized_lying_total_time, 
+                                                  input$relationship_date_range, 
+                                                  network = input$relationship_network_selection, 
+                                                  threshold_selected, 
+                                                  layouts_type,
+                                                  selected_nodes,
+                                                  data_config)[[1]]
+          
+          output$lying_table <- plot_network_three(synchronized_lying_total_time, 
+                                                   input$relationship_date_range, 
+                                                   network = input$relationship_network_selection, 
+                                                   threshold_selected, 
+                                                   layouts_type,
+                                                   selected_nodes,
+                                                   data_config)[[2]]
         }
       } else {
         # displacement network setup
@@ -282,10 +275,11 @@ observeEvent(user(),{
               edges$width <- edges$width / 2
             }
 
-            output$network_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp(nodes, edges)
+            output$network_disp_plot <- visNetwork::renderVisNetwork({
+              plot_network_disp(nodes, edges, layouts_type)
             })
-            output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
+
+            output$network_disp_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           } else if (input$relationship_network_selection == "Displacement Star*") {
             
             cow_id <- input$star_cow_selection
@@ -328,11 +322,9 @@ observeEvent(user(),{
             
             edges$width <- edges$weight
             
-            nodes <- data.frame(id = unique(c(
-              edges$from,
-              edges$to
-            ))) %>%
-              mutate(label = paste(id))
+            nodes <- combine_replace_nodes_paired(edges, 
+                                                  input$relationship_date_range[[1]],
+                                                  input$relationship_date_range[[2]])
             
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp_star(nodes, edges) %>%
@@ -362,7 +354,8 @@ observeEvent(user(),{
                  input$relationship_date_range[[1]],
                  input$relationship_date_range[[2]],
                  cow_id = cow_id
-        )
+        ) %>%
+          config(modeBarButtonsToRemove = config)
       })
       
       output$elo_table <- format_dt_table(elo_df(raw_graph_data,
@@ -380,7 +373,8 @@ observeEvent(user(),{
                  input$relationship_date_range[[2]],
                  cow_id_1 = cow_id_1,
                  cow_id_2 = cow_id_2
-        )
+        ) %>%
+          config(modeBarButtonsToRemove = config)
       })
       
       output$elo_table <- format_dt_table(elo_df(raw_graph_data,
@@ -527,7 +521,7 @@ observeEvent(user(),{
   })
 
 
-  # feed bin tab
+  # Feed bin tab
   observe({
     req(input$bin_date)
     req(input$activity_bin_selection)
