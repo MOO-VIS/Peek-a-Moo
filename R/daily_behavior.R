@@ -79,7 +79,29 @@ daily_total_schedumoo_info <- function(df) {
     mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
     select(c("Cow", "Behaviour", "time_for_total")) %>%
     drop_na()
-      
+
+  cows <- as.list(unique(df$Cow))
+  sum_bad_cow <- 0
+
+  # check for missing data
+  for (i in cows) {
+    df_check <- df %>%
+      filter(Cow == i) %>%
+      group_by(Behaviour) %>%
+      summarise(total = sum(time_for_total))
+
+    if (length(df_check$Behaviour) != 4) {
+      sum_bad_cow =+ 1
+    }
+  }
+
+  if(sum_bad_cow > 0){
+    showNotification(type = "warning",
+                     paste0("Behaviour data incomplete for some cow(s).")
+    )
+  }
+  # 
+  #     
     # instantiate summary df
     df_filter <- df %>%
       group_by(Behaviour) %>%
@@ -107,27 +129,6 @@ daily_schedu_moo_plot <- function(df) {
       mode = 'lines',
       yaxis=list(type='category'),
     )
-  
-  cows <- as.list(unique(df$Cow))
-  sum_bad_cow <- 0
-  
-  # check for missing data
-  for (i in cows) {
-    df_check <- df %>%
-      filter(Cow == i) %>%
-      group_by(Behaviour) %>%
-      summarise(total = sum(as.integer(Time)))
-    
-    if (length(df_check$Behaviour) != 4) {
-      sum_bad_cow =+ 1
-    }
-  }
-  
-  if(sum_bad_cow > 0){
-    showNotification(type = "warning",
-                     paste0("Behaviour data incomplete for some cow(s).")
-    )
-  }
   
   # Set plotting colours
   standing_colour <- '#ffb3b3'
