@@ -1,13 +1,13 @@
 library(shinymanager)
 
-# passphrase <- Sys.getenv("PASSPHRASE")
+ passphrase <- Sys.getenv("PASSPHRASE")
 
-credentials <- data.frame(
-  user = c("guest", "user", "admin"), # mandatory
-  password = c("guest", "shiny", "shinymanager"), # mandatory
-  admin = c(FALSE, FALSE, TRUE),
-  stringsAsFactors = FALSE
-)
+# credentials <- data.frame(
+#   user = c("guest", "user", "admin"), # mandatory
+#   password = c("guest", "shiny", "shinymanager"), # mandatory
+#   admin = c(FALSE, FALSE, TRUE),
+#   stringsAsFactors = FALSE
+# )
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-        credentials
-     # "../auth/database.sqlite",
-    #  passphrase = passphrase
+     #   credentials
+      "../auth/database.sqlite",
+      passphrase = passphrase
     )
   )
   
@@ -29,7 +29,7 @@ server <- function(input, output, session) {
     res_auth$user[[1]]
   })
   
-# Call to determine user access
+# Call to determine user access, and welcome modal
 
 config <- NULL
 data_config <- NULL
@@ -49,6 +49,15 @@ observeEvent(user(),{
       pageLength = 1,
       dom = 't'
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else if ((user() == 'user')){
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -56,6 +65,15 @@ observeEvent(user(),{
       pageLength = 5,
       dom = "Bftip"
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else {
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -64,6 +82,15 @@ observeEvent(user(),{
       dom = "Bftip",
       buttons = list(list(extend = "csv", title = "Data_Download"))
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   }
 })  
   

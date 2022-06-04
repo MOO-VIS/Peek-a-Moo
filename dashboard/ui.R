@@ -415,7 +415,7 @@ body <- dashboardBody(
   )
 )
 
-ui <- fluidPage(dashboardPage(header, sidebar, body))
+ui <- fluidPage(useShinyalert(), dashboardPage(header, sidebar, body))
 
 # Authentication page
 ui <- secure_app(ui,
