@@ -180,7 +180,6 @@ relationships_tab <- tabItem(
           "<b>Customizations:</b>",
           "<u>Date Range</u> - timeline for the given plots",
           "<u>Network</u> - type of network to display",
-          "<u>Threshold</u> - top weighted % of connections to display in the network",
           sep = "<br>"
         ),
         placement = "right",
@@ -192,9 +191,11 @@ relationships_tab <- tabItem(
         content = paste(
           "<b>Customizations (Feeding/Lying networks) :</b>",
           "<u>Layout Type</u> - shape of the displayed network",
+          "<u>Threshold</u> - top weighted % of connections to display in the network",
           "",
           "<b>Customizations (Displacement networks) :</b>",
           "<u>Competition Density</u> - threshold of competition density to filter connections in the network by",
+          "<u>Threshold</u> - top weighted % of connections to display in the network (default only)",
           "<u>Cow of Interest (star only) </u> - cow to be showcased in the network",
           "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together",
           sep = "<br>"
