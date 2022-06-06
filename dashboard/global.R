@@ -38,7 +38,7 @@ convert_date_col <- function(df) {
     unnest(value)
 }
 
-download data from GCP
+# download data from GCP
 gcs_auth(json_file = '../auth/peek-a-moo.json')
 
 gcs_global_bucket("peek-a-moo-data")
