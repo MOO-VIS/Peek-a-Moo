@@ -64,20 +64,47 @@ cow_date_range_plot <- function(df, y_col, show_average){
   
   # throw error if no data available for date range
   if(nrow(df) == 0) stop('No data available for this date range')
+  if(length(unique(df$Cow)) > 21) stop('The maximum cows to plot is 20. Please adjust selection.')
   
+  # custom color palette
+  custom_palette <- c("#F7766D",
+                      "#325803",
+                      "#C5D1A5",
+                      "#7C9454",
+                      "#416413",
+                      "#8AA164",
+                      "#D4DDB5",
+                      "#4F7023",
+                      "#99AD74",
+                      "#5E7C34",
+                      "#A8B984",
+                      "#D1DAE0",
+                      "#BECBD3",
+                      "#ABBCC6",
+                      "#98ADB9",
+                      "#859EAC",
+                      "#728F9F",
+                      "#608092",
+                      "#4D7185",
+                      "#3A6278",
+                      "#27536B",
+                      "#14445E",
+                      "#013551")
+
   # extract y_label from unquoted col and format
   y_label <- quo_name(enquo(y_col)) %>%
     format_col_name()
   
   plt <- df %>%
-    ggplot(aes(x = date, y = {{y_col}}, colour = `Cow`)) +
+    ggplot(aes(x = date, y = {{y_col}}, color = Cow)) +
     geom_line() +
     theme(legend.position = "bottom") + 
     xlab("Date") +
     ylab(y_label) +
     scale_x_date(date_labels = "%b-%Y") + 
+    scale_colour_manual(values = custom_palette) +
     theme_classic() + theme(legend.position = "none")
-  
+    
   if(show_average){
     plt <- plt + 
       stat_smooth(
