@@ -109,7 +109,7 @@ daily_tab <- tabItem(
     valueBoxOutput("total_lying", width = 3),
     tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
-    tags$style(".small-box.bg-blue { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-blue { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -254,7 +254,7 @@ relationships_tab <- tabItem(
     valueBoxOutput("mean_THI", width = 4),
     tags$style(".small-box.bg-navy { background-color: #F7766D !important; color: #FFFFFF !important; }"),
     valueBoxOutput("max_THI", width = 4),
-    tags$style(".small-box.bg-purple { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-purple { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
     valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
@@ -422,8 +422,8 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #94B4D6;
-    border-color: #94B4D6;
+    background-color: #7ea4ce;
+    border-color: #7ea4ce;
     } .btn-primary:hover {
     color: #ffffff;
     background-color: #85a2c1;
@@ -453,8 +453,8 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #94B4D6;
-    border-color: #94B4D6;
+    background-color: #7ea4ce;
+    border-color: #7ea4ce;
 }")),
       tags$p(
         "For any questions, please contact ",

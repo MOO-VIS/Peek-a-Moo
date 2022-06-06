@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-       # credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      #  credentials
+       "../auth/database.sqlite",
+       passphrase = passphrase
     )
   )
 
@@ -54,7 +54,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#94B4D6",
+        confirmButtonCol = "#7ea4ce",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100
@@ -71,7 +71,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#94B4D6",
+        confirmButtonCol = "#7ea4ce",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100
@@ -89,7 +89,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#94B4D6",
+        confirmButtonCol = "#7ea4ce",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100

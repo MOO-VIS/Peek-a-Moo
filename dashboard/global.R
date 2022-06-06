@@ -489,13 +489,13 @@ custom_theme <- function() {
         color: white;
       }
       .skin-blue .main-header .logo {
-        background-color: #94B4D6;
+        background-color: #7ea4ce;
       }
       .skin-blue .main-header .logo:hover {
-        background-color: #94B4D6;
+        background-color: #7ea4ce;
       }
       .skin-blue .main-header .navbar {
-        background-color: #94B4D6;
+        background-color: #7ea4ce;
       }
         .skin-blue .main-sidebar {
         background-color: #013551;
@@ -511,16 +511,19 @@ custom_theme <- function() {
     }
     .box.box-solid.box-primary>.box-header {
     color:#fff;
-     background:#94B4D6
+     background:#7ea4ce
                     }
     .box.box-solid.box-primary  {
-    border-bottom-color:#94B4D6;
-    border-left-color:#94B4D6;
-    border-right-color:#94B4D6;
-    border-top-color:#94B4D6;
+    border-bottom-color:#7ea4ce;
+    border-left-color:#7ea4ce;
+    border-right-color:#7ea4ce;
+    border-top-color:#7ea4ce;
     } .nav-tabs-custom>.nav-tabs>li.active {
-    border-top-color: #94B4D6;
-}"
+    border-top-color: #7ea4ce;
+} .skin-blue .sidebar-menu>li.active>a {
+    border-left-color: #7ea4ce;
+} .skin-blue .sidebar-menu>li:hover>a {
+    border-left-color: #7ea4ce;}"
   )))
 
   return(theme)
