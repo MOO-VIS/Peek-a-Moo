@@ -82,7 +82,7 @@ daily_total_schedumoo_info <- function(df) {
 
   cows <- as.list(unique(df$Cow))
   sum_bad_cow <- 0
-  
+
   # check for missing data
   for (i in cows) {
     df_check <- df %>%
@@ -94,13 +94,14 @@ daily_total_schedumoo_info <- function(df) {
       sum_bad_cow =+ 1
     }
   }
-  
+
   if(sum_bad_cow > 0){
-        showNotification(type = "warning",
-        paste0("Behaviour data incomplete for some cow(s).")
-      )
+    showNotification(type = "warning",
+                     paste0("Behaviour data incomplete for some cow(s).")
+    )
   }
-      
+  # 
+  #     
     # instantiate summary df
     df_filter <- df %>%
       group_by(Behaviour) %>%
@@ -132,7 +133,7 @@ daily_schedu_moo_plot <- function(df) {
   # Set plotting colours
   standing_colour <- '#ffb3b3'
   lying_colour <- '#ffd37b'
-  drinking_colour <- '#4ea0cc'
+  drinking_colour <- '#94B4D6'
   feeding_colour <- '#bfc7a3'
   
   

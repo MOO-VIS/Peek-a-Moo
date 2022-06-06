@@ -29,7 +29,7 @@ server <- function(input, output, session) {
     res_auth$user[[1]]
   })
   
-# Call to determine user access
+# Call to determine user access, and welcome modal
 
 config <- NULL
 data_config <- NULL
@@ -49,6 +49,15 @@ observeEvent(user(),{
       pageLength = 1,
       dom = 't'
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else if ((user() == 'user')){
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -56,6 +65,15 @@ observeEvent(user(),{
       pageLength = 5,
       dom = "Bftip"
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else {
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -64,6 +82,15 @@ observeEvent(user(),{
       dom = "Bftip",
       buttons = list(list(extend = "csv", title = "Data_Download"))
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   }
 })  
   
@@ -586,6 +613,31 @@ observeEvent(user(),{
     output$THI_plot <- renderPlotly({
       plot_THI_analysis(df) %>%
         config(modeBarButtonsToRemove = config)
+    })
+    
+    output$mean_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(mean(df$THI_mean),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Average THI", 
+        icon = icon('thermometer-half', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'light-blue'
+      )
+  })
+    output$max_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(max(df$THI_max),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Max THI", 
+        icon = icon('thermometer-full', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'navy'
+      )
+    })
+    output$min_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(min(df$THI_min),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Min THI", 
+        icon = icon('thermometer-empty', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'purple'
+      )
     })
   })
 

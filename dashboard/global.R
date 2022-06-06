@@ -18,6 +18,8 @@ library(shinyBS)
 library(rmarkdown)
 library(rstan)
 library(rstantools)
+library(shinyalert)
+
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
@@ -523,3 +525,4 @@ custom_theme <- function() {
 
   return(theme)
 }
+

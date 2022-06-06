@@ -25,7 +25,7 @@ plot_elo <- function(x, start_date, end_date, cow_id = NULL) {
   df <- elo_df(x, start_date, end_date, cow_id)
   
   plot <- ggplot(df, aes(x = Date, y = Elo)) +
-    geom_line(color = "red") +
+    geom_line(color = "#F7766D") +
     scale_x_date(date_labels = "%d-%B-%y") +
     labs(x = 'Date', 
          y = 'Elo Rating',
@@ -52,8 +52,8 @@ plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 =
     arrange(desc(Elo_mean)) %>%
     ungroup() %>%
     mutate(Color = case_when(
-      Elo_mean == max(Elo_mean) ~ "#F8766D",
-      Elo_mean == min(Elo_mean) ~ "#00BFC4"
+      Elo_mean == max(Elo_mean) ~ "#F7766D",
+      Elo_mean == min(Elo_mean) ~ "#6fa8dc"
     )) %>%
     arrange(Cow)
   
