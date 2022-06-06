@@ -15,7 +15,11 @@ library(visNetwork)
 library(googleCloudStorageR)
 library(reshape2)
 library(shinyBS)
+library(rmarkdown)
+library(rstan)
+library(rstantools)
 library(shinyalert)
+
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
@@ -77,6 +81,7 @@ if (!exists("THI")) {
   load("../data/bin_empty_total_time_summary.Rda")
   load("../data/Feeding_drinking_at_the_same_time_total_time.Rda")
   load("../data/Feeding_drinking_neighbour_total.Rda")
+  load("../data/Feeding_drinking_neighbour_bout.Rda")
   load("../data/Replacement_behaviour_by_date.Rda")
   load("../data/_10-mon__elo_all_replacements_long_noNA.Rda")
 
@@ -159,6 +164,28 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
   )
 }
 
+report_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
+  tabBox(
+    title = title, side = "right", selected = "Plot", width = width,
+    height = height,
+    popover,
+    tabPanel("Analysis", helpText("Note: generating a report is going to take several minutes as a MCMC is running under the hood."),
+             cow_selection_widget("analysis_cow_id", multiple = FALSE, label = "Cow of Interest"),
+             download_format_widget("analysis_format"),
+             downloadButton('downloadReport')),
+    tabPanel("Data", shinycssloaders::withSpinner(
+      image = "loading_cow_table.gif",
+      DT::dataTableOutput(paste0(var_name, "_table"))
+    )),
+    tabPanel("Plot", shinycssloaders::withSpinner(
+      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
+      output_fun(paste0(var_name, "_plot"))
+    ))
+  )
+}
+
+
+
 #' Helper function to format tables with export option
 #'
 #' @param df The dataframe to convert
@@ -198,6 +225,16 @@ aggregation_widget <- function(inputId) {
     selected = "day",
     choiceNames = c("By Day", "By Month"),
     choiceValues = c("day", "month"),
+  )
+}
+
+download_format_widget <- function(inputId) {
+  radioButtons(
+    inputId = inputId,
+    label = "Document format",
+    selected = "PDF",
+    choiceNames = c("PDF", "HTML"),
+    choiceValues = c("PDF", "HTML"),
   )
 }
 
@@ -296,6 +333,25 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
     inputId = inputId,
     choices = cow_choices,
     selected = NULL
+  )
+}
+
+update_cow_selection_neighbour <- function(date_obj, inputId, session, select_all = FALSE) {
+    
+  # find cows that exist in date range
+  cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
+    select(Cow) %>%
+    unique() %>%
+    arrange(desc(Cow))
+  colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
+
+  # update widget
+  updatePickerInput(
+    session = session,
+    inputId = inputId,
+    choices = cow_choices,
+    selected = NULL,
+    options = pickerOptions(maxOptions = 1)
   )
 }
 
