@@ -53,10 +53,41 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
     visPhysics(stabilization = FALSE)
 }
 
+nodes_edges_list_synchronicity <- function(raw_graph_data, 
+                                           date_range, 
+                                           threshold_selected) {
+  
+  edges <- combine_edges(
+    raw_graph_data,
+    date_range[[1]],
+    date_range[[2]],
+    threshold_selected
+  )
+  
+  g <- .make_tidygraph(raw_graph_data, edges)
+  deg <- degree(g)
+  size <- deg / max(deg) * 40
+  
+  nodes <- combine_nodes(
+    raw_graph_data,
+    date_range[[1]],
+    date_range[[2]],
+    size
+  )
+  
+  if (mean(edges$width > 2)) {
+    edges$width <- edges$width / 2
+  }
+  
+  out <- list(nodes, edges)
+  
+}
+
 plot_network_three <- function(raw_graph_data, 
                                date_range, 
-                               network = NULL, 
-                               threshold_selected, 
+                               network = NULL,
+                               nodes,
+                               edges,
                                layouts_type, 
                                selected_nodes = NULL,
                                data_config = NULL) {
@@ -74,33 +105,8 @@ plot_network_three <- function(raw_graph_data,
     return(out)
   } else {
     
-    # plot the network (not displacement)
-    edges <- combine_edges(
-      raw_graph_data,
-      date_range[[1]],
-      date_range[[2]],
-      threshold_selected
-    )
-    
-    g <- .make_tidygraph(raw_graph_data, edges)
-    deg <- degree(g)
-    size <- deg / max(deg) * 40
-    
-    nodes <- combine_nodes(
-      raw_graph_data,
-      date_range[[1]],
-      date_range[[2]],
-      size
-    )
-    
-    if (mean(edges$width > 2)) {
-      edges$width <- edges$width / 2
-    }
-    
-    plot <- visNetwork::renderVisNetwork({
-      plot_network(nodes, edges, layouts_type, selected_nodes)
-    })
-    
+    plot <- plot_network(nodes, edges, layouts_type, selected_nodes)
+
     table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
     
     out <- list(plot, table)

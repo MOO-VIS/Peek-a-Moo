@@ -1,6 +1,6 @@
 library(shinymanager)
 
- passphrase <- Sys.getenv("PASSPHRASE")
+passphrase <- Sys.getenv("PASSPHRASE")
 
 # credentials <- data.frame(
 #   user = c("guest", "user", "admin"), # mandatory
@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     #   credentials
+      #  credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -127,13 +127,6 @@ observeEvent(user(),{
   })
   
   observe({
-    update_cow_selection_synchronicity(
-      input$relationship_date_range, 
-      "synchronicity_cow_selection", 
-      session)
-  })
-
-  observe({
     req(input$relationship_date_range)
 
     update_cow_selection_displacement(
@@ -166,6 +159,64 @@ observeEvent(user(),{
       CD_max = input$paired_cd_range[[2]]
     )
   })
+  
+  values <- reactiveValues(nodes_feeding = NULL, 
+                           edges_feeding = NULL, 
+                           nodes_lying = NULL,
+                           edges_lying = NULL)
+  
+  # render Synchronicity network
+  observe({
+    req(input$relationship_date_range)
+    req(input$relationship_network_selection)
+    
+    `%!in%` <- Negate(`%in%`)
+    
+    threshold_id <- input$relationship_threshold_selection
+    threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75, 0))
+    rownames(threshold_df) <- c("5%", "10%", "25%", "All")
+    threshold_selected <- threshold_df[threshold_id, ]
+    
+    if (input$relationship_network_selection == "Synchronicity") {
+      if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
+        output$feeding_plot <- visNetwork::renderVisNetwork({
+          validate(
+            need(
+              input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+              paste0(
+                "Ending date must come after the starting date. Please select a different starting date."
+              )
+            )
+          )
+        })
+        
+        output$lying_plot <- visNetwork::renderVisNetwork({
+          validate(
+            need(
+              input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+              paste0(
+                "Ending date must come after the starting date. Please select a different starting date."
+              )
+            )
+          )
+        })
+      } else {
+        values$nodes_feeding <- nodes_edges_list_synchronicity(Feeding_drinking_at_the_same_time_total_time,
+                                                               input$relationship_date_range,
+                                                               threshold_selected)[[1]]
+        values$edges_feeding <- nodes_edges_list_synchronicity(Feeding_drinking_at_the_same_time_total_time,
+                                                               input$relationship_date_range,
+                                                               threshold_selected)[[2]]
+        
+        values$nodes_lying <- nodes_edges_list_synchronicity(synchronized_lying_total_time,
+                                                             input$relationship_date_range,
+                                                             threshold_selected)[[1]]
+        values$edges_lying <- nodes_edges_list_synchronicity(synchronized_lying_total_time,
+                                                             input$relationship_date_range,
+                                                             threshold_selected)[[2]]
+      }
+    }
+  })
 
   # render network
   observe({
@@ -197,55 +248,109 @@ observeEvent(user(),{
       # select network to plot
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Neighbour") {
-          output$neighbour_plot <- plot_network_three(Feeding_drinking_neighbour_total_time,
+          
+          nodes_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                          input$relationship_date_range,
+                                                          threshold_selected)[[1]]
+          edges_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                          input$relationship_date_range,
+                                                          threshold_selected)[[2]]
+          
+          output$neighbour_plot <- visNetwork::renderVisNetwork({
+            plot_network_three(Feeding_drinking_neighbour_total_time,
                                                       input$relationship_date_range,
                                                       network = input$relationship_network_selection,
-                                                      threshold_selected,
+                                                      nodes_neighbour, 
+                                                      edges_neighbour,
                                                       layouts_type,
                                                       selected_nodes = NULL,
                                                       data_config)[[1]]
+          })
           
-          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
-                                                       input$relationship_date_range, 
-                                                       network = input$relationship_network_selection, 
-                                                       threshold_selected, 
+          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time,
+                                                       input$relationship_date_range,
+                                                       network = input$relationship_network_selection,
+                                                       nodes_neighbour, 
+                                                       edges_neighbour,
                                                        layouts_type,
                                                        selected_nodes = NULL,
                                                        data_config)[[2]]
         } else {
-          selected_nodes <- input$synchronicity_cow_selection
-          
-          output$feeding_plot <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                                    input$relationship_date_range, 
-                                                    network = input$relationship_network_selection, 
-                                                    threshold_selected, 
-                                                    layouts_type,
-                                                    selected_nodes,
-                                                    data_config)[[1]]
-          
-          output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+          if (length(input$current_feeding) == 0 && length(input$current_lying) == 0) {
+            output$feeding_plot <- visNetwork::renderVisNetwork({
+              plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+                                 input$relationship_date_range, 
+                                 network = input$relationship_network_selection, 
+                                 values$nodes_feeding, 
+                                 values$edges_feeding,
+                                 layouts_type,
+                                 selected_nodes = NULL,
+                                 data_config)[[1]] %>%
+                visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_feeding', nodes.nodes);
+                ;}")
+            })
+            
+            output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+                                                       input$relationship_date_range, 
+                                                       network = input$relationship_network_selection, 
+                                                       values$nodes_feeding, 
+                                                       values$edges_feeding,
+                                                       layouts_type,
+                                                       selected_nodes = NULL,
+                                                       data_config)[[2]]
+            
+            output$lying_plot <- visNetwork::renderVisNetwork({
+              plot_network_three(synchronized_lying_total_time, 
+                                 input$relationship_date_range, 
+                                 network = input$relationship_network_selection, 
+                                 values$nodes_lying, 
+                                 values$edges_lying,
+                                 layouts_type,
+                                 selected_nodes = NULL,
+                                 data_config)[[1]] %>%
+                visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_lying', nodes.nodes);
+                ;}")
+            })
+            
+            output$lying_table <- plot_network_three(synchronized_lying_total_time, 
                                                      input$relationship_date_range, 
                                                      network = input$relationship_network_selection, 
-                                                     threshold_selected, 
+                                                     values$nodes_lying, 
+                                                     values$edges_lying,
                                                      layouts_type,
-                                                     selected_nodes,
+                                                     selected_nodes = NULL,
                                                      data_config)[[2]]
-          
-          output$lying_plot <- plot_network_three(synchronized_lying_total_time, 
-                                                  input$relationship_date_range, 
-                                                  network = input$relationship_network_selection, 
-                                                  threshold_selected, 
-                                                  layouts_type,
-                                                  selected_nodes,
-                                                  data_config)[[1]]
-          
-          output$lying_table <- plot_network_three(synchronized_lying_total_time, 
-                                                   input$relationship_date_range, 
-                                                   network = input$relationship_network_selection, 
-                                                   threshold_selected, 
-                                                   layouts_type,
-                                                   selected_nodes,
-                                                   data_config)[[2]]
+          } else if (length(input$current_feeding) > 0) {
+            output$lying_plot <- visNetwork::renderVisNetwork({
+              plot_network_three(synchronized_lying_total_time, 
+                                 input$relationship_date_range, 
+                                 network = input$relationship_network_selection, 
+                                 values$nodes_lying, 
+                                 values$edges_lying,
+                                 layouts_type,
+                                 selected_nodes = input$current_feeding,
+                                 data_config)[[1]] %>%
+                visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_lying', nodes.nodes);
+                ;}")
+            })
+          } else if (length(input$current_lying) > 0) {
+            output$feeding_plot <- visNetwork::renderVisNetwork({
+              plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
+                                 input$relationship_date_range, 
+                                 network = input$relationship_network_selection, 
+                                 values$nodes_feeding, 
+                                 values$edges_feeding,
+                                 layouts_type,
+                                 selected_nodes = input$current_lying,
+                                 data_config)[[1]] %>%
+                visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_feeding', nodes.nodes);
+                ;}")
+            })
+          } 
         }
       } else {
         # displacement network setup
