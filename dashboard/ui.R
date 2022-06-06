@@ -160,10 +160,6 @@ relationships_tab <- tabItem(
         column(4, layout_selection_widget("relationship_layout_selection", multiple = FALSE))
       ),
       conditionalPanel(
-        condition = "input.relationship_network_selection == 'Synchronicity'",
-        column(4, cow_selection_widget("synchronicity_cow_selection", label = "Cow of Interest"))
-      ),
-      conditionalPanel(
         condition = "input.relationship_network_selection == 'Displacement'",
         column(4, sliderInput("cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
