@@ -1,6 +1,6 @@
 library(shinymanager)
 
- passphrase <- Sys.getenv("PASSPHRASE")
+passphrase <- Sys.getenv("PASSPHRASE")
 
 # credentials <- data.frame(
 #   user = c("guest", "user", "admin"), # mandatory
@@ -11,98 +11,100 @@ library(shinymanager)
 
 # Set up shiny server
 server <- function(input, output, session) {
-  
+
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     #   credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      #credentials
+       "../auth/database.sqlite",
+        passphrase = passphrase
     )
   )
-  
+
   output$auth_output <- renderPrint({
     reactiveValuesToList(res_auth)
   })
-  
+
   user <- reactive({
     res_auth$user[[1]]
   })
-  
-# Call to determine user access, and welcome modal
 
-config <- NULL
-data_config <- NULL
+  # Call to determine user access, and welcome modal
 
-observeEvent(user(),{  
-  if(is.null(user()) == TRUE){
-    config <<- c("zoomIn2d", "zoomOut2d")
-    data_config <<- list(
-      scrollX = TRUE,
-      pageLength = 5,
-      dom = "t"
-    )
-  } else if (user() == 'guest') {
-    config <<- c("toImage", "zoomIn2d", "zoomOut2d")
-    data_config <<- list(
-      scrollX = TRUE,
-      pageLength = 1,
-      dom = 't'
-    )
-    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
-               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
-               closeOnClickOutside = TRUE,
-               showConfirmButton = TRUE,
-               confirmButtonText = "Let's get mooving!",
-               confirmButtonCol = "#94B4D6",
-               imageUrl = "../welcome.png",
-               imageWidth = 100,
-               imageHeight = 100)
-  } else if ((user() == 'user')){
-    config <<- c("zoomIn2d", "zoomOut2d")
-    data_config <<- list(
-      scrollX = TRUE,
-      pageLength = 5,
-      dom = "Bftip"
-    )
-    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
-               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
-               closeOnClickOutside = TRUE,
-               showConfirmButton = TRUE,
-               confirmButtonText = "Let's get mooving!",
-               confirmButtonCol = "#94B4D6",
-               imageUrl = "../welcome.png",
-               imageWidth = 100,
-               imageHeight = 100)
-  } else {
-    config <<- c("zoomIn2d", "zoomOut2d")
-    data_config <<- list(
-      scrollX = TRUE,
-      pageLength = 5,
-      dom = "Bftip",
-      buttons = list(list(extend = "csv", title = "Data_Download"))
-    )
-    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
-               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
-               closeOnClickOutside = TRUE,
-               showConfirmButton = TRUE,
-               confirmButtonText = "Let's get mooving!",
-               confirmButtonCol = "#94B4D6",
-               imageUrl = "../welcome.png",
-               imageWidth = 100,
-               imageHeight = 100)
-  }
-})  
-  
+  config <- NULL
+  data_config <- NULL
+
+  observeEvent(user(), {
+    if (is.null(user()) == TRUE) {
+      config <<- c("zoomIn2d", "zoomOut2d")
+      data_config <<- list(
+        scrollX = TRUE,
+        pageLength = 5,
+        dom = "t"
+      )
+    } else if (user() == "guest") {
+      config <<- c("toImage", "zoomIn2d", "zoomOut2d")
+      data_config <<- list(
+        scrollX = TRUE,
+        pageLength = 1,
+        dom = "t"
+      )
+      shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+        "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+        closeOnClickOutside = TRUE,
+        showConfirmButton = TRUE,
+        confirmButtonText = "Let's get mooving!",
+        confirmButtonCol = "#94B4D6",
+        imageUrl = "../welcome.png",
+        imageWidth = 100,
+        imageHeight = 100
+      )
+    } else if ((user() == "user")) {
+      config <<- c("zoomIn2d", "zoomOut2d")
+      data_config <<- list(
+        scrollX = TRUE,
+        pageLength = 5,
+        dom = "Bftip"
+      )
+      shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+        "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+        closeOnClickOutside = TRUE,
+        showConfirmButton = TRUE,
+        confirmButtonText = "Let's get mooving!",
+        confirmButtonCol = "#94B4D6",
+        imageUrl = "../welcome.png",
+        imageWidth = 100,
+        imageHeight = 100
+      )
+    } else {
+      config <<- c("zoomIn2d", "zoomOut2d")
+      data_config <<- list(
+        scrollX = TRUE,
+        pageLength = 5,
+        dom = "Bftip",
+        buttons = list(list(extend = "csv", title = "Data_Download"))
+      )
+      shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+        "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+        closeOnClickOutside = TRUE,
+        showConfirmButton = TRUE,
+        confirmButtonText = "Let's get mooving!",
+        confirmButtonCol = "#94B4D6",
+        imageUrl = "../welcome.png",
+        imageWidth = 100,
+        imageHeight = 100
+      )
+    }
+  })
+
   # Warning section
   observe({
-    
     warning_df <- combine_warnings(
       food_cuttoff = input$food_intake,
       water_cuttoff = input$water_intake,
       bin_cuttoff = input$bin_volume
     )
-    
+
     output$warning_table <- format_dt_table(warning_df, page_length = 20, data_config = data_config)
 
     output$warning_plot <- DT::renderDataTable(
@@ -122,27 +124,31 @@ observeEvent(user(),{
   })
 
   # contact menu
-    output$contact <- renderMenu({
-      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "Feedback and questions",
-                          messageItem(
-                            from = "Contact us",
-                            message =  "animal.welfare@ubc.ca",
-                            icon = icon("envelope"),
-                            href = "mailto:animal.welfare@ubc.ca"
-                          ))
-    })
-    
-  # github issues contribute  
-    output$github <- renderMenu({
-      dropdownMenu(type = 'messages', badgeStatus = NULL, headerText = "See an issue or want to contribute?",
-                   messageItem(
-                     from = "Issues / Contributions",
-                     message =  "Visit our GitHub repository",
-                     icon = icon("github", lib = "font-awesome"),
-                     href = "https://github.com/UBC-AWP/Peek-a-Moo"
-                   ),
-                   icon = icon("github", lib = "font-awesome"))
-    })
+  output$contact <- renderMenu({
+    dropdownMenu(
+      type = "messages", badgeStatus = NULL, headerText = "Feedback and questions",
+      messageItem(
+        from = "Contact us",
+        message =  "animal.welfare@ubc.ca",
+        icon = icon("envelope"),
+        href = "mailto:animal.welfare@ubc.ca"
+      )
+    )
+  })
+
+  # github issues contribute
+  output$github <- renderMenu({
+    dropdownMenu(
+      type = "messages", badgeStatus = NULL, headerText = "See an issue or want to contribute?",
+      messageItem(
+        from = "Issues / Contributions",
+        message =  "Visit our GitHub repository",
+        icon = icon("github", lib = "font-awesome"),
+        href = "https://github.com/UBC-AWP/Peek-a-Moo"
+      ),
+      icon = icon("github", lib = "font-awesome")
+    )
+  })
 
 
   # update cow selections based on selected dates
@@ -152,12 +158,13 @@ observeEvent(user(),{
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
-  
+
   observe({
     update_cow_selection_synchronicity(
-      input$relationship_date_range, 
-      "synchronicity_cow_selection", 
-      session)
+      input$relationship_date_range,
+      "synchronicity_cow_selection",
+      session
+    )
   })
 
   observe({
@@ -169,21 +176,21 @@ observeEvent(user(),{
       session = session
     )
   })
-  
+
   observe({
     req(input$relationship_date_range)
-    
+
     update_cow_selection_displacement(
       date_obj = input$relationship_date_range,
       inputId = "paired_cow_selection_1",
       session = session
     )
   })
-  
+
   observe({
     req(input$relationship_date_range)
     req(input$paired_cow_selection_1)
-    
+
     update_2nd_cow_selection_displacement(
       date_obj = input$relationship_date_range,
       inputId = "paired_cow_selection_2",
@@ -219,60 +226,106 @@ observeEvent(user(),{
           )
         )
       })
+      output$feeding_plot <- visNetwork::renderVisNetwork({
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
+      })
+      output$neighbour_plot <- visNetwork::renderVisNetwork({
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
+      })
+      output$lying_plot <- visNetwork::renderVisNetwork({
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
+      })
+      output$network_disp_plot <- visNetwork::renderVisNetwork({
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
+      })
     } else {
 
       # select network to plot
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Neighbour") {
           output$neighbour_plot <- plot_network_three(Feeding_drinking_neighbour_total_time,
-                                                      input$relationship_date_range,
-                                                      network = input$relationship_network_selection,
-                                                      threshold_selected,
-                                                      layouts_type,
-                                                      selected_nodes = NULL,
-                                                      data_config)[[1]]
-          
-          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
-                                                       input$relationship_date_range, 
-                                                       network = input$relationship_network_selection, 
-                                                       threshold_selected, 
-                                                       layouts_type,
-                                                       selected_nodes = NULL,
-                                                       data_config)[[2]]
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes = NULL,
+            data_config
+          )[[1]]
+
+          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time,
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes = NULL,
+            data_config
+          )[[2]]
         } else {
           selected_nodes <- input$synchronicity_cow_selection
-          
-          output$feeding_plot <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                                    input$relationship_date_range, 
-                                                    network = input$relationship_network_selection, 
-                                                    threshold_selected, 
-                                                    layouts_type,
-                                                    selected_nodes,
-                                                    data_config)[[1]]
-          
-          output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                                     input$relationship_date_range, 
-                                                     network = input$relationship_network_selection, 
-                                                     threshold_selected, 
-                                                     layouts_type,
-                                                     selected_nodes,
-                                                     data_config)[[2]]
-          
-          output$lying_plot <- plot_network_three(synchronized_lying_total_time, 
-                                                  input$relationship_date_range, 
-                                                  network = input$relationship_network_selection, 
-                                                  threshold_selected, 
-                                                  layouts_type,
-                                                  selected_nodes,
-                                                  data_config)[[1]]
-          
-          output$lying_table <- plot_network_three(synchronized_lying_total_time, 
-                                                   input$relationship_date_range, 
-                                                   network = input$relationship_network_selection, 
-                                                   threshold_selected, 
-                                                   layouts_type,
-                                                   selected_nodes,
-                                                   data_config)[[2]]
+
+          output$feeding_plot <- plot_network_three(Feeding_drinking_at_the_same_time_total_time,
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes,
+            data_config
+          )[[1]]
+
+          output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time,
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes,
+            data_config
+          )[[2]]
+
+          output$lying_plot <- plot_network_three(synchronized_lying_total_time,
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes,
+            data_config
+          )[[1]]
+
+          output$lying_table <- plot_network_three(synchronized_lying_total_time,
+            input$relationship_date_range,
+            network = input$relationship_network_selection,
+            threshold_selected,
+            layouts_type,
+            selected_nodes,
+            data_config
+          )[[2]]
         }
       } else {
         # displacement network setup
@@ -300,7 +353,7 @@ observeEvent(user(),{
 
             g <- .make_tidygraph(raw_graph_data, edges, directed = TRUE)
             deg <- degree(g, mode = "all")
-            
+
             nodes <- combine_replace_nodes(
               raw_graph_data,
               input$relationship_date_range[[1]],
@@ -320,28 +373,27 @@ observeEvent(user(),{
 
             output$network_disp_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
           } else if (input$relationship_network_selection == "Displacement Star*") {
-            
             cow_id <- input$star_cow_selection
-            
+
             edges <- combine_replace_edges_star(raw_graph_data,
-                                                input$relationship_date_range[[1]],
-                                                input$relationship_date_range[[2]],
-                                                cow_id = cow_id,
-                                                CD_min = input$star_cd_range[[1]],
-                                                CD_max = input$star_cd_range[[2]]
+              input$relationship_date_range[[1]],
+              input$relationship_date_range[[2]],
+              cow_id = cow_id,
+              CD_min = input$star_cd_range[[1]],
+              CD_max = input$star_cd_range[[2]]
             )
             edges$width <- edges$weight
             if (mean(edges$width > 2)) {
               edges$width <- edges$width / 2
             }
-            
+
             nodes <- combine_replace_nodes_star(
               edges,
               cow_id,
               input$relationship_date_range[[1]],
               input$relationship_date_range[[2]]
             )
-            
+
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp_star(nodes, edges)
             })
@@ -349,22 +401,24 @@ observeEvent(user(),{
           } else {
             cow_id_1 <- input$paired_cow_selection_1
             cow_id_2 <- input$paired_cow_selection_2
-            
+
             edges <- combine_replace_edges_paired(raw_graph_data,
-                                                input$relationship_date_range[[1]],
-                                                input$relationship_date_range[[2]],
-                                                cow_id_1 = cow_id_1,
-                                                cow_id_2 = cow_id_2,
-                                                CD_min = input$paired_cd_range[[1]],
-                                                CD_max = input$paired_cd_range[[2]]
+              input$relationship_date_range[[1]],
+              input$relationship_date_range[[2]],
+              cow_id_1 = cow_id_1,
+              cow_id_2 = cow_id_2,
+              CD_min = input$paired_cd_range[[1]],
+              CD_max = input$paired_cd_range[[2]]
             )
-            
+
             edges$width <- edges$weight
-            
-            nodes <- combine_replace_nodes_paired(edges, 
-                                                  input$relationship_date_range[[1]],
-                                                  input$relationship_date_range[[2]])
-            
+
+            nodes <- combine_replace_nodes_paired(
+              edges,
+              input$relationship_date_range[[1]],
+              input$relationship_date_range[[2]]
+            )
+
             output$network_plot <- visNetwork::renderVisNetwork({
               plot_network_disp_star(nodes, edges) %>%
                 visNodes(shape = "circle") %>%
@@ -382,46 +436,59 @@ observeEvent(user(),{
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-    
+
     raw_graph_data <- dominance_df
-    
-    if (input$relationship_network_selection == "Displacement Star*") {
-      cow_id <- input$star_cow_selection
-      
+
+    if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
       output$elo_plot <- renderPlotly({
-        plot_elo(raw_graph_data,
-                 input$relationship_date_range[[1]],
-                 input$relationship_date_range[[2]],
-                 cow_id = cow_id
-        ) %>%
-          config(modeBarButtonsToRemove = config)
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
       })
-      
-      output$elo_table <- format_dt_table(elo_df(raw_graph_data,
-                                                 input$relationship_date_range[[1]],
-                                                 input$relationship_date_range[[2]],
-                                                 cow_id_1 = cow_id
-      ), data_config = data_config)
-    } else if (input$relationship_network_selection == "Displacement Paired") {
-      cow_id_1 <- input$paired_cow_selection_1
-      cow_id_2 <- input$paired_cow_selection_2
-      
-      output$elo_plot <- renderPlotly({
-        plot_elo_paired(raw_graph_data,
-                 input$relationship_date_range[[1]],
-                 input$relationship_date_range[[2]],
-                 cow_id_1 = cow_id_1,
-                 cow_id_2 = cow_id_2
-        ) %>%
-          config(modeBarButtonsToRemove = config)
-      })
-      
-      output$elo_table <- format_dt_table(elo_df(raw_graph_data,
-                                                 input$relationship_date_range[[1]],
-                                                 input$relationship_date_range[[2]],
-                                                 cow_id_1 = cow_id_1,
-                                                 cow_id_2 = cow_id_2
-      ), data_config = data_config)
+    } else {
+      if (input$relationship_network_selection == "Displacement Star*") {
+        cow_id <- input$star_cow_selection
+
+        output$elo_plot <- renderPlotly({
+          plot_elo(raw_graph_data,
+            input$relationship_date_range[[1]],
+            input$relationship_date_range[[2]],
+            cow_id = cow_id
+          ) %>%
+            config(modeBarButtonsToRemove = config)
+        })
+
+        output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+          input$relationship_date_range[[1]],
+          input$relationship_date_range[[2]],
+          cow_id_1 = cow_id
+        ), data_config = data_config)
+      } else if (input$relationship_network_selection == "Displacement Paired") {
+        cow_id_1 <- input$paired_cow_selection_1
+        cow_id_2 <- input$paired_cow_selection_2
+
+        output$elo_plot <- renderPlotly({
+          plot_elo_paired(raw_graph_data,
+            input$relationship_date_range[[1]],
+            input$relationship_date_range[[2]],
+            cow_id_1 = cow_id_1,
+            cow_id_2 = cow_id_2
+          ) %>%
+            config(modeBarButtonsToRemove = config)
+        })
+
+        output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+          input$relationship_date_range[[1]],
+          input$relationship_date_range[[2]],
+          cow_id_1 = cow_id_1,
+          cow_id_2 = cow_id_2
+        ), data_config = data_config)
+      }
     }
   })
 
@@ -434,10 +501,10 @@ observeEvent(user(),{
     #' @param y_col The column of interest
     #' @param var_name The name of the UI output variable
     plot_cow_date_range <- function(df, y_col, var_name) {
-    
+
       # filter table
       df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
-      
+
       # generate table
       output[[paste0(var_name, "_table")]] <- format_dt_table(df, data_config = data_config)
 
@@ -484,73 +551,77 @@ observeEvent(user(),{
       "feed_intake"
     )
   })
-  
+
   observe({
     req(input$daily_date)
     req(input$daily_cow_selection)
-    
+
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- Cleaned_feeding_original_data
     drinking <- Cleaned_drinking_original_data
     lying_standing <- duration_for_each_bout
-    
+
     # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
     df_1 <- df %>%
       mutate(Time = as.character(df$Time))
     output$daily_table <- format_dt_table(drop_na(df_1, Cow), data_config = data_config)
-    output$daily_plot <- renderPlotly({daily_schedu_moo_plot(df) %>%
+    output$daily_plot <- renderPlotly({
+      daily_schedu_moo_plot(df) %>%
         config(modeBarButtonsToRemove = config)
-  })
+    })
     totals <- daily_total_schedumoo_info(df)
-    
+
     output$total_standing <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[4],big.mark=','), " s"), style = "font-size: 60%;"),
-        "Total standing time", 
-        icon = icon('circle-arrow-up', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'red'
+        tags$p(paste0(format(totals[4], big.mark = ","), " s"), style = "font-size: 60%;"),
+        "Total standing time",
+        icon = icon("circle-arrow-up", lib = "glyphicon", style = "font-size: 40px;"),
+        color = "red"
       )
     })
     output$total_lying <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[3],big.mark=','), " s"), style = "font-size: 60%;"),
-        "Total lying time", 
-        icon = icon('circle-arrow-down', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'yellow'
+        tags$p(paste0(format(totals[3], big.mark = ","), " s"), style = "font-size: 60%;"),
+        "Total lying time",
+        icon = icon("circle-arrow-down", lib = "glyphicon", style = "font-size: 40px;"),
+        color = "yellow"
       )
     })
     output$total_feeding <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[2],big.mark=','), " s"), style = "font-size: 60%;"),
-        "Total feeding time", 
-        icon = icon('grain', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'green'
+        tags$p(paste0(format(totals[2], big.mark = ","), " s"), style = "font-size: 60%;"),
+        "Total feeding time",
+        icon = icon("grain", lib = "glyphicon", style = "font-size: 40px;"),
+        color = "green"
       )
     })
     output$total_drinking <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[1],big.mark=','), " s"), style = "font-size: 60%;"),
-        "Total drinking time", 
-        icon = icon('tint', lib = 'glyphicon', style="font-size: 40px;"),
-        color = 'blue'
+        tags$p(paste0(format(totals[1], big.mark = ","), " s"), style = "font-size: 60%;"),
+        "Total drinking time",
+        icon = icon("tint", lib = "glyphicon", style = "font-size: 40px;"),
+        color = "blue"
       )
     })
-})
-  
-  #Render Relationship tab plots
+  })
+
+  # Render Relationship tab plots
   observe({
     req(input$relationship_cow_selection)
     req(input$relationship_date_range)
 
 
+
     df <- actor_reactor_analysis(make_analysis_df(Replacement_behaviour_by_date))
     output$bullying_table <- format_dt_table(df, data_config = data_config)
     output$bullying_plot <- renderPlotly({
-      plot_bully_analysis(df,
-                          input$relationship_cow_selection,
-                          input$relationship_date_range[[1]],
-                          input$relationship_date_range[[2]]) %>%
+      plot_bully_analysis(
+        df,
+        input$relationship_cow_selection,
+        input$relationship_date_range[[1]],
+        input$relationship_date_range[[2]]
+      ) %>%
         config(modeBarButtonsToRemove = config)
     })
   })
@@ -558,37 +629,71 @@ observeEvent(user(),{
   observe({
     req(input$relationship_date_range)
 
-    df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
-    output$THI_table <- format_dt_table(df, data_config = data_config)
-    output$THI_plot <- renderPlotly({
-      plot_THI_analysis(df) %>%
-        config(modeBarButtonsToRemove = config)
-    })
-    
-    output$mean_THI <- renderValueBox({
-      valueBox(
-        tags$p(paste0(format(round(mean(df$THI_mean),1),big.mark=','), " THI"), style = "font-size: 60%;"),
-        "Average THI", 
-        icon = icon('thermometer-half', lib = 'font-awesome', style="font-size: 40px;"),
-        color = 'light-blue'
-      )
-  })
-    output$max_THI <- renderValueBox({
-      valueBox(
-        tags$p(paste0(format(round(max(df$THI_max),1),big.mark=','), " THI"), style = "font-size: 60%;"),
-        "Max THI", 
-        icon = icon('thermometer-full', lib = 'font-awesome', style="font-size: 40px;"),
-        color = 'navy'
-      )
-    })
-    output$min_THI <- renderValueBox({
-      valueBox(
-        tags$p(paste0(format(round(min(df$THI_min),1),big.mark=','), " THI"), style = "font-size: 60%;"),
-        "Min THI", 
-        icon = icon('thermometer-empty', lib = 'font-awesome', style="font-size: 40px;"),
-        color = 'purple'
-      )
-    })
+    if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
+      output$THI_plot <- renderPlotly({
+        validate(
+          need(
+            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+            paste0(
+              "Ending date must come after the starting date. Please select a different starting date."
+            )
+          )
+        )
+      })
+      output$mean_THI <- renderValueBox({
+        valueBox(
+          tags$p("Error: date selection"),
+          "Average THI",
+          color = "light-blue"
+        )
+      })
+      output$max_THI <- renderValueBox({
+        valueBox(
+          tags$p("Error: date selection"),
+          "Max THI",
+          color = "navy"
+        )
+      })
+      output$min_THI <- renderValueBox({
+        valueBox(
+          tags$p("Error: date selection"),
+          "Min THI",
+          color = "purple"
+        )
+      })
+    } else {
+      df <- THI_analysis(THI, input$relationship_date_range[[1]], input$relationship_date_range[[2]])
+      output$THI_table <- format_dt_table(df, data_config = data_config)
+      output$THI_plot <- renderPlotly({
+        plot_THI_analysis(df) %>%
+          config(modeBarButtonsToRemove = config)
+      })
+
+      output$mean_THI <- renderValueBox({
+        valueBox(
+          tags$p(paste0(format(round(mean(df$THI_mean), 1), big.mark = ","), " THI"), style = "font-size: 60%;"),
+          "Average THI",
+          icon = icon("thermometer-half", lib = "font-awesome", style = "font-size: 40px;"),
+          color = "light-blue"
+        )
+      })
+      output$max_THI <- renderValueBox({
+        valueBox(
+          tags$p(paste0(format(round(max(df$THI_max), 1), big.mark = ","), " THI"), style = "font-size: 60%;"),
+          "Max THI",
+          icon = icon("thermometer-full", lib = "font-awesome", style = "font-size: 40px;"),
+          color = "navy"
+        )
+      })
+      output$min_THI <- renderValueBox({
+        valueBox(
+          tags$p(paste0(format(round(min(df$THI_min), 1), big.mark = ","), " THI"), style = "font-size: 60%;"),
+          "Min THI",
+          icon = icon("thermometer-empty", lib = "font-awesome", style = "font-size: 40px;"),
+          color = "purple"
+        )
+      })
+    }
   })
 
 
@@ -596,7 +701,7 @@ observeEvent(user(),{
   observe({
     update_bin_selection(input$bin_date, "activity_bin_selection", session)
   })
-  
+
 
   # Feed bin tab
   observe({
