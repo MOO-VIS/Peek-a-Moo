@@ -258,8 +258,31 @@ relationships_tab <- tabItem(
     valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
-    default_tabBox("THI", "THI", width = 12)
-  )
+    default_tabBox(
+      title = p(
+        "THI",
+      tags$style(type = "text/css", "#button_THI_plot{border-radius: 0px;border-width: 0px}"),
+      bsButton("button_THI_plot",
+               label = "", icon = icon("info-circle", lib = "font-awesome"),
+               size = "extra-small"
+      )
+    ), 
+    "THI",
+    width = 12,
+    popover = bsPopover(
+      id = "button_THI_plot", title = "THI",
+      content = 
+      paste("THI stands for Temperature Humidity Index and is calculated as:",
+            "",
+            "<i>THI = 0.8*Temperature + Relative Humidity Index * (Temperature - 14.4) + 46.4 </i>",
+            "",
+            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress. The threshold for heat stress is THI = 68, (pictured as the grey dashed line in the plot below).",
+            sep = "<br>"),
+      placement = "right",
+      trigger = "hover",
+      options = list(container = "body"))
+)
+)
 )
 
 # Bins tab
