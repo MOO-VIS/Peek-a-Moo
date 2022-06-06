@@ -1,4 +1,4 @@
 helpers.installPackages('shinydashboard', 'shinyWidgets', 'shinymanager', 
     'Rcpp', 'dplyr', 'lubridate', 'plotly', 'igraph', 'png', 'visNetwork', 
     'googleCloudStorageR', 'shinycssloaders', 'tidyr', 'tibble', 'purrr',
-    'forcats', 'stringr', 'reshape2')
+    'forcats', 'stringr', 'reshape2', 'rmarkdown', 'rstan', 'rstantools','StanHeaders')

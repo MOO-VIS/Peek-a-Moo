@@ -201,7 +201,7 @@ relationships_tab <- tabItem(
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Neighbour'",
-      default_tabBox("Feeding Neighbours", "neighbour", 
+      report_tabBox("Feeding Neighbours", "neighbour", 
                      width = 12, 
                      output_fun = visNetworkOutput)
     )
