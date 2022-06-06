@@ -109,7 +109,7 @@ daily_tab <- tabItem(
     valueBoxOutput("total_lying", width = 3),
     tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
-    tags$style(".small-box.bg-blue { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-blue { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -180,7 +180,6 @@ relationships_tab <- tabItem(
           "<b>Customizations:</b>",
           "<u>Date Range</u> - timeline for the given plots",
           "<u>Network</u> - type of network to display",
-          "<u>Threshold</u> - top weighted % of connections to display in the network",
           sep = "<br>"
         ),
         placement = "right",
@@ -192,9 +191,11 @@ relationships_tab <- tabItem(
         content = paste(
           "<b>Customizations (Feeding/Lying networks) :</b>",
           "<u>Layout Type</u> - shape of the displayed network",
+          "<u>Threshold</u> - top weighted % of connections to display in the network",
           "",
           "<b>Customizations (Displacement networks) :</b>",
           "<u>Competition Density</u> - threshold of competition density to filter connections in the network by",
+          "<u>Threshold</u> - top weighted % of connections to display in the network (default only)",
           "<u>Cow of Interest (star only) </u> - cow to be showcased in the network",
           "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together",
           sep = "<br>"
@@ -250,12 +251,35 @@ relationships_tab <- tabItem(
     valueBoxOutput("mean_THI", width = 4),
     tags$style(".small-box.bg-navy { background-color: #F7766D !important; color: #FFFFFF !important; }"),
     valueBoxOutput("max_THI", width = 4),
-    tags$style(".small-box.bg-purple { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-purple { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
     valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
-    default_tabBox("THI", "THI", width = 12)
-  )
+    default_tabBox(
+      title = p(
+        "THI",
+      tags$style(type = "text/css", "#button_THI_plot{border-radius: 0px;border-width: 0px}"),
+      bsButton("button_THI_plot",
+               label = "", icon = icon("info-circle", lib = "font-awesome"),
+               size = "extra-small"
+      )
+    ), 
+    "THI",
+    width = 12,
+    popover = bsPopover(
+      id = "button_THI_plot", title = "THI",
+      content = 
+      paste("THI stands for Temperature Humidity Index and is calculated as:",
+            "",
+            "<i>THI = 0.8*Temperature + Relative Humidity Index * (Temperature - 14.4) + 46.4 </i>",
+            "",
+            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress. The threshold for heat stress is THI = 68, (pictured as the grey dashed line in the plot below).",
+            sep = "<br>"),
+      placement = "right",
+      trigger = "hover",
+      options = list(container = "body"))
+)
+)
 )
 
 # Bins tab
@@ -418,8 +442,8 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #94B4D6;
-    border-color: #94B4D6;
+    background-color: #7ea4ce;
+    border-color: #7ea4ce;
     } .btn-primary:hover {
     color: #ffffff;
     background-color: #85a2c1;
@@ -449,8 +473,8 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #94B4D6;
-    border-color: #94B4D6;
+    background-color: #7ea4ce;
+    border-color: #7ea4ce;
 }")),
       tags$p(
         "For any questions, please contact ",
