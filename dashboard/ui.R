@@ -21,7 +21,7 @@ sidebar <- dashboardSidebar(
   )
 )
 
-#Activities tab
+# Activities tab
 activities_tab <- tabItem(
   "activities",
   fluidRow(
@@ -73,7 +73,7 @@ activities_tab <- tabItem(
   )
 )
 
-#Daily tab
+# Daily tab
 daily_tab <- tabItem(
   "daily_behavior",
   fluidRow(
@@ -109,7 +109,7 @@ daily_tab <- tabItem(
     valueBoxOutput("total_lying", width = 3),
     tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
-    tags$style(".small-box.bg-blue { background-color: #4ea0cc !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-blue { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -135,21 +135,25 @@ daily_tab <- tabItem(
   )
 )
 
-#Realtionships tab
+# Realtionships tab
 relationships_tab <- tabItem(
   "relationships",
   fluidRow(
     box(
       title = p(
         "Global Customizations",
-        tags$style(type = "text/css", "#button_network{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_network", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+        tags$style(type = "text/css", "#button_global_network{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_global_network", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
       ), width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(6, date_range_widget("relationship_date_range")),
       column(6, network_selection_widget("relationship_network_selection", multiple = TRUE))
     ),
     box(
-      title = "Network Customizations", width = 12, solidHeader = TRUE, collapsible = TRUE,
+      title = p(
+        "Network Customizations",
+        tags$style(type = "text/css", "#button_network{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_network", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+      ), width = 12, solidHeader = TRUE, collapsible = TRUE,
       conditionalPanel(
         condition = "input.relationship_network_selection == 'Neighbour' || input.relationship_network_selection == 'Synchronicity' || input.relationship_network_selection == 'Displacement'",
         column(4, threshold_selection_widget("relationship_threshold_selection", multiple = FALSE)),
@@ -171,21 +175,28 @@ relationships_tab <- tabItem(
         column(4, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       bsPopover(
-        id = "button_network", title = "Relationships Tab",
-        content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
-          "",
-          "<b>Customizations (all) :</b>",
+        id = "button_global_network", title = "Global Network Customizations",
+        content = paste(
+          "<b>Customizations:</b>",
           "<u>Date Range</u> - timeline for the given plots",
           "<u>Network</u> - type of network to display",
           "<u>Threshold</u> - top weighted % of connections to display in the network",
-          "",
+          sep = "<br>"
+        ),
+        placement = "right",
+        trigger = "hover",
+        options = list(container = "body")
+      ),
+      bsPopover(
+        id = "button_network", title = "Network Specific Customizations",
+        content = paste(
           "<b>Customizations (Feeding/Lying networks) :</b>",
           "<u>Layout Type</u> - shape of the displayed network",
           "",
           "<b>Customizations (Displacement networks) :</b>",
           "<u>Competition Density</u> - threshold of competition density to filter connections in the network by",
-          "<u>Cow of Interest</u> - cow to be showcased in the network",
-          "<u>First/Second Cow of Interest</u> - the two cows to be showcased in the network together",
+          "<u>Cow of Interest (star only) </u> - cow to be showcased in the network",
+          "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together",
           sep = "<br>"
         ),
         placement = "right",
@@ -197,7 +208,7 @@ relationships_tab <- tabItem(
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Neighbour'",
-      default_tabBox("Feeding Neighbours", "neighbour", 
+      report_tabBox("Feeding Neighbours", "neighbour", 
                      width = 12, 
                      output_fun = visNetworkOutput)
     )
@@ -205,37 +216,49 @@ relationships_tab <- tabItem(
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Synchronicity'",
-      default_tabBox("Feeding Synchronicity", "feeding", 
-                     width = 6, 
-                     output_fun = visNetworkOutput),
-      default_tabBox("Lying Synchronicity", "lying", 
-                     width = 6, 
-                     output_fun = visNetworkOutput)
+      default_tabBox("Feeding Synchronicity", "feeding",
+        width = 6,
+        output_fun = visNetworkOutput
+      ),
+      default_tabBox("Lying Synchronicity", "lying",
+        width = 6,
+        output_fun = visNetworkOutput
+      )
     )
   ),
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Displacement'",
       default_tabBox("Social Network", "network_disp",
-                     width = 12,
-                     output_fun = visNetworkOutput)
+        width = 12,
+        output_fun = visNetworkOutput
+      )
     )
   ),
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Displacement Star*' || input.relationship_network_selection == 'Displacement Paired'",
-      default_tabBox("Social Network", "network", 
-                     width = 6, 
-                     output_fun = visNetworkOutput),
+      default_tabBox("Social Network", "network",
+        width = 6,
+        output_fun = visNetworkOutput
+      ),
       default_tabBox("Dominance", "elo", width = 6)
     )
+  ),
+  fluidRow(
+    tags$style(".small-box.bg-light-blue { background-color: #CA929D !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("mean_THI", width = 4),
+    tags$style(".small-box.bg-navy { background-color: #F7766D !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("max_THI", width = 4),
+    tags$style(".small-box.bg-purple { background-color: #94B4D6 !important; color: #FFFFFF !important; }"),
+    valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
     default_tabBox("THI", "THI", width = 12)
   )
 )
 
-#Bins tab
+# Bins tab
 bins_tab <- tabItem(
   "bins",
   fluidRow(
@@ -300,7 +323,7 @@ bins_tab <- tabItem(
   )
 )
 
-#Warnings tab
+# Warnings tab
 warnings_tab <- tabItem(
   "warnings",
   box(
@@ -387,7 +410,7 @@ body <- dashboardBody(
   )
 )
 
-ui <- fluidPage(dashboardPage(header, sidebar, body))
+ui <- fluidPage(useShinyalert(), dashboardPage(header, sidebar, body))
 
 # Authentication page
 ui <- secure_app(ui,

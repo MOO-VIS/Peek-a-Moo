@@ -1,0 +1,239 @@
+---
+title: "Statistical analysis report about neighbour counts"
+output: html_document
+params:
+  data: NA
+  cow_id: NA
+  date_range: NA
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+```
+
+
+
+```{r library packages, include=FALSE}
+rstan_options(auto_write = TRUE)  # To save some compiling
+```
+
+```{r prepare data}
+
+# functions to convert the data form to edgelist
+adjacency_to_long <- function(x, upper_only = FALSE) {
+  # check inputs
+  dn <- dimnames(x)
+  if (!inherits(x, "matrix")) {
+    stop("Input must be a matrix")
+  } else if (is.null(dn) || is.null(dn[[1]]) || is.null(dn[[2]])) {
+    stop("Input matrix must have named dimensions.")
+  } else if (!all.equal(dn[[1]], dn[[2]])) {
+    stop("Dimension names must match across both axes")
+  }
+  # zero-out the lower triangle if needed
+  if (upper_only) {
+    x[lower.tri(x)] <- 0
+  }
+  # pivot data to long
+  x %>% as.data.frame() %>%
+    tibble::rownames_to_column("from") %>%
+    tidyr::pivot_longer(-from, "to", "time") %>%
+    dplyr::filter(value > 0)
+}
+
+`%||%` <- function(x, y) {
+  if (is_null(x)) y else x
+}
+
+combine_data <- function(x, from_date = NULL, to_date = NULL){
+
+  # set defaults
+  from_date <- from_date %||% -Inf
+  to_date   <- to_date %||% Inf
+
+  # combine list into one long data frame
+  edgelist <- x %>%
+    purrr::map_df(adjacency_to_long, .id = "date") %>%
+    dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    filter(date >= from_date,
+           date <= to_date,
+           ) %>%
+    dplyr::rename(weight = value) %>%
+    group_by(date, from, to) %>%
+    summarise(weight = sum(weight), across()) %>%
+    ungroup() %>%
+    group_by(from, to) %>%
+    mutate(dyad_id = cur_group_id(),
+           dyad = paste0(from," <-> ",to),
+           to = as.integer(to),
+           from = as.integer(from),
+           weight = as.integer(weight)) %>%
+    ungroup() %>%
+    tibble()
+  # return the edgelist
+  edgelist
+}
+
+df <- combine_data(params$data, params$date_range[[1]], params$date_range[[2]])
+
+
+```
+
+# Model for edge weights
+
+$$\text{count} \sim Poisson(\lambda_{ij}^{n})$$
+
+$$\log(\lambda_{ij}^{n}) = \log(W_{ij})$$
+
+
+
+# Fit the model
+
+```{stan output.var='stan_model'}
+// The below code specifies the prior
+data {
+  int<lower=0> num_obs; // Number of observations
+  int<lower=0> num_dyads; // Number of dyads
+  int<lower=0> count[num_obs]; // Count corresponding to each observation 
+  int<lower=0> dyad_ids[num_obs]; // Dyad ID corresponding to each data point
+}
+
+parameters {
+  vector[num_dyads] log_edge; // Log edge weights for each dyad.
+}
+
+transformed parameters {
+  vector[num_obs] log_lambda = log_edge[dyad_ids]; 
+}  
+
+
+model {
+  count ~ poisson(exp(log_lambda));
+}
+
+generated quantities {
+  int count_pred[num_obs] = poisson_rng(exp(log_lambda));
+}
+
+```
+
+```{r, include=FALSE}
+
+model_data <- list(
+  num_obs = nrow(df), # Number of observations
+  num_dyads = length(unique(df$dyad_id)), # Number of dyads
+  dyad_ids = df$dyad_id, # Vector of dyad IDs corresponding to each observation
+  count = df$weight # Vector of event counts corresponding to each observation,
+)
+
+posterior_sampling <- rstan::sampling(
+  object = stan_model,
+  data = model_data,
+  chains = 1,
+  iter = 8000,
+  warmup = 2000,
+  thin = 10,
+  seed = 123,
+  cores = getOption("mc.cores", 1L)
+)
+
+
+```
+# Model checking
+
+The R-hat values provided by Stan indicate how well the chains have converged, with values very close to 1.00 being ideal. Values diverging from 1.00 indicate that the posterior samples may be very unreliable, and shouldn't be trusted. The chains can be plotted using Rstan's `traceplot` function to verify this visually:
+
+```{r, message=FALSE}
+rstan::traceplot(posterior_sampling)
+
+# Extract event predictions from the fitted model
+count_pred <- rstan::extract(posterior_sampling)$count_pred
+num_iterations <- dim(count_pred)[1]
+
+count_df_agg <- df %>%
+  group_by(from, to) %>%
+  summarise(count_total = sum(weight),
+            dyad_id = cur_group_id())
+
+
+
+# Plot the density of the observed event counts
+plot(density(count_df_agg$count_total), main="", xlab="Dyadic event counts")
+
+# Plot the densities of the predicted event counts, repeat for 20 samples
+count_df_copy <- df
+for (i in 1:20) {
+  count_df_copy$weight <- count_pred[sample(1:num_iterations, size=1), ]
+  count_df_agg_copy <- count_df_copy %>% 
+    group_by(from, to) %>%
+    summarise(count_total = sum(weight))
+  lines(density(count_df_agg_copy$count_total), col=rgb(0, 0, 1, 0.5))
+}
+
+
+posterior_sampling_df <- as.data.frame(posterior_sampling)
+
+
+```
+
+# Visualization
+
+```{r}
+# We select the edge coefficients related to our focal cow
+cow_id = params$cow_id
+count_df.focus <- df %>% 
+  filter(to == cow_id | from == cow_id) 
+ids <- unique(count_df.focus$dyad_id)
+
+posterior_sampling.focus <- posterior_sampling_df[,ids] %>%
+  map_df(.,exp)
+
+# We create a new column indicating the replicate by row (1800 in total).
+posterior_sampling.focus$sample <- 1:nrow(posterior_sampling.focus)
+
+# Melting the data frame leaving one column for the replicate number (sample),
+# another one indicating the team (as log_edge[1], ... log_edge[31]), and
+# the continuous posterior count values from our Bayesian sampling.
+posterior_sampling.focus <- posterior_sampling.focus %>%
+  pivot_longer(-sample, names_to = "dyad", values_to = "count")
+
+# We need the real team codes stored in dictionary_names instead of
+# log_edge[1], ... log_edge[31].
+posterior_sampling.focus$dyad <- as.factor(posterior_sampling.focus$dyad)
+
+dictionary_names <- count_df.focus %>%
+  mutate(dyad_id = paste("log_edge[", as.character(dyad_id), "]", sep = ""))
+recoding <- dictionary_names$dyad
+names(recoding) <- dictionary_names$dyad_id
+levels(posterior_sampling.focus$dyad) <- recode(
+  levels(posterior_sampling.focus$dyad),
+  !!!recoding
+)
+
+posterior_count_CIs <- posterior_sampling.focus %>% 
+  group_by(dyad) %>% 
+  summarize(lower_bound = quantile(count, probs = 0.025),
+            median = median(count),
+            upper_bound = quantile(count, probs = 0.975)) %>%
+  mutate(dyad = fct_reorder(dyad, median)) %>%
+  arrange(desc(median)) %>%
+  slice(-(11:(n()-10)))
+
+
+posterior_count_CIs_plot <- posterior_count_CIs %>%
+  ggplot(aes(x = median, y = dyad)) +
+  geom_errorbarh(aes(xmax = upper_bound, xmin = lower_bound, color = dyad)) +
+  geom_point(color = "blue") +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 11),
+    axis.title = element_text(size = 11),
+    legend.position = "none"
+  ) +
+  ggtitle("95% credible intervals by dyad") +
+  labs(y = "Dyad", x = "Posterior value of count")
+
+posterior_count_CIs_plot
+
+```

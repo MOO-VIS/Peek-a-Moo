@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      #  credentials
+      # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -29,7 +29,7 @@ server <- function(input, output, session) {
     res_auth$user[[1]]
   })
   
-# Call to determine user access
+# Call to determine user access, and welcome modal
 
 config <- NULL
 data_config <- NULL
@@ -49,6 +49,15 @@ observeEvent(user(),{
       pageLength = 1,
       dom = 't'
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else if ((user() == 'user')){
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -56,6 +65,15 @@ observeEvent(user(),{
       pageLength = 5,
       dom = "Bftip"
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   } else {
     config <<- c("zoomIn2d", "zoomOut2d")
     data_config <<- list(
@@ -64,6 +82,15 @@ observeEvent(user(),{
       dom = "Bftip",
       buttons = list(list(extend = "csv", title = "Data_Download"))
     )
+    shinyalert("Welcome to the UBC AWP Dairy Cow Dashboard!",
+               "Please select a network from the drop down menu in the \"Global Customizations\" panel to begin.",
+               closeOnClickOutside = TRUE,
+               showConfirmButton = TRUE,
+               confirmButtonText = "Let's get mooving!",
+               confirmButtonCol = "#94B4D6",
+               imageUrl = "../welcome.png",
+               imageWidth = 100,
+               imageHeight = 100)
   }
 })  
   
@@ -126,6 +153,13 @@ observeEvent(user(),{
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
   
+  observe({
+    update_cow_selection_neighbour(
+      input$relationship_date_range, 
+      "analysis_cow_id", 
+      session)
+  })
+
   observe({
     req(input$relationship_date_range)
 
@@ -222,6 +256,7 @@ observeEvent(user(),{
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
+    
 
     `%!in%` <- Negate(`%in%`)
 
@@ -275,6 +310,48 @@ observeEvent(user(),{
                                                        layouts_type,
                                                        selected_nodes = NULL,
                                                        data_config)[[2]]
+          
+          ## render R markdown file
+
+          
+          output$downloadReport <- downloadHandler(
+            filename = function() {
+              paste('neighbor-report', sep = '.', switch(
+                input$analysis_format, PDF = 'pdf', HTML = 'html'
+              ))
+            },
+            
+            content = function(file) {
+              src <- normalizePath('report.Rmd')
+              
+              # temporarily switch to the temp dir, in case you do not have write
+              # permission to the current working directory
+              owd <- setwd(tempdir())
+              on.exit(setwd(owd))
+              file.copy(src, 'report.Rmd', overwrite = TRUE)
+              data <- Feeding_drinking_neighbour_bout
+              # Set up parameters to pass to Rmd document
+              params <- list(
+                data = data,
+                cow_id = input$analysis_cow_id, 
+                date_range = input$relationship_date_range
+                )
+              # Knit the document, passing in the `params` list, and eval it in a
+              # child of the global environment (this isolates the code in the document
+              # from the code in this app).
+              out <- rmarkdown::render(
+                'report.Rmd', 
+                switch(
+                input$analysis_format,
+                PDF = pdf_document(), 
+                HTML = html_document()
+              ),
+              params = params,
+              envir = new.env(parent = globalenv())
+              )
+              file.rename(out, file)
+            }
+          )
         } else {
           if (length(input$current_feeding) == 0 && length(input$current_lying) == 0) {
             output$feeding_plot <- visNetwork::renderVisNetwork({
@@ -641,6 +718,31 @@ observeEvent(user(),{
     output$THI_plot <- renderPlotly({
       plot_THI_analysis(df) %>%
         config(modeBarButtonsToRemove = config)
+    })
+    
+    output$mean_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(mean(df$THI_mean),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Average THI", 
+        icon = icon('thermometer-half', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'light-blue'
+      )
+  })
+    output$max_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(max(df$THI_max),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Max THI", 
+        icon = icon('thermometer-full', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'navy'
+      )
+    })
+    output$min_THI <- renderValueBox({
+      valueBox(
+        tags$p(paste0(format(round(min(df$THI_min),1),big.mark=','), " THI"), style = "font-size: 60%;"),
+        "Min THI", 
+        icon = icon('thermometer-empty', lib = 'font-awesome', style="font-size: 40px;"),
+        color = 'purple'
+      )
     })
   })
 
