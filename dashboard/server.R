@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
- #     credentials
-       "../auth/database.sqlite",
-        passphrase = passphrase
+       # credentials
+      "../auth/database.sqlite",
+      passphrase = passphrase
     )
   )
 
@@ -166,6 +166,13 @@ server <- function(input, output, session) {
       session
     )
   })
+  
+  observe({
+    update_cow_selection_neighbour(
+      input$relationship_date_range, 
+      "analysis_cow_id", 
+      session)
+  })
 
   observe({
     req(input$relationship_date_range)
@@ -205,6 +212,7 @@ server <- function(input, output, session) {
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
+    
 
     `%!in%` <- Negate(`%in%`)
 
@@ -272,22 +280,62 @@ server <- function(input, output, session) {
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Neighbour") {
           output$neighbour_plot <- plot_network_three(Feeding_drinking_neighbour_total_time,
-            input$relationship_date_range,
-            network = input$relationship_network_selection,
-            threshold_selected,
-            layouts_type,
-            selected_nodes = NULL,
-            data_config
-          )[[1]]
+                                                      input$relationship_date_range,
+                                                      network = input$relationship_network_selection,
+                                                      threshold_selected,
+                                                      layouts_type,
+                                                      selected_nodes = NULL,
+                                                      data_config)[[1]]
+          
+          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time, 
+                                                       input$relationship_date_range, 
+                                                       network = input$relationship_network_selection, 
+                                                       threshold_selected, 
+                                                       layouts_type,
+                                                       selected_nodes = NULL,
+                                                       data_config)[[2]]
+          
+          ## render R markdown file
 
-          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time,
-            input$relationship_date_range,
-            network = input$relationship_network_selection,
-            threshold_selected,
-            layouts_type,
-            selected_nodes = NULL,
-            data_config
-          )[[2]]
+          
+          output$downloadReport <- downloadHandler(
+            filename = function() {
+              paste('neighbor-report', sep = '.', switch(
+                input$analysis_format, PDF = 'pdf', HTML = 'html'
+              ))
+            },
+            
+            content = function(file) {
+              src <- normalizePath('report.Rmd')
+              
+              # temporarily switch to the temp dir, in case you do not have write
+              # permission to the current working directory
+              owd <- setwd(tempdir())
+              on.exit(setwd(owd))
+              file.copy(src, 'report.Rmd', overwrite = TRUE)
+              data <- Feeding_drinking_neighbour_bout
+              # Set up parameters to pass to Rmd document
+              params <- list(
+                data = data,
+                cow_id = input$analysis_cow_id, 
+                date_range = input$relationship_date_range
+                )
+              # Knit the document, passing in the `params` list, and eval it in a
+              # child of the global environment (this isolates the code in the document
+              # from the code in this app).
+              out <- rmarkdown::render(
+                'report.Rmd', 
+                switch(
+                input$analysis_format,
+                PDF = pdf_document(), 
+                HTML = html_document()
+              ),
+              params = params,
+              envir = new.env(parent = globalenv())
+              )
+              file.rename(out, file)
+            }
+          )
         } else {
           selected_nodes <- input$synchronicity_cow_selection
 
