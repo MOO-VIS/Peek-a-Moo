@@ -15,6 +15,7 @@ library(visNetwork)
 library(googleCloudStorageR)
 library(reshape2)
 library(shinyBS)
+library(shinyalert)
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
@@ -468,3 +469,4 @@ custom_theme <- function() {
 
   return(theme)
 }
+
