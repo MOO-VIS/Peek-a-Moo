@@ -355,25 +355,6 @@ update_cow_selection_neighbour <- function(date_obj, inputId, session, select_al
   )
 }
 
-update_cow_selection_synchronicity <- function(date_obj, inputId, session, select_all = FALSE) {
-  
-  # find cows that exist in date range
-  cow_choices <- filter_dates(feed_drink_df, date, date_obj) %>%
-    select(Cow) %>%
-    unique() %>%
-    arrange(desc(Cow))
-  colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date range")
-  
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = cow_choices,
-    selected = NULL,
-    options = pickerOptions(maxOptions = 1)
-  )
-}
-
 update_cow_selection_displacement <- function(relationship_type = "Displacement Star*", date_obj, inputId, session) {
   if (relationship_type != "Displacement Star*") {
     update_cow_selection(date_obj, inputId, session)
