@@ -29,7 +29,7 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
     ) %>%
     visEdges(
       smooth = list(enabled = TRUE, type = "horizontal"),
-      color = list(color = "#D3D3D3", highlight = "#ffd37b", hover = "#2B7CE9")
+      color = list(color = "#D3D3D3", highlight = "#ffcc66", hover = "#2B7CE9")
     ) %>%
     visInteraction(
       hover = TRUE,
@@ -121,7 +121,7 @@ plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
     visNodes(
       shape = "dot",
       color = list(
-        highlight = list(background = "#ffd37b", border = "darkred")
+        highlight = list(background = "#ffcc66", border = "darkred")
       )
     ) %>%
     visEdges(
@@ -438,7 +438,7 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
         id != cow_id ~ "#2B7CE9"
       ),
       color.hover.background = case_when(
-        id == cow_id ~ "#ffd37b",
+        id == cow_id ~ "#ffcc66",
         id != cow_id ~ "#D2E5FF"
       ),
       color.hover.border = case_when(

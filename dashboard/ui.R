@@ -103,13 +103,13 @@ daily_tab <- tabItem(
     )
   ),
   fluidRow(
-    tags$style(".small-box.bg-red { background-color: #ffb3b3 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-red { background-color: #ff9999 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_standing", width = 3),
-    tags$style(".small-box.bg-yellow { background-color: #ffd37b !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-yellow { background-color: #ffcc66 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_lying", width = 3),
-    tags$style(".small-box.bg-green { background-color: #bfc7a3 !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-green { background-color: #b2bb90 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_feeding", width = 3),
-    tags$style(".small-box.bg-blue { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-blue { background-color: #6b96c7 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("total_drinking", width = 3)
   ),
   fluidRow(
@@ -251,7 +251,7 @@ relationships_tab <- tabItem(
     valueBoxOutput("mean_THI", width = 4),
     tags$style(".small-box.bg-navy { background-color: #F7766D !important; color: #FFFFFF !important; }"),
     valueBoxOutput("max_THI", width = 4),
-    tags$style(".small-box.bg-purple { background-color: #7ea4ce !important; color: #FFFFFF !important; }"),
+    tags$style(".small-box.bg-purple { background-color: #6b96c7 !important; color: #FFFFFF !important; }"),
     valueBoxOutput("min_THI", width = 4),
   ),
   fluidRow(
@@ -434,7 +434,7 @@ body <- dashboardBody(
   )
 )
 
-ui <- fluidPage(useShinyalert(), dashboardPage(header, sidebar, body))
+ui <- fluidPage(useShinyalert(), dashboardPage(title="Dairy Cow Dashboard", header, sidebar, body))
 
 # Authentication page
 ui <- secure_app(ui,
@@ -442,23 +442,23 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #7ea4ce;
-    border-color: #7ea4ce;
+    background-color: #6b96c7;
+    border-color: #6b96c7;
     } .btn-primary:hover {
     color: #ffffff;
-    background-color: #85a2c1;
-    border-color: #85a2c1;
+    background-color: #6b96c7;
+    border-color: #6b96c7;
 } .btn-primary:focus {
     color: #ffffff;
-    background-color: #85a2c1;
-    border-color: #85a2c1;
+    background-color: #6b96c7;
+    border-color: #6b96c7;
 }  .btn-primary:active:hover {
     color: #ffffff;
-    background-color: #85a2c1;
-    border-color: #85a2c1;
-} a {color:#85a2c1; 
-} a:hover {color:#85a2c1; 
-} a:focus {color:#85a2c1;
+    background-color: #6b96c7;
+    border-color: #6b96c7;
+} a {color:#6b96c7; 
+} a:hover {color:#6b96c7; 
+} a:focus {color:#6b96c7;
 } body {
     font-family:Helvetica;}")),
       tags$h2("Peek-a-Moo\nDashboard", style = "align:center"),
@@ -473,8 +473,8 @@ ui <- secure_app(ui,
     tags$div(
       tags$style(HTML(".btn-primary {
     color: #ffffff;
-    background-color: #7ea4ce;
-    border-color: #7ea4ce;
+    background-color: #6b96c7;
+    border-color: #6b96c7;
 }")),
       tags$p(
         "For any questions, please contact ",
