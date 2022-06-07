@@ -54,7 +54,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#7ea4ce",
+        confirmButtonCol = "#6b96c7",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100
@@ -71,7 +71,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#7ea4ce",
+        confirmButtonCol = "#6b96c7",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100
@@ -89,7 +89,7 @@ server <- function(input, output, session) {
         closeOnClickOutside = TRUE,
         showConfirmButton = TRUE,
         confirmButtonText = "Let's get mooving!",
-        confirmButtonCol = "#7ea4ce",
+        confirmButtonCol = "#6b96c7",
         imageUrl = "../welcome.png",
         imageWidth = 100,
         imageHeight = 100

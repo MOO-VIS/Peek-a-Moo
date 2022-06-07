@@ -131,10 +131,10 @@ daily_schedu_moo_plot <- function(df) {
     )
   
   # Set plotting colours
-  standing_colour <- '#ffb3b3'
-  lying_colour <- '#ffd37b'
-  drinking_colour <- '#94B4D6'
-  feeding_colour <- '#bfc7a3'
+  standing_colour <- '#ff9999'
+  lying_colour <- '#ffcc66'
+  drinking_colour <- '#6b96c7'
+  feeding_colour <- '#b2bb90'
   
   
   # Plot traces for standing, lying, feeding, and drinking events.

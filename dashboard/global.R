@@ -470,13 +470,13 @@ custom_theme <- function() {
         color: white;
       }
       .skin-blue .main-header .logo {
-        background-color: #7ea4ce;
+        background-color: #6b96c7;
       }
       .skin-blue .main-header .logo:hover {
-        background-color: #7ea4ce;
+        background-color: #6b96c7;
       }
       .skin-blue .main-header .navbar {
-        background-color: #7ea4ce;
+        background-color: #6b96c7;
       }
         .skin-blue .main-sidebar {
         background-color: #013551;
@@ -492,19 +492,19 @@ custom_theme <- function() {
     }
     .box.box-solid.box-primary>.box-header {
     color:#fff;
-     background:#7ea4ce
+     background:#6b96c7
                     }
     .box.box-solid.box-primary  {
-    border-bottom-color:#7ea4ce;
-    border-left-color:#7ea4ce;
-    border-right-color:#7ea4ce;
-    border-top-color:#7ea4ce;
+    border-bottom-color:#6b96c7;
+    border-left-color:#6b96c7;
+    border-right-color:#6b96c7;
+    border-top-color:#6b96c7;
     } .nav-tabs-custom>.nav-tabs>li.active {
-    border-top-color: #7ea4ce;
+    border-top-color: #6b96c7;
 } .skin-blue .sidebar-menu>li.active>a {
-    border-left-color: #7ea4ce;
+    border-left-color: #6b96c7;
 } .skin-blue .sidebar-menu>li:hover>a {
-    border-left-color: #7ea4ce;}"
+    border-left-color: #6b96c7;}"
   )))
 
   return(theme)
