@@ -278,7 +278,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold (top % of connected cows)"),
+    label = paste0("Threshold"),
     choices = c("5%", "10%", "25%", "All"),
     selected = NULL,
     multiple = multiple,
@@ -457,7 +457,8 @@ bin_selection_widget <- function(inputId) {
   )
 }
 
-#' Custom theme setting function
+#' Custom theme setting function for colors
+#'
 #'
 custom_theme <- function() {
   theme <- tags$head(tags$style(HTML(

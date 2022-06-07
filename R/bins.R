@@ -57,7 +57,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
     # bg
     rgb(237, 237, 237, maxColorValue = 255),
     # empty
-    rgb(42, 128, 183, maxColorValue = 255)
+    '#b2bb90'
   )   # full
   full_df <- data.frame(
     Var1 = integer(),
@@ -134,7 +134,7 @@ parse_hunger_df <- function(df, bins){
 hunger_plot <- function(df){
   plt <- df %>%
     ggplot(aes(x = Bin, y = Duration)) +
-    geom_col(fill = "lightblue") +
+    geom_col(fill = "#b2bb90") +
     ylab("Empty Duration (s)") + 
     geom_hline(yintercept = mean(df$Duration), linetype='dotted', col = "gray", alpha = 0.5) +
     theme_classic() +
