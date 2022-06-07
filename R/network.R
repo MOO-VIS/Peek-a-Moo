@@ -83,38 +83,6 @@ nodes_edges_list_synchronicity <- function(raw_graph_data,
   
 }
 
-plot_network_three <- function(raw_graph_data, 
-                               date_range, 
-                               network = NULL,
-                               nodes,
-                               edges,
-                               layouts_type, 
-                               selected_nodes = NULL,
-                               data_config = NULL) {
-  if (!(is.null(missing_date_range_check(date_range,
-                                         df = raw_graph_data,
-                                         network
-  )))) {
-    warning_output <- missing_date_range_check(date_range,
-                                                    df = raw_graph_data,
-                                                    network
-    )
-
-    out <- list(warning_output, NULL)
-    
-    return(out)
-  } else {
-    
-    plot <- plot_network(nodes, edges, layouts_type, selected_nodes)
-
-    table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
-    
-    out <- list(plot, table)
-    
-    return(out)
-  }
-}
-
 plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
   
   plot_network(nodes, edges, layouts_type) %>%

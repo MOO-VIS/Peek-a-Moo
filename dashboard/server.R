@@ -330,150 +330,122 @@ server <- function(input, output, session) {
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Neighbour") {
           
-          nodes_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
-                                                          input$relationship_date_range,
-                                                          threshold_selected)[[1]]
-          edges_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
-                                                          input$relationship_date_range,
-                                                          threshold_selected)[[2]]
-          
-          output$neighbour_plot <- visNetwork::renderVisNetwork({
-            plot_network_three(Feeding_drinking_neighbour_total_time,
-                                                      input$relationship_date_range,
-                                                      network = input$relationship_network_selection,
-                                                      nodes_neighbour, 
-                                                      edges_neighbour,
-                                                      layouts_type,
-                                                      selected_nodes = NULL,
-                                                      data_config)[[1]]
-          })
-          
-          output$neighbour_table <- plot_network_three(Feeding_drinking_neighbour_total_time,
-                                                       input$relationship_date_range,
-                                                       network = input$relationship_network_selection,
-                                                       nodes_neighbour, 
-                                                       edges_neighbour,
-                                                       layouts_type,
-                                                       selected_nodes = NULL,
-                                                       data_config)[[2]]
-          
-          ## render R markdown file
-
-          
-          output$downloadReport <- downloadHandler(
-            filename = function() {
-              paste('neighbor-report', sep = '.', switch(
-                input$analysis_format, PDF = 'pdf', HTML = 'html'
-              ))
-            },
+          if (!(is.null(missing_date_range_check(input$relationship_date_range,
+                                                 df = Feeding_drinking_neighbour_total_time,
+                                                 network = input$relationship_network_selection
+          )))) {
+            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+                                                            df = Feeding_drinking_neighbour_total_time,
+                                                            network = input$relationship_network_selection
+            )
+          } else {
+            nodes_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                              input$relationship_date_range,
+                                                              threshold_selected)[[1]]
+            edges_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                              input$relationship_date_range,
+                                                              threshold_selected)[[2]]
             
-            content = function(file) {
-              src <- normalizePath('report.Rmd')
+            output$neighbour_plot <- visNetwork::renderVisNetwork({
+              plot_network(nodes_neighbour, edges_neighbour, layouts_type, selected_nodes = NULL)
+            })
+            
+            output$neighbour_table <- format_dt_table(edges_neighbour %>% select(c(from, to, weight)), data_config = data_config)
+            
+            ## render R markdown file
+            
+            output$downloadReport <- downloadHandler(
+              filename = function() {
+                paste('neighbor-report', sep = '.', switch(
+                  input$analysis_format, PDF = 'pdf', HTML = 'html'
+                ))
+              },
               
-              # temporarily switch to the temp dir, in case you do not have write
-              # permission to the current working directory
-              owd <- setwd(tempdir())
-              on.exit(setwd(owd))
-              file.copy(src, 'report.Rmd', overwrite = TRUE)
-              data <- Feeding_drinking_neighbour_bout
-              # Set up parameters to pass to Rmd document
-              params <- list(
-                data = data,
-                cow_id = input$analysis_cow_id, 
-                date_range = input$relationship_date_range
+              content = function(file) {
+                src <- normalizePath('report.Rmd')
+                
+                # temporarily switch to the temp dir, in case you do not have write
+                # permission to the current working directory
+                owd <- setwd(tempdir())
+                on.exit(setwd(owd))
+                file.copy(src, 'report.Rmd', overwrite = TRUE)
+                data <- Feeding_drinking_neighbour_bout
+                # Set up parameters to pass to Rmd document
+                params <- list(
+                  data = data,
+                  cow_id = input$analysis_cow_id, 
+                  date_range = input$relationship_date_range
                 )
-              # Knit the document, passing in the `params` list, and eval it in a
-              # child of the global environment (this isolates the code in the document
-              # from the code in this app).
-              out <- rmarkdown::render(
-                'report.Rmd', 
-                switch(
-                input$analysis_format,
-                PDF = pdf_document(), 
-                HTML = html_document()
-              ),
-              params = params,
-              envir = new.env(parent = globalenv())
-              )
-              file.rename(out, file)
-            }
-          )
+                # Knit the document, passing in the `params` list, and eval it in a
+                # child of the global environment (this isolates the code in the document
+                # from the code in this app).
+                out <- rmarkdown::render(
+                  'report.Rmd', 
+                  switch(
+                    input$analysis_format,
+                    PDF = pdf_document(), 
+                    HTML = html_document()
+                  ),
+                  params = params,
+                  envir = new.env(parent = globalenv())
+                )
+                file.rename(out, file)
+              }
+            )
+          }
         } else {
-          if (length(input$current_feeding) == 0 && length(input$current_lying) == 0) {
-            output$feeding_plot <- visNetwork::renderVisNetwork({
-              plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                 input$relationship_date_range, 
-                                 network = input$relationship_network_selection, 
-                                 values$nodes_feeding, 
-                                 values$edges_feeding,
-                                 layouts_type,
-                                 selected_nodes = NULL,
-                                 data_config)[[1]] %>%
-                visEvents(select = "function(nodes) {
+          
+          if (!(is.null(missing_date_range_check(input$relationship_date_range,
+                                                 df = Feeding_drinking_at_the_same_time_total_time,
+                                                 network = input$relationship_network_selection
+          )))) {
+            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+                                                            df = Feeding_drinking_at_the_same_time_total_time,
+                                                            network = input$relationship_network_selection
+            )
+          } else if (!(is.null(missing_date_range_check(input$relationship_date_range,
+                                                        df = synchronized_lying_total_time,
+                                                        network = input$relationship_network_selection
+          )))) {
+            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+                                                            df = synchronized_lying_total_time,
+                                                            network = input$relationship_network_selection
+            )
+          } else {
+            if (length(input$current_feeding) == 0 && length(input$current_lying) == 0) {
+              output$feeding_plot <- visNetwork::renderVisNetwork({
+                plot_network(values$nodes_feeding, values$edges_feeding, layouts_type, selected_nodes = NULL) %>%
+                  visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_feeding', nodes.nodes);
                 ;}")
-            })
-            
-            output$feeding_table <- plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                                       input$relationship_date_range, 
-                                                       network = input$relationship_network_selection, 
-                                                       values$nodes_feeding, 
-                                                       values$edges_feeding,
-                                                       layouts_type,
-                                                       selected_nodes = NULL,
-                                                       data_config)[[2]]
-            
-            output$lying_plot <- visNetwork::renderVisNetwork({
-              plot_network_three(synchronized_lying_total_time, 
-                                 input$relationship_date_range, 
-                                 network = input$relationship_network_selection, 
-                                 values$nodes_lying, 
-                                 values$edges_lying,
-                                 layouts_type,
-                                 selected_nodes = NULL,
-                                 data_config)[[1]] %>%
-                visEvents(select = "function(nodes) {
+              })
+              
+              output$feeding_table <- format_dt_table(values$edges_feeding %>% select(c(from, to, weight)), data_config = data_config)
+              
+              output$lying_plot <- visNetwork::renderVisNetwork({
+                plot_network(values$nodes_lying, values$edges_lying, layouts_type, selected_nodes = NULL) %>%
+                  visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_lying', nodes.nodes);
                 ;}")
-            })
-            
-            output$lying_table <- plot_network_three(synchronized_lying_total_time, 
-                                                     input$relationship_date_range, 
-                                                     network = input$relationship_network_selection, 
-                                                     values$nodes_lying, 
-                                                     values$edges_lying,
-                                                     layouts_type,
-                                                     selected_nodes = NULL,
-                                                     data_config)[[2]]
-          } else if (length(input$current_feeding) > 0) {
-            output$lying_plot <- visNetwork::renderVisNetwork({
-              plot_network_three(synchronized_lying_total_time, 
-                                 input$relationship_date_range, 
-                                 network = input$relationship_network_selection, 
-                                 values$nodes_lying, 
-                                 values$edges_lying,
-                                 layouts_type,
-                                 selected_nodes = input$current_feeding,
-                                 data_config)[[1]] %>%
-                visEvents(select = "function(nodes) {
+              })
+              
+              output$lying_table <- format_dt_table(values$edges_lying %>% select(c(from, to, weight)), data_config = data_config)
+            } else if (length(input$current_feeding) > 0) {
+              output$lying_plot <- visNetwork::renderVisNetwork({
+                plot_network(values$nodes_lying, values$edges_lying, layouts_type, selected_nodes = input$current_feeding) %>%
+                  visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_lying', nodes.nodes);
                 ;}")
-            })
-          } else if (length(input$current_lying) > 0) {
-            output$feeding_plot <- visNetwork::renderVisNetwork({
-              plot_network_three(Feeding_drinking_at_the_same_time_total_time, 
-                                 input$relationship_date_range, 
-                                 network = input$relationship_network_selection, 
-                                 values$nodes_feeding, 
-                                 values$edges_feeding,
-                                 layouts_type,
-                                 selected_nodes = input$current_lying,
-                                 data_config)[[1]] %>%
-                visEvents(select = "function(nodes) {
+              })
+            } else if (length(input$current_lying) > 0) {
+              output$feeding_plot <- visNetwork::renderVisNetwork({
+                plot_network(values$nodes_feeding, values$edges_feeding, layouts_type, selected_nodes = input$current_lying) %>%
+                  visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_feeding', nodes.nodes);
                 ;}")
-            })
-          } 
+              })
+            } 
+          }
         }
       } else {
         # displacement network setup
