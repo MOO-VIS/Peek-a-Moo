@@ -105,9 +105,9 @@ statistical_FAQ <- function(){
            tags$li(
                    tags$em('Relationships tab'),
                    " → ",
-                   tags$em("Neighbours network"),
+                   tags$em("Neighbour network"),
                    " → ",
-                   tags$em('Analysis tab'),
+                   tags$em('Analysis panel (right of Feeding Neighbours title)'),
                    " → ",
                    tags$em("initiating a download of the report."))),
     tags$p("The full statistical analysis and code can also be viewed within it's separate repo ",
