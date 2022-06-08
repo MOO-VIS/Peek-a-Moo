@@ -413,7 +413,6 @@ FAQ_tab <- tabItem(
   data_FAQ(),
   statistical_FAQ(),
   references_FAQ(),
-  download_format_widget("analysis_format_references"),
   downloadButton('downloadReferences')
 )
 
@@ -442,8 +441,7 @@ body <- dashboardBody(
   )
 )
 
-ui <- fluidPage(useShinyalert(),
-                setSliderColor(c("#6b96c7","#6b96c7","#6b96c7","#6b96c7"),
+ui <- fluidPage(setSliderColor(c("#6b96c7","#6b96c7","#6b96c7","#6b96c7"),
                                c(1,2,3,4)),
                 dashboardPage(title="Dairy Cow Dashboard",
                               header,

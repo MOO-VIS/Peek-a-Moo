@@ -885,4 +885,13 @@ server <- function(input, output, session) {
         config(modeBarButtonsToRemove = config)
     })
   })
+  
+  observe({
+    output$downloadReferences <- downloadHandler(
+      filename = "citation-references.pdf",
+      content = function(file) {
+        file.copy("www/citation-references.pdf", file)
+      }
+    )
+  })
 }

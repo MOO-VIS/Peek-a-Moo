@@ -4,13 +4,21 @@
 #' 
 methodologies_FAQ <- function(){
   fluidRow(
-    h2(paste0('Methodologies by Tab:')),
+    h2(paste0('Methodologies by Tab')),
     tags$u(tags$b( "Relationships")), 
     tags$li(tags$b("Networks:"),
             "Created with the ",
             tags$a("visNetwork ",
                    href = "https://datastorm-open.github.io/visNetwork/"),
-            "package. The network is calcualted with nodes representing individual cows, and the edges representing total synchronized lying/standing time, or count of bouts/interactions between cows."),
+            "package. The networks are calcualted with nodes representing individual cows, and the edges representing total synchronized lying/standing time, or count of bouts/interactions between cows. The Neighbour, Synchronicity, and Displacement networks default to showing the entire herd, and individual cows can be isolated by selecting them either with the dropdown menu for id, or by clicking on a node. The Displacement Star* and Displacement Paired networks show displacement on a more granular level for individual ior paired cows respectively, alongside a plot for their dominance or elo score."),
+    tags$li(tags$b("Dominance:"),
+            "Created with the ",
+            tags$a("Plotly ",
+                   href = "https://plotly.com/r/"),
+            "and ",
+            tags$a("ggplot2 ",
+                   href = "https://github.com/tidyverse/ggplot2/blob/HEAD/R/plot.r"),
+            "packages. This plot appears alongside the Displacement Star* and Displacement Paired networks only, and shows a cow or pair of cows elo scores (measure of dominance) over the a given timeline."),
     tags$li(tags$b("THI:"),
             "Created with the ",
             tags$a("Plotly ",
@@ -33,7 +41,7 @@ methodologies_FAQ <- function(){
             "Created with the ",
             tags$a("Plotly ",
                    href = "https://plotly.com/r/"),
-            "package. This plot shows the lying, standing, drinking, and feeding timeline of the selected cow(s) over a given day. Each behaviour is plotted in a separate colour, by minute. The value boxes show the total cummulative time spent per each behaviour, aggregated for the selected cow(s)."),
+            "package. This plot shows the lying, standing, drinking, and feeding timeline of the selected cow(s) over a given day. Each behaviour is plotted in a separate colour, by minute. The value boxes show the total cummulative time spent per each behaviour, per day, aggregated for the selected cow(s)."),
     tags$u(tags$b( "Bins")),
     tags$li(tags$b("Hunger Plot"),
             "Created with the ",
@@ -42,7 +50,7 @@ methodologies_FAQ <- function(){
             "and ",
             tags$a("ggplot2 ",
                    href = "https://github.com/tidyverse/ggplot2/blob/HEAD/R/plot.r"),
-            "packages. This plot shows the amount of seconds that a bin was empty for the selected date."),
+            "packages. This plot shows the amount of seconds that a feeding bin was empty for the selected date."),
     tags$li(tags$b("Hourly Feed Bin Data:"),
             "Created using the ",
             tags$a("ggplot2 ",
@@ -50,7 +58,7 @@ methodologies_FAQ <- function(){
             "package, and adapted from the heatmap method discussed ",
             tags$a("here.",
                    href = "https://stackoverflow.com/questions/48522350/create-an-image-filled-chart-in-r-using-ggplot"),
-            "This plot visually demonstrates how full each bin is on average over the selected hours of a given date. It also displays the amount of times the bin was visited within that same timeline."),
+            "This plot visually demonstrates how full each feeding bin is on average over the selected hours of a given date. It also displays the amount of times the feeding bin was visited within that same timeline."),
   )
 }
 
@@ -60,7 +68,7 @@ methodologies_FAQ <- function(){
 #' 
 about_FAQ <- function(){
   fluidRow(
-    h2(paste0('About:')),
+    h2(paste0('About')),
     tags$p("This dashboard was created as part of a capstone project for the ",
            tags$a("UBC Master of Data Science",
                   href = "https://masterdatascience.ubc.ca/"),
@@ -75,13 +83,13 @@ about_FAQ <- function(){
 #' 
 data_FAQ <- function(){
   fluidRow(
-    h2(paste0('Data:')),
+    h2(paste0('Data')),
     tags$p("The data presented in this dashboard was collected at the ",
            tags$a( "UBC Dairy Education and Research Centre",
                    href = "https://dairycentre.landfood.ubc.ca/?login",
            ),
            "in Agassiz, BC, Canada."),
-    tags$p("The data was collected using various Instantec and HOBO smart technology within the barn. For more information on the data, it's collection, and usage expectations, please contact the ",
+    tags$p("The data was collected using various Instantec and HOBO smart technology within the barn. For more information on the data, its collection, and usage expectations, please contact the ",
            tags$a("Animal Welfare Department at UBC.", href = "mailto:animal.welfare@ubc.ca"))
   )
 }
@@ -92,8 +100,17 @@ data_FAQ <- function(){
 #' 
 statistical_FAQ <- function(){
   fluidRow(
-    h2(paste0('Statistical Analysis:')),
-    tags$p("As part of the work on this dashboard, a statistical analysis was developed to contribute to the ongoing research of identifying significant social connections and networks amongst cows. Although the analysis is not explicitly included in the dashboard, an example simulation can be run by naviagting to the \'Relationships\' tab, selecting the \'Neighbours\' network, then the \'Analysis\' tab, and initiating a download of the report. The full statistical analysis and code can also be viewed on it's separate repo ",
+    h2(paste0('Statistical Analysis')),
+    tags$p("As part of the work on this dashboard, a Bayesian statistical analysis was developed to contribute to the ongoing research of identifying significant social connections and networks amongst cows. Although the analysis is not explicitly included in the dashboard, an example simulation can be run by naviagting to:",
+           tags$li(
+                   tags$em('Relationships tab'),
+                   " → ",
+                   tags$em("Neighbours network"),
+                   " → ",
+                   tags$em('Analysis tab'),
+                   " → ",
+                   tags$em("initiating a download of the report."))),
+    tags$p("The full statistical analysis and code can also be viewed within it's separate repo ",
            tags$a("here.",
                   href = "https://github.com/UBC-AWP/Peek-a-Moo"))
   )
@@ -105,7 +122,7 @@ statistical_FAQ <- function(){
 #' 
 references_FAQ <- function(){
   fluidRow(
-    h2(paste0('References and Citation:')),
-    tags$p("For a full list of references for this dashboard, as well as a citation example, please download the report below.")
+    h2(paste0('References and Citation')),
+    tags$p("For a full list of references for this dashboard, as well as a citation example and expectations of use, please download the report below.")
   )
 }
