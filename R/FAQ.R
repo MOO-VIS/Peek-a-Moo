@@ -69,7 +69,7 @@ methodologies_FAQ <- function(){
 about_FAQ <- function(){
   fluidRow(
     h2(paste0('About')),
-    tags$p("This dashboard was created as part of a capstone project for the ",
+    tags$p("Guided by Borbala Foris and Sky Cheng, researchers with the UBC Animal Welfare Program, this dashboard was created as part of a capstone project for the ",
            tags$a("UBC Master of Data Science",
                   href = "https://masterdatascience.ubc.ca/"),
            " program. The dashboard was first started in 2021 by Sasha Babicki, Elanor Boyle-Stanley, Steffen Pentelow, Ify Anene, Rafael P.H. and Selma. It was further contributed to in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu."
