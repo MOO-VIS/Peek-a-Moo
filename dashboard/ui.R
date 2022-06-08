@@ -14,7 +14,7 @@ sidebar <- dashboardSidebar(
     id = "sidemenu",
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
-    menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
+    menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
@@ -391,9 +391,9 @@ warnings_tab <- tabItem(
       content = paste("This tab shows the detected Instatec warnings for the dataset.",
         "",
         "<b>Customizations:</b>",
-        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below",
-        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below",
-        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below",
+        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below.",
+        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below.",
+        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below.",
         sep = "<br>"
       ),
       placement = "right",
@@ -408,7 +408,13 @@ warnings_tab <- tabItem(
 FAQ_tab <- tabItem(
   "FAQ",
   tags$style(HTML("#shiny-tab-FAQ{ padding-left: 20px; padding-right: 20px; }")),
-  methodologies_data()
+  about_FAQ(),
+  methodologies_FAQ(),
+  data_FAQ(),
+  statistical_FAQ(),
+  references_FAQ(),
+  download_format_widget("analysis_format_references"),
+  downloadButton('downloadReferences')
 )
 
 # Dashboard body and combining tabs
