@@ -5,7 +5,6 @@
 #' @param bin_selection Bins to include in data frame
 #' @return Grouped data frame for particular date chosen and summarized values.
 select_feed_bin_data <- function(df, feed_date, bin_selection) {
-  # if (is.null(feed_date)) feed_date = lubridate::as_date("2020-8-1")
   
   ## feed bin plot section
   df <- df %>%
@@ -22,7 +21,6 @@ select_feed_bin_data <- function(df, feed_date, bin_selection) {
   one_bin_df <- df %>%
     mutate(Hour = lubridate::hour(Start)) %>%
     group_by(Bin, Hour) %>%
-    # mutate(count_visits = n()) %>%
     summarise(hrly_avg_wt = mean(Startweight),
               hrly_visits = n())
 }
@@ -57,7 +55,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
     # bg
     rgb(237, 237, 237, maxColorValue = 255),
     # empty
-    rgb(42, 128, 183, maxColorValue = 255)
+    '#b2bb90'
   )   # full
   full_df <- data.frame(
     Var1 = integer(),
@@ -90,7 +88,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
   }
   
   full_df <-
-    merge(full_df, hourly_df, by = 'Bin') %>% #filter(Bin < 4) %>%
+    merge(full_df, hourly_df, by = 'Bin') %>%
     mutate(
       Title_label = factor(Bin),
       Label_wt = paste0(hrly_avg_wt, 'KG'),
@@ -118,7 +116,7 @@ plot_feed_bin_data <- function(hourly_df, hr, max_wt) {
       axis.title = element_blank(),
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      strip.background = element_rect(fill = "#BCD3E7")
+      strip.background = element_rect(fill = "#dee2d0")
     ) +
     facet_wrap( ~ Title_label + Label_visits)
 }
@@ -134,7 +132,7 @@ parse_hunger_df <- function(df, bins){
 hunger_plot <- function(df){
   plt <- df %>%
     ggplot(aes(x = Bin, y = Duration)) +
-    geom_col(fill = "lightblue") +
+    geom_col(fill = "#b2bb90") +
     ylab("Empty Duration (s)") + 
     geom_hline(yintercept = mean(df$Duration), linetype='dotted', col = "gray", alpha = 0.5) +
     theme_classic() +

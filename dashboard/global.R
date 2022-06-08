@@ -169,7 +169,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
     title = title, side = "right", selected = "Plot", width = width,
     height = height,
     popover,
-    tabPanel("Analysis", helpText("Note: generating a report is going to take several minutes as a MCMC is running under the hood."),
+    tabPanel("Analysis", helpText("Select a cow of interest to generate a Bayesian analysis report on \"Feeding Neighbours\". Note: generating a report will take more than 4 minutes, as a Markov chain Monte Carlo simulation is running under the hood."),
              cow_selection_widget("analysis_cow_id", multiple = FALSE, label = "Cow of Interest"),
              download_format_widget("analysis_format"),
              downloadButton('downloadReport')),
@@ -278,7 +278,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold (top % of connected cows)"),
+    label = paste0("Threshold"),
     choices = c("5%", "10%", "25%", "All"),
     selected = NULL,
     multiple = multiple,
@@ -457,7 +457,8 @@ bin_selection_widget <- function(inputId) {
   )
 }
 
-#' Custom theme setting function
+#' Custom theme setting function for colors
+#'
 #'
 custom_theme <- function() {
   theme <- tags$head(tags$style(HTML(

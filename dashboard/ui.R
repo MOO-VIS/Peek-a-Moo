@@ -14,7 +14,7 @@ sidebar <- dashboardSidebar(
     id = "sidemenu",
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
-    menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
+    menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
@@ -89,7 +89,7 @@ daily_tab <- tabItem(
       column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
-        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows. Selecting more than a single cow, will aggregate the results.",
+        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows. Selecting more than a single cow, will aggregate the total results.",
           "",
           "<b>Customizations:</b>",
           "<u>Date</u> - the date for the plots to showcase.",
@@ -178,8 +178,8 @@ relationships_tab <- tabItem(
         id = "button_global_network", title = "Global Network Customizations",
         content = paste(
           "<b>Customizations:</b>",
-          "<u>Date Range</u> - timeline for the given plots",
-          "<u>Network</u> - type of network to display",
+          "<u>Date Range</u> - timeline for the given plots.",
+          "<u>Network</u> - type of network to display.",
           sep = "<br>"
         ),
         placement = "right",
@@ -190,14 +190,14 @@ relationships_tab <- tabItem(
         id = "button_network", title = "Network Specific Customizations",
         content = paste(
           "<b>Customizations (Feeding/Lying networks) :</b>",
-          "<u>Layout Type</u> - shape of the displayed network",
-          "<u>Threshold</u> - top weighted % of connections to display in the network",
+          "<u>Layout Type</u> - shape of the displayed network.",
+          "<u>Threshold</u> - top weighted % of connections to display in the network.",
           "",
           "<b>Customizations (Displacement networks) :</b>",
-          "<u>Competition Density</u> - threshold of competition density to filter connections in the network by",
-          "<u>Threshold</u> - top weighted % of connections to display in the network (default only)",
-          "<u>Cow of Interest (star only) </u> - cow to be showcased in the network",
-          "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together",
+          "<u>Competition Density</u> - threshold of competition density to filter connections in the network by.",
+          "<u>Threshold (default only)</u> - top weighted % of connections to display in the network.",
+          "<u>Cow of Interest (star only) </u> - cow to be showcased in the network.",
+          "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together.",
           sep = "<br>"
         ),
         placement = "right",
@@ -273,7 +273,9 @@ relationships_tab <- tabItem(
             "",
             "<i>THI = 0.8*Temperature + Relative Humidity Index * (Temperature - 14.4) + 46.4 </i>",
             "",
-            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress. The threshold for heat stress is THI = 68, (pictured as the grey dashed line in the plot below).",
+            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress.",
+            "",
+            "The threshold for heat stress is THI = 68, pictured as the grey dashed line in the plot below.",
             sep = "<br>"),
       placement = "right",
       trigger = "hover",
@@ -301,8 +303,8 @@ bins_tab <- tabItem(
           content = paste("This tab shows weight status and interaction information for the feedbins.",
             "",
             "<b>Customizations:</b>",
-            "<u>Date</u> - the date for the plots to showcase",
-            "<u>Bins</u> - feed bin(s) to showcase in the hunger plot",
+            "<u>Date</u> - the date for the plots to showcase.",
+            "<u>Bins</u> - feed bin(s) to showcase in the hunger plot.",
             sep = "<br>"
           ),
           placement = "right",
@@ -389,9 +391,9 @@ warnings_tab <- tabItem(
       content = paste("This tab shows the detected Instatec warnings for the dataset.",
         "",
         "<b>Customizations:</b>",
-        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below",
-        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below",
-        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below",
+        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below.",
+        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below.",
+        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below.",
         sep = "<br>"
       ),
       placement = "right",
@@ -406,7 +408,12 @@ warnings_tab <- tabItem(
 FAQ_tab <- tabItem(
   "FAQ",
   tags$style(HTML("#shiny-tab-FAQ{ padding-left: 20px; padding-right: 20px; }")),
-  methodologies_data()
+  about_FAQ(),
+  methodologies_FAQ(),
+  data_FAQ(),
+  statistical_FAQ(),
+  references_FAQ(),
+  downloadButton('downloadReferences')
 )
 
 # Dashboard body and combining tabs
@@ -434,7 +441,12 @@ body <- dashboardBody(
   )
 )
 
-ui <- fluidPage(useShinyalert(), dashboardPage(title="Dairy Cow Dashboard", header, sidebar, body))
+ui <- fluidPage(setSliderColor(c("#6b96c7","#6b96c7","#6b96c7","#6b96c7"),
+                               c(1,2,3,4)),
+                dashboardPage(title="Dairy Cow Dashboard",
+                              header,
+                              sidebar,
+                              body))
 
 # Authentication page
 ui <- secure_app(ui,

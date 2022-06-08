@@ -29,6 +29,10 @@ THI_analysis <- function(df, start_date, end_date) {
 #' @return An interactive plotly plot. 
 plot_THI_analysis <- function(df) {
   
+  df <- df %>%
+    mutate(THI_mean = round(THI_mean,2),
+           THI_max = round(THI_max,2),
+           THI_min = round(THI_min,2))
   
   # Make plot
   analysis_plot_thi <- ggplot(df, aes(x = date)) +
@@ -39,5 +43,10 @@ plot_THI_analysis <- function(df) {
     geom_line(linetype="dashed", color="gray", size=1, alpha=.5, y = 68) + 
     theme_classic() + theme(legend.position = "none")
   
-  ggplotly(analysis_plot_thi)
+  analysis_plot_thi <- ggplotly(analysis_plot_thi)
+  
+  analysis_plot_thi$x$data[[3]]$hoverinfo <- "none"
+  
+  analysis_plot_thi
 }
+

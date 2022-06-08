@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
+     # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -856,5 +856,14 @@ server <- function(input, output, session) {
       hunger_plot(df) %>%
         config(modeBarButtonsToRemove = config)
     })
+  })
+  
+  observe({
+    output$downloadReferences <- downloadHandler(
+      filename = "citation-references.pdf",
+      content = function(file) {
+        file.copy("www/citation-references.pdf", file)
+      }
+    )
   })
 }
