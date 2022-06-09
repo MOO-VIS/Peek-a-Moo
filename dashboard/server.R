@@ -356,19 +356,33 @@ server <- function(input, output, session) {
             
             output$downloadReport <- downloadHandler(
               filename = function() {
-                paste('neighbor-report', sep = '.', switch(
+                paste0("Cow_",
+                      input$analysis_cow_id,
+                      "_",
+                      input$relationship_date_range[[1]],
+                      "_to_",
+                      input$relationship_date_range[[2]],
+                      '_neighbor_count_report', 
+                      '.', 
+                      switch(
                   input$analysis_format, PDF = 'pdf', HTML = 'html'
-                ))
-              },
+                        )
+                      )
+                },
               
               content = function(file) {
-                src <- normalizePath('report.Rmd')
+                src1 <- normalizePath('report.Rmd')
+                src2 <- normalizePath('reference.bib')
+                src3 <- normalizePath('neighbour_report.tex')
                 
                 # temporarily switch to the temp dir, in case you do not have write
                 # permission to the current working directory
                 owd <- setwd(tempdir())
                 on.exit(setwd(owd))
-                file.copy(src, 'report.Rmd', overwrite = TRUE)
+                file.copy(src1, 'report.Rmd', overwrite = TRUE)
+                file.copy(src2, 'reference.bib', overwrite = TRUE)
+                file.copy(src3, 'neighbour_report.tex', overwrite = TRUE)
+                
                 data <- Feeding_drinking_neighbour_bout
                 # Set up parameters to pass to Rmd document
                 params <- list(
@@ -383,8 +397,9 @@ server <- function(input, output, session) {
                   'report.Rmd', 
                   switch(
                     input$analysis_format,
-                    PDF = pdf_document(), 
-                    HTML = html_document()
+                    PDF = pdf_document(fig_caption = TRUE,        
+                                       includes = includes(in_header =  "neighbour_report.tex")), 
+                    HTML = html_document(toc = TRUE)
                   ),
                   params = params,
                   envir = new.env(parent = globalenv())
