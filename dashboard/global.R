@@ -158,7 +158,7 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
       DT::dataTableOutput(paste0(var_name, "_table"))
     )),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
+      image = paste0("loading_cow6.gif"),
       output_fun(paste0(var_name, "_plot"))
     ))
   )
@@ -178,7 +178,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
       DT::dataTableOutput(paste0(var_name, "_table"))
     )),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
+      image = paste0("loading_cow6.gif"),
       output_fun(paste0(var_name, "_plot"))
     ))
   )
