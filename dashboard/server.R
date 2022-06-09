@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     # credentials
+    #  credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -153,7 +153,7 @@ server <- function(input, output, session) {
 
   # update cow selections based on selected dates
   observe({
-    update_cow_selection(input$activity_date_range, "activity_cow_selection", session)
+    update_cow_selection(input$behaviour_date_range, "behaviour_cow_selection", session)
   })
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
@@ -612,7 +612,7 @@ server <- function(input, output, session) {
     }
   })
 
-  # render activity plots
+  # render behaviour plots
   observe({
 
     #' Generate the plot and data tabs for time range plots
@@ -623,7 +623,7 @@ server <- function(input, output, session) {
     plot_cow_date_range <- function(df, y_col, var_name) {
 
       # filter table
-      df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
+      df <- process_range_data(df, input$behaviour_agg_type, input$behaviour_cow_selection, input$behaviour_date_range)
 
       # generate table
       output[[paste0(var_name, "_table")]] <- format_dt_table(df, data_config = data_config)
@@ -819,18 +819,18 @@ server <- function(input, output, session) {
 
   # Feed Bin selection
   observe({
-    update_bin_selection(input$bin_date, "activity_bin_selection", session)
+    update_bin_selection(input$bin_date, "behaviour_bin_selection", session)
   })
 
 
   # Feed bin tab
   observe({
     req(input$bin_date)
-    req(input$activity_bin_selection)
+    req(input$behaviour_bin_selection)
 
     bin_df <- select_feed_bin_data(feed_df,
       feed_date = input$bin_date,
-      bin_selection = input$activity_bin_selection
+      bin_selection = input$behaviour_bin_selection
     )
     # plot
     output$feed_bin_plot <- renderPlot({
@@ -846,10 +846,10 @@ server <- function(input, output, session) {
 
   observe({
     req(input$bin_date)
-    req(input$activity_bin_selection)
+    req(input$behaviour_bin_selection)
 
     df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
-      parse_hunger_df(input$activity_bin_selection)
+      parse_hunger_df(input$behaviour_bin_selection)
 
     output$hunger_table <- format_dt_table(df, data_config = data_config)
     output$hunger_plot <- renderPlotly({

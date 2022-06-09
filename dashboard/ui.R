@@ -13,7 +13,7 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "sidemenu",
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
-    menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
+    menuItem("Behaviour Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
     menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
@@ -28,11 +28,11 @@ activities_tab <- tabItem(
     box(
       title = p(
         "Customizations",
-        tags$style(type = "text/css", "#button_activity{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_activity", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+        tags$style(type = "text/css", "#button_behaviour{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_behaviour", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
       ),
       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(2, aggregation_widget("activity_agg_type")),
+      column(2, aggregation_widget("behaviour_agg_type")),
       column(
         2,
         checkboxInput(
@@ -41,11 +41,11 @@ activities_tab <- tabItem(
           value = FALSE
         )
       ),
-      column(4, date_range_widget("activity_date_range")),
-      column(4, cow_selection_widget("activity_cow_selection")),
+      column(4, date_range_widget("behaviour_date_range")),
+      column(4, cow_selection_widget("behaviour_cow_selection")),
       bsPopover(
-        id = "button_activity", title = "Activity Patterns Tab",
-        content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+        id = "button_behaviour", title = "Behaviour Patterns Tab",
+        content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
           "",
           "<b>Customizations:</b>",
           "<u>Aggregate</u> - aggregates the data on the daily, or monthly level.",
@@ -126,7 +126,7 @@ daily_tab <- tabItem(
       width = 12,
       popover = bsPopover(
         id = "button_daily_plot", title = "Data note:",
-        content = paste("Behaviour totals may not match those on the activity patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."),
+        content = paste("Behaviour totals may not match those on the behaviour patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."),
         placement = "right",
         trigger = "hover",
         options = list(container = "body")
@@ -297,7 +297,7 @@ bins_tab <- tabItem(
       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       fluidRow(
         column(4, date_widget("bin_date"), ),
-        column(8, bin_selection_widget("activity_bin_selection")),
+        column(8, bin_selection_widget("behaviour_bin_selection")),
         bsPopover(
           id = "button_bins", title = "Bins Tab",
           content = paste("This tab shows weight status and interaction information for the feedbins.",
@@ -329,8 +329,8 @@ bins_tab <- tabItem(
         column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
         column(4, bin_wt_widget("bin_weight")),
         bsPopover(
-          id = "button_other", title = "Activity Patterns Tab",
-          content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+          id = "button_other", title = "Behaviour Patterns Tab",
+          content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
             "",
             "<b>Customizations:</b>",
             "<u>Hour</u> - hour of the selected date to observe in the plot",

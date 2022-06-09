@@ -23,7 +23,7 @@ library(shinyalert)
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
-source("../R/activities.R")
+source("../R/behaviour.R")
 source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
