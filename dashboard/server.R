@@ -690,36 +690,37 @@ server <- function(input, output, session) {
       daily_schedu_moo_plot(df) %>%
         config(modeBarButtonsToRemove = config)
     })
+    
     totals <- daily_total_schedumoo_info(df)
 
     output$total_standing <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[4], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total standing time",
+        tags$p(paste0(format(round((totals[4]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average standing time",
         icon = icon("walking", lib = "font-awesome", style = "font-size: 40px;"),
         color = "red"
       )
     })
     output$total_lying <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[3], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total lying time",
+        tags$p(paste0(format(round((totals[3]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average lying time",
         icon = icon("bed", lib = "font-awesome", style = "font-size: 40px;"),
         color = "yellow"
       )
     })
     output$total_feeding <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[2], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total feeding time",
+        tags$p(paste0(format(round((totals[2]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average feeding time",
         icon = icon("grain", lib = "glyphicon", style = "font-size: 40px;"),
         color = "green"
       )
     })
     output$total_drinking <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[1], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total drinking time",
+        tags$p(paste0(format(round((totals[1]/60),1), big.mark = "."), " min"), style = "font-size: 60%;"),
+        "Average drinking time",
         icon = icon("tint", lib = "glyphicon", style = "font-size: 40px;"),
         color = "blue"
       )

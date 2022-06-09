@@ -89,7 +89,7 @@ daily_tab <- tabItem(
       column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
-        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows. Selecting more than a single cow, will aggregate the total results.",
+        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows.",
           "",
           "<b>Customizations:</b>",
           "<u>Date</u> - the date for the plots to showcase.",
@@ -125,8 +125,14 @@ daily_tab <- tabItem(
       "daily",
       width = 12,
       popover = bsPopover(
-        id = "button_daily_plot", title = "Data note:",
-        content = paste("Behaviour totals may not match those on the behaviour patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."),
+        id = "button_daily_plot", title = "Average time boxes:",
+        content = paste(
+          "<b>Daily behaviour plots:</b>",
+          "Average daily value boxes are calculated based on the data presented in the daily behaviour timeline chart. Both plots use duration of bouts and only consider behaviours that are fully contained within the given date. Behaviours that extend beyond midnight or began before midnight the previous day are not considered.",
+          "",
+          "<u>Warning:</u> Including cows with missing behaviour data will effect the calculation of the average daily value boxes as they are still included in the total number of cows, and their available info is included in the calculation of the average.",
+          sep = "<br>"
+        ),
         placement = "right",
         trigger = "hover",
         options = list(container = "body")
