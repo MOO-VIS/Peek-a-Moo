@@ -71,9 +71,8 @@ cow_date_range_plot <- function(df, y_col, show_average){
                       "#325803",
                       "#C5D1A5",
                       "#7C9454",
-                      "#416413",
-                      "#8AA164",
                       "#D4DDB5",
+                      "#8AA164",
                       "#4F7023",
                       "#99AD74",
                       "#5E7C34",
@@ -89,7 +88,8 @@ cow_date_range_plot <- function(df, y_col, show_average){
                       "#3A6278",
                       "#27536B",
                       "#14445E",
-                      "#013551")
+                      "#013551",
+                      "#416413")
 
   # extract y_label from unquoted col and format
   y_label <- quo_name(enquo(y_col)) %>%
@@ -103,7 +103,7 @@ cow_date_range_plot <- function(df, y_col, show_average){
     ylab(y_label) +
     scale_x_date(date_labels = "%b-%Y") + 
     scale_colour_manual(values = custom_palette) +
-    theme_classic() + theme(legend.position = "none")
+    theme_classic() + theme(legend.position = "bottom")
     
   if(show_average){
     plt <- plt + 
