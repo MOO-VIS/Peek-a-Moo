@@ -2,12 +2,12 @@ library(shinymanager)
 
 passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
+credentials <- data.frame(
+  user = c("guest", "user", "admin"), # mandatory
+  password = c("guest", "shiny", "shinymanager"), # mandatory
+  admin = c(FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-    #  credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      credentials
+    #  "../auth/database.sqlite",
+    #  passphrase = passphrase
     )
   )
 
@@ -696,7 +696,7 @@ server <- function(input, output, session) {
       valueBox(
         tags$p(paste0(format(totals[4], big.mark = ","), " s"), style = "font-size: 60%;"),
         "Total standing time",
-        icon = icon("circle-arrow-up", lib = "glyphicon", style = "font-size: 40px;"),
+        icon = icon("walking", lib = "font-awesome", style = "font-size: 40px;"),
         color = "red"
       )
     })
@@ -704,7 +704,7 @@ server <- function(input, output, session) {
       valueBox(
         tags$p(paste0(format(totals[3], big.mark = ","), " s"), style = "font-size: 60%;"),
         "Total lying time",
-        icon = icon("circle-arrow-down", lib = "glyphicon", style = "font-size: 40px;"),
+        icon = icon("bed", lib = "font-awesome", style = "font-size: 40px;"),
         color = "yellow"
       )
     })
