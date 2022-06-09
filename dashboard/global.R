@@ -28,7 +28,7 @@ source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
 source("../R/bully_analysis.R")
-source("../R/bins.R")
+#source("../R/bins.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
 
@@ -44,27 +44,27 @@ convert_date_col <- function(df) {
 }
 
 # download data from GCP
-# gcs_auth(json_file = '../auth/peek-a-moo.json')
-# 
-# gcs_global_bucket("peek-a-moo-data")
-# 
-# objects <- gcs_list_objects()
-# download_list <- grep("*.Rda", objects$name, value = TRUE)
-# 
-# if (!dir.exists("../data/")) {
-#   dir.create("../data/")
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
-# 
-# check_files = list.files('../data/')
-# 
-# if (!length(check_files) > 0) {
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
+gcs_auth(json_file = '../auth/peek-a-moo.json')
+
+gcs_global_bucket("peek-a-moo-data")
+
+objects <- gcs_list_objects()
+download_list <- grep("*.Rda", objects$name, value = TRUE)
+
+if (!dir.exists("../data/")) {
+  dir.create("../data/")
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
+
+check_files = list.files('../data/')
+
+if (!length(check_files) > 0) {
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
 
 # load data if not already in memory
 if (!exists("THI")) {
@@ -406,56 +406,56 @@ update_2nd_cow_selection_displacement <- function(date_obj,
   )
 }
       
-#' Widget for Bin Weight Selection
-#'
-#' @param inputId The id of the picker input widget to update
-bin_wt_widget <- function(inputId) {
-  selectInput(
-    inputId = inputId,
-    label = "Full Bin Weight (KG)",
-    choices = rep(1:100),
-    selected = as.integer(75)
-  )
-}
+#' #' Widget for Bin Weight Selection
+#' #'
+#' #' @param inputId The id of the picker input widget to update
+#' bin_wt_widget <- function(inputId) {
+#'   selectInput(
+#'     inputId = inputId,
+#'     label = "Full Bin Weight (KG)",
+#'     choices = rep(1:100),
+#'     selected = as.integer(75)
+#'   )
+#' }
 
-#' Helper function for updating bin selection picker input widgets
-#'
-#' @param date_obj The date or date range to filter by
-#' @param inputId The id of the picker input widget to update
-#' @param session The current server session
-update_bin_selection <- function(date_obj, inputId, session) {
-
-  # find bins that exist in date range
-  bin_choices <- filter_dates(feed_df, date, date_obj) %>%
-    select(Bin) %>%
-    unique() %>%
-    arrange(Bin)
-  colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
-
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = bin_choices,
-    selected = bin_choices[[1]]
-  )
-}
-
-#' Widget for Bin Selection
-#'
-#' @param inputId The id of the picker input widget to update
-bin_selection_widget <- function(inputId) {
-  pickerInput(
-    inputId = inputId,
-    label = "Bins",
-    choices = list(),
-    multiple = TRUE,
-    options = list(
-      "actions-box" = TRUE,
-      "none-selected-text" = "Select bins"
-    )
-  )
-}
+#' #' Helper function for updating bin selection picker input widgets
+#' #'
+#' #' @param date_obj The date or date range to filter by
+#' #' @param inputId The id of the picker input widget to update
+#' #' @param session The current server session
+#' update_bin_selection <- function(date_obj, inputId, session) {
+#' 
+#'   # find bins that exist in date range
+#'   bin_choices <- filter_dates(feed_df, date, date_obj) %>%
+#'     select(Bin) %>%
+#'     unique() %>%
+#'     arrange(Bin)
+#'   colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
+#' 
+#'   # update widget
+#'   updatePickerInput(
+#'     session = session,
+#'     inputId = inputId,
+#'     choices = bin_choices,
+#'     selected = bin_choices[[1]]
+#'   )
+#' }
+#' 
+#' #' Widget for Bin Selection
+#' #'
+#' #' @param inputId The id of the picker input widget to update
+#' bin_selection_widget <- function(inputId) {
+#'   pickerInput(
+#'     inputId = inputId,
+#'     label = "Bins",
+#'     choices = list(),
+#'     multiple = TRUE,
+#'     options = list(
+#'       "actions-box" = TRUE,
+#'       "none-selected-text" = "Select bins"
+#'     )
+#'   )
+#' }
 
 #' Custom theme setting function for colors
 #'

@@ -15,7 +15,7 @@ sidebar <- dashboardSidebar(
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Behaviour Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
-    menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
+   # menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
   )
@@ -291,69 +291,69 @@ relationships_tab <- tabItem(
 )
 
 # Bins tab
-bins_tab <- tabItem(
-  "bins",
-  fluidRow(
-    box(
-      title = p(
-        "Customizations",
-        tags$style(type = "text/css", "#button_bins{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_bins", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ),
-      width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      fluidRow(
-        column(4, date_widget("bin_date"), ),
-        column(8, bin_selection_widget("behaviour_bin_selection")),
-        bsPopover(
-          id = "button_bins", title = "Bins Tab",
-          content = paste("This tab shows weight status and interaction information for the feedbins.",
-            "",
-            "<b>Customizations:</b>",
-            "<u>Date</u> - the date for the plots to showcase.",
-            "<u>Bins</u> - feed bin(s) to showcase in the hunger plot.",
-            sep = "<br>"
-          ),
-          placement = "right",
-          trigger = "hover",
-          options = list(container = "body")
-        )
-      )
-    )
-  ),
-  fluidRow(
-    default_tabBox("Hunger Plot", "hunger", width = 12)
-  ),
-  fluidRow(
-    box(
-      title = p(
-        "Customizations",
-        tags$style(type = "text/css", "#button_other{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_other", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ),
-      width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      fluidRow(
-        column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
-        column(4, bin_wt_widget("bin_weight")),
-        bsPopover(
-          id = "button_other", title = "Behaviour Patterns Tab",
-          content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
-            "",
-            "<b>Customizations:</b>",
-            "<u>Hour</u> - hour of the selected date to observe in the plot",
-            "<u>Full Bin Weight</u> - TBD",
-            sep = "<br>"
-          ),
-          placement = "right",
-          trigger = "hover",
-          options = list(container = "body")
-        )
-      ),
-    )
-  ),
-  fluidRow(
-    default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
-  )
-)
+# bins_tab <- tabItem(
+#   "bins",
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_bins{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_bins", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(4, date_widget("bin_date"), ),
+#         column(8, bin_selection_widget("behaviour_bin_selection")),
+#         bsPopover(
+#           id = "button_bins", title = "Bins Tab",
+#           content = paste("This tab shows weight status and interaction information for the feedbins.",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Date</u> - the date for the plots to showcase.",
+#             "<u>Bins</u> - feed bin(s) to showcase in the hunger plot.",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       )
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hunger Plot", "hunger", width = 12)
+#   ),
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_other{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_other", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
+#         column(4, bin_wt_widget("bin_weight")),
+#         bsPopover(
+#           id = "button_other", title = "Behaviour Patterns Tab",
+#           content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Hour</u> - hour of the selected date to observe in the plot",
+#             "<u>Full Bin Weight</u> - TBD",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       ),
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
+#   )
+# )
 
 # Warnings tab
 warnings_tab <- tabItem(
@@ -441,7 +441,7 @@ body <- dashboardBody(
     activities_tab,
     daily_tab,
     relationships_tab,
-    bins_tab,
+   # bins_tab,
     warnings_tab,
     FAQ_tab
   )

@@ -2,12 +2,12 @@ library(shinymanager)
 
 passphrase <- Sys.getenv("PASSPHRASE")
 
-credentials <- data.frame(
-  user = c("guest", "user", "admin"), # mandatory
-  password = c("guest", "shiny", "shinymanager"), # mandatory
-  admin = c(FALSE, FALSE, TRUE),
-  stringsAsFactors = FALSE
-)
+# credentials <- data.frame(
+#   user = c("guest", "user", "admin"), # mandatory
+#   password = c("guest", "shiny", "shinymanager"), # mandatory
+#   admin = c(FALSE, FALSE, TRUE),
+#   stringsAsFactors = FALSE
+# )
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      credentials
-    #  "../auth/database.sqlite",
-    #  passphrase = passphrase
+    #  credentials
+      "../auth/database.sqlite",
+      passphrase = passphrase
     )
   )
 
@@ -818,46 +818,46 @@ server <- function(input, output, session) {
   })
 
 
-  # Feed Bin selection
-  observe({
-    update_bin_selection(input$bin_date, "behaviour_bin_selection", session)
-  })
+  # # Feed Bin selection
+  # observe({
+  #   update_bin_selection(input$bin_date, "behaviour_bin_selection", session)
+  # })
 
 
   # Feed bin tab
-  observe({
-    req(input$bin_date)
-    req(input$behaviour_bin_selection)
-
-    bin_df <- select_feed_bin_data(feed_df,
-      feed_date = input$bin_date,
-      bin_selection = input$behaviour_bin_selection
-    )
-    # plot
-    output$feed_bin_plot <- renderPlot({
-      plot_feed_bin_data(
-        hourly_df = bin_df,
-        hr = input$obs_hr,
-        max_wt = input$bin_weight
-      )
-    })
-    # CSV output
-    output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
-  })
-
-  observe({
-    req(input$bin_date)
-    req(input$behaviour_bin_selection)
-
-    df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
-      parse_hunger_df(input$behaviour_bin_selection)
-
-    output$hunger_table <- format_dt_table(df, data_config = data_config)
-    output$hunger_plot <- renderPlotly({
-      hunger_plot(df) %>%
-        config(modeBarButtonsToRemove = config)
-    })
-  })
+  # observe({
+  #   req(input$bin_date)
+  #   req(input$behaviour_bin_selection)
+  # 
+  #   bin_df <- select_feed_bin_data(feed_df,
+  #     feed_date = input$bin_date,
+  #     bin_selection = input$behaviour_bin_selection
+  #   )
+  #   # plot
+  #   output$feed_bin_plot <- renderPlot({
+  #     plot_feed_bin_data(
+  #       hourly_df = bin_df,
+  #       hr = input$obs_hr,
+  #       max_wt = input$bin_weight
+  #     )
+  #   })
+  #   # CSV output
+  #   output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
+  # })
+  # 
+  # observe({
+  #   req(input$bin_date)
+  #   req(input$behaviour_bin_selection)
+  # 
+  #   df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
+  #     parse_hunger_df(input$behaviour_bin_selection)
+  # 
+  #   output$hunger_table <- format_dt_table(df, data_config = data_config)
+  #   output$hunger_plot <- renderPlotly({
+  #     hunger_plot(df) %>%
+  #       config(modeBarButtonsToRemove = config)
+  #   })
+  # })
   
   observe({
     output$downloadReferences <- downloadHandler(
