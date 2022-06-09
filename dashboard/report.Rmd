@@ -1,5 +1,5 @@
 ---
-title: "Preliminary statistical analysis on diary cows feeding and drinking data"
+title: "Preliminary statistical analysis on dairy cows feeding and drinking data"
 bibliography: reference.bib
 author: "2022 MDS cow-bonds team"
 output:
