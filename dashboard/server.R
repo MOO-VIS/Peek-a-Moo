@@ -203,7 +203,9 @@ server <- function(input, output, session) {
   values <- reactiveValues(nodes_feeding = NULL, 
                            edges_feeding = NULL, 
                            nodes_lying = NULL,
-                           edges_lying = NULL)
+                           edges_lying = NULL,
+                           nodes_neighbour = NULL,
+                           edges_neighbour = NULL)
   
   # render Synchronicity network
   observe({
@@ -254,6 +256,26 @@ server <- function(input, output, session) {
         values$edges_lying <- nodes_edges_list_synchronicity(synchronized_lying_total_time,
                                                              input$relationship_date_range,
                                                              threshold_selected)[[2]]
+      }
+    } else if (input$relationship_network_selection == "Neighbour") {
+      if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
+        output$neighbour_plot <- visNetwork::renderVisNetwork({
+          validate(
+            need(
+              input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
+              paste0(
+                "Ending date must come after the starting date. Please select a different starting date."
+              )
+            )
+          )
+        })
+      } else {
+        values$nodes_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                                 input$relationship_date_range,
+                                                                 threshold_selected)[[1]]
+        values$edges_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
+                                                               input$relationship_date_range,
+                                                               threshold_selected)[[2]]
       }
     }
   })
@@ -334,23 +356,28 @@ server <- function(input, output, session) {
                                                  df = Feeding_drinking_neighbour_total_time,
                                                  network = input$relationship_network_selection
           )))) {
-            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+            output$neighbour_plot <- missing_date_range_check(input$relationship_date_range,
                                                             df = Feeding_drinking_neighbour_total_time,
                                                             network = input$relationship_network_selection
             )
           } else {
-            nodes_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
-                                                              input$relationship_date_range,
-                                                              threshold_selected)[[1]]
-            edges_neighbour <- nodes_edges_list_synchronicity(Feeding_drinking_neighbour_total_time,
-                                                              input$relationship_date_range,
-                                                              threshold_selected)[[2]]
             
-            output$neighbour_plot <- visNetwork::renderVisNetwork({
-              plot_network(nodes_neighbour, edges_neighbour, layouts_type, selected_nodes = NULL)
-            })
-            
-            output$neighbour_table <- format_dt_table(edges_neighbour %>% select(c(from, to, weight)), data_config = data_config)
+            if (length(input$current_neighbour) == 0) {
+              output$neighbour_plot <- visNetwork::renderVisNetwork({
+                plot_network(values$nodes_neighbour, values$edges_neighbour, layouts_type, selected_nodes = NULL) %>%
+                  visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_neighbour', nodes.nodes);
+                ;}")
+              })
+              
+              output$neighbour_table <- format_dt_table(values$edges_neighbour %>% select(c(from, to, weight)), data_config = data_config)
+            } else if (length(input$current_neighbour) == 1) {
+              output$neighbour_table <- format_dt_table(
+                values$edges_neighbour %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_neighbour) | (to == input$current_neighbour)), 
+                data_config = data_config)
+            }
             
             ## render R markdown file
             
@@ -414,7 +441,7 @@ server <- function(input, output, session) {
                                                  df = Feeding_drinking_at_the_same_time_total_time,
                                                  network = input$relationship_network_selection
           )))) {
-            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+            output$feeding_plot <- missing_date_range_check(input$relationship_date_range,
                                                             df = Feeding_drinking_at_the_same_time_total_time,
                                                             network = input$relationship_network_selection
             )
@@ -422,7 +449,7 @@ server <- function(input, output, session) {
                                                         df = synchronized_lying_total_time,
                                                         network = input$relationship_network_selection
           )))) {
-            output$network_plot <- missing_date_range_check(input$relationship_date_range,
+            output$lying_plot <- missing_date_range_check(input$relationship_date_range,
                                                             df = synchronized_lying_total_time,
                                                             network = input$relationship_network_selection
             )
@@ -452,6 +479,20 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_lying', nodes.nodes);
                 ;}")
               })
+              
+              output$feeding_table <- format_dt_table(
+                values$edges_feeding %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_feeding) | (to == input$current_feeding)), 
+                data_config = data_config
+                )
+              
+              output$lying_table <- format_dt_table(
+                values$edges_lying %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_feeding) | (to == input$current_feeding)), 
+                data_config = data_config
+              )
             } else if (length(input$current_lying) > 0) {
               output$feeding_plot <- visNetwork::renderVisNetwork({
                 plot_network(values$nodes_feeding, values$edges_feeding, layouts_type, selected_nodes = input$current_lying) %>%
@@ -459,6 +500,20 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_feeding', nodes.nodes);
                 ;}")
               })
+              
+              output$feeding_table <- format_dt_table(
+                values$edges_feeding %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_lying) | (to == input$current_lying)), 
+                data_config = data_config
+              )
+              
+              output$lying_table <- format_dt_table(
+                values$edges_lying %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_lying) | (to == input$current_lying)), 
+                data_config = data_config
+                )
             } 
           }
         }
@@ -501,12 +556,23 @@ server <- function(input, output, session) {
             if (mean(edges$width > 2)) {
               edges$width <- edges$width / 2
             }
-
-            output$network_disp_plot <- visNetwork::renderVisNetwork({
-              plot_network_disp(nodes, edges, layouts_type)
-            })
-
-            output$network_disp_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
+            
+            if (length(input$current_disp) == 0) {
+              output$network_disp_plot <- visNetwork::renderVisNetwork({
+                plot_network_disp(nodes, edges, layouts_type) %>%
+                  visEvents(select = "function(nodes) {
+                Shiny.onInputChange('current_disp', nodes.nodes);
+                ;}")
+              })
+              
+              output$network_disp_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
+            } else if (length(input$current_disp) == 1) {
+              output$network_disp_table <- format_dt_table(
+                edges %>% 
+                  select(c(from, to, weight)) %>%
+                  filter((from == input$current_disp) | (to == input$current_disp)), 
+                data_config = data_config)
+            }
           } else if (input$relationship_network_selection == "Displacement Star*") {
             cow_id <- input$star_cow_selection
 
