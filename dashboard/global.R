@@ -19,6 +19,7 @@ library(rmarkdown)
 library(rstan)
 library(rstantools)
 library(shinyalert)
+library(akima)
 
 
 # load in plot/table creation scripts

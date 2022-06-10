@@ -112,7 +112,7 @@ statistical_FAQ <- function(){
                    tags$em("initiating a download of the report."))),
     tags$p("The full statistical analysis and code can also be viewed within its separate repo ",
            tags$a("here.",
-                  href = "https://github.com/UBC-AWP/Peek-a-Moo"))
+                  href = "https://github.com/UBC-AWP/Bayesian-analysis"))
   )
 }
 
