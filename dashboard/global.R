@@ -19,6 +19,10 @@ library(rmarkdown)
 library(rstan)
 library(rstantools)
 library(shinyalert)
+library(tibble)
+library(stats)
+library(graphics)
+library(ggplot2)
 
 
 # load in plot/table creation scripts
@@ -43,28 +47,28 @@ convert_date_col <- function(df) {
     unnest(value)
 }
 
-# download data from GCP
-gcs_auth(json_file = '../auth/peek-a-moo.json')
-
-gcs_global_bucket("peek-a-moo-data")
-
-objects <- gcs_list_objects()
-download_list <- grep("*.Rda", objects$name, value = TRUE)
-
-if (!dir.exists("../data/")) {
-  dir.create("../data/")
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
-
-check_files = list.files('../data/')
-
-if (!length(check_files) > 0) {
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
+# # download data from GCP
+# gcs_auth(json_file = '../auth/peek-a-moo.json')
+# 
+# gcs_global_bucket("peek-a-moo-data")
+# 
+# objects <- gcs_list_objects()
+# download_list <- grep("*.Rda", objects$name, value = TRUE)
+# 
+# if (!dir.exists("../data/")) {
+#   dir.create("../data/")
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
+# 
+# check_files = list.files('../data/')
+# 
+# if (!length(check_files) > 0) {
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
 
 # load data if not already in memory
 if (!exists("THI")) {
