@@ -481,7 +481,7 @@ ui <- secure_app(ui,
     font-family:Helvetica;}")),
       tags$h2("Peek-a-Moo\nDashboard", style = "align:center"),
       tags$img(
-        src = "../loading_cow1.gif", width = 100
+        src = "../welcome.png", width = 100
       ),
       tags$p(
         "General visitors please contact the administrator for login in credentials."
