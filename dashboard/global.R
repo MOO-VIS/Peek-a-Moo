@@ -20,6 +20,8 @@ library(rstan)
 library(rstantools)
 library(shinyalert)
 library(akima)
+library(DBI)
+library(RPostgres)
 
 
 # load in plot/table creation scripts
@@ -33,58 +35,73 @@ source("../R/bully_analysis.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
 
-#' Helper function for converting dataframes to having dates in a single column
-#'
-#' @param df The dataframe to convert
-#'
-#' @return Dataframe with dates in a single date column
-convert_date_col <- function(df) {
-  tibble::enframe(df, name = "date") %>%
-    mutate(date = as.Date(date)) %>%
-    unnest(value)
-}
 
-# download data from GCP
-gcs_auth(json_file = '../auth/peek-a-moo.json')
 
-gcs_global_bucket("peek-a-moo-data")
+# # download data from GCP
+# gcs_auth(json_file = '../auth/peek-a-moo.json')
+# 
+# gcs_global_bucket("peek-a-moo-data")
+# 
+# objects <- gcs_list_objects()
+# download_list <- grep("*.Rda", objects$name, value = TRUE)
+# 
+# if (!dir.exists("../data/")) {
+#   dir.create("../data/")
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
+# 
+# check_files = list.files('../data/')
+# 
+# if (!length(check_files) > 0) {
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
 
-objects <- gcs_list_objects()
-download_list <- grep("*.Rda", objects$name, value = TRUE)
+# use environment variable
+Postgres_user <- Sys.getenv("Postgres_user")
+Postgres_password <- Sys.getenv("Postgres_password")
 
-if (!dir.exists("../data/")) {
-  dir.create("../data/")
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
+# connect the PostgreSQL
+con <-  dbConnect(RPostgres::Postgres(), user=Postgres_user, password=Postgres_password,
+                  host="localhost", port=5432, dbname="postgres", timezone="America/Los_Angeles")
 
-check_files = list.files('../data/')
 
-if (!length(check_files) > 0) {
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
+master_feed_replacement_all <- tbl(con,"master_feed_replacement_all") %>%
+  as.data.frame()
+
+Cleaned_feeding_original_data <- tbl(con,"Cleaned_feeding_original_data") %>%
+  as.data.frame()
+
+Cleaned_drinking_original_data <- tbl(con,"Cleaned_drinking_original_data") %>%
+  as.data.frame()
+
+non_nutritive_visits <- tbl(con,"non_nutritive_visits") %>%
+  as.data.frame()
+
+Replacement_behaviour_by_date <- tbl(con,"Replacement_behaviour_by_date") %>%
+  as.data.frame()
+
+elo_24h_na_filled <- tbl(con,"elo_24h_na_filled") %>%
+  as.data.frame()
+
+Feeding_and_drinking_analysis <- tbl(con,"Feeding_and_drinking_analysis") %>%
+  as.data.frame()
+
+Insentec_warning <- tbl(con,"Insentec_warning") %>%
+  as.data.frame()
+
+lying_standing_summary_by_date <- tbl(con,"lying_standing_summary_by_date") %>%
+  as.data.frame()
+
+master_summary <- tbl(con,"master_summary") %>%
+  as.data.frame()
+
 
 # load data if not already in memory
 if (!exists("THI")) {
-  load("../data/Wali_trial_summarized_THI.Rda")
-  load("../data/Feeding_and_drinking_analysis.Rda")
-  load("../data/Insentec_warning.Rda")
-  load("../data/duration_for_each_bout.Rda")
-  load("../data/lying_standing_summary_by_date.Rda")
-  load("../data/synchronized_lying_total_time.Rda")
-  load("../data/Cleaned_drinking_original_data.Rda")
-  load("../data/Cleaned_feeding_original_data.Rda")
-  load("../data/non_nutritive_visits.Rda")
-  load("../data/feed_replacement_10mon_CD.Rda")
-  load("../data/bin_empty_total_time_summary.Rda")
-  load("../data/Feeding_drinking_at_the_same_time_total_time.Rda")
-  load("../data/Feeding_drinking_neighbour_total.Rda")
-  load("../data/Feeding_drinking_neighbour_bout.Rda")
-  load("../data/Replacement_behaviour_by_date.Rda")
-  load("../data/_10-mon__elo_all_replacements_long_noNA.Rda")
 
   THI <- master_summary
 
@@ -94,9 +111,8 @@ if (!exists("THI")) {
 # create dataframes for plots and tables
 standing_bout_df <- lying_standing_summary_by_date
 feed_drink_df <- Feeding_and_drinking_analysis
-non_nutritive_df <- convert_date_col(non_nutritive_visits)
+non_nutritive_df <- non_nutritive_visits
 feeding_intake_df <- Feeding_and_drinking_analysis
-feed_df <- convert_date_col(Cleaned_feeding_original_data)
 replacement_df <- master_feed_replacement_all
 dominance_df <- elo_24h_na_filled
 
@@ -363,9 +379,9 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
     # find cows that exist in date range
     cow_choices <- filter_dates(replacement_df, date, date_obj) %>%
       # filter_cd(occupied_bins_with_feed_percent, cd_range) %>%
-      select(Actor_cow) %>%
+      select(from) %>%
       unique() %>%
-      arrange(desc(Actor_cow))
+      arrange(desc(from))
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date and cd range")
 
     # update widget
@@ -386,7 +402,7 @@ update_2nd_cow_selection_displacement <- function(date_obj,
                                                   CD_max = NULL) {
   # find cows that exist in date range
   edges <- combine_replace_edges_star(
-    replacement_df, date_obj[1], date_obj[2],
+    "master_feed_replacement_all", date_obj[1], date_obj[2],
     cow_id_1, CD_min, CD_max
   )
 
