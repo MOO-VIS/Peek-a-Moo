@@ -19,7 +19,12 @@ library(rmarkdown)
 library(rstan)
 library(rstantools)
 library(shinyalert)
+library(tibble)
+library(stats)
+library(graphics)
+library(ggplot2)
 library(akima)
+
 
 
 # load in plot/table creation scripts
