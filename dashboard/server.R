@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     # credentials
+      # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -543,14 +543,14 @@ server <- function(input, output, session) {
             }
             
             if (length(input$current_disp) == 0) {
-              output$network_disp_plot <- visNetwork::renderVisNetwork({
+              output$network_plot <- visNetwork::renderVisNetwork({
                 plot_network_disp(nodes, edges, layouts_type) %>%
                   visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_disp', nodes.nodes);
                 ;}")
               })
               
-              output$network_disp_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
+              output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
             } else if (length(input$current_disp) == 1) {
               output$network_disp_table <- format_dt_table(
                 edges %>% 
@@ -637,11 +637,24 @@ server <- function(input, output, session) {
         )
       })
     } else {
-      if (input$relationship_network_selection == "Displacement Star*") {
+      if (input$relationship_network_selection == "Displacement") {
+        output$elo_plot <- renderPlotly({
+          plot_elo(raw_graph_data,
+                   input$relationship_date_range[[1]],
+                   input$relationship_date_range[[2]]
+          ) %>%
+            config(modeBarButtonsToRemove = config)
+        })
+        
+        output$elo_table <- format_dt_table(elo_df(raw_graph_data,
+                                                   input$relationship_date_range[[1]],
+                                                   input$relationship_date_range[[2]]
+        ), data_config = data_config)
+      } else if (input$relationship_network_selection == "Displacement Star*") {
         cow_id <- input$star_cow_selection
 
         output$elo_plot <- renderPlotly({
-          plot_elo(raw_graph_data,
+          plot_elo_star(raw_graph_data,
             input$relationship_date_range[[1]],
             input$relationship_date_range[[2]],
             cow_id = cow_id
