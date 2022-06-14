@@ -23,16 +23,18 @@ library(tibble)
 library(stats)
 library(graphics)
 library(ggplot2)
+library(akima)
+
 
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
-source("../R/activities.R")
+source("../R/behaviour.R")
 source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
 source("../R/bully_analysis.R")
-source("../R/bins.R")
+#source("../R/bins.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
 
@@ -162,7 +164,7 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
       DT::dataTableOutput(paste0(var_name, "_table"))
     )),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
+      image = paste0("loading_cow6.gif"),
       output_fun(paste0(var_name, "_plot"))
     ))
   )
@@ -173,7 +175,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
     title = title, side = "right", selected = "Plot", width = width,
     height = height,
     popover,
-    tabPanel("Analysis", helpText("Note: generating a report is going to take several minutes as a MCMC is running under the hood."),
+    tabPanel("Analysis", helpText("Select a cow of interest to generate a Bayesian analysis report on \"Feeding Neighbours\". Note: generating a report will take more than 4 minutes, as a Markov chain Monte Carlo simulation is running under the hood."),
              cow_selection_widget("analysis_cow_id", multiple = FALSE, label = "Cow of Interest"),
              download_format_widget("analysis_format"),
              downloadButton('downloadReport')),
@@ -182,7 +184,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
       DT::dataTableOutput(paste0(var_name, "_table"))
     )),
     tabPanel("Plot", shinycssloaders::withSpinner(
-      image = paste0("loading_cow", as.character(sample(0:7, 1)), ".gif"),
+      image = paste0("loading_cow6.gif"),
       output_fun(paste0(var_name, "_plot"))
     ))
   )
@@ -282,7 +284,7 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = paste0("Threshold (top % of connected cows)"),
+    label = paste0("Threshold"),
     choices = c("5%", "10%", "25%", "All"),
     selected = NULL,
     multiple = multiple,
@@ -368,7 +370,7 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
       # filter_cd(occupied_bins_with_feed_percent, cd_range) %>%
       select(Actor_cow) %>%
       unique() %>%
-      arrange(desc(Actor_cow))
+      arrange(Actor_cow)
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date and cd range")
 
     # update widget
@@ -410,58 +412,59 @@ update_2nd_cow_selection_displacement <- function(date_obj,
   )
 }
       
-#' Widget for Bin Weight Selection
+#' #' Widget for Bin Weight Selection
+#' #'
+#' #' @param inputId The id of the picker input widget to update
+#' bin_wt_widget <- function(inputId) {
+#'   selectInput(
+#'     inputId = inputId,
+#'     label = "Full Bin Weight (KG)",
+#'     choices = rep(1:100),
+#'     selected = as.integer(75)
+#'   )
+#' }
+
+#' #' Helper function for updating bin selection picker input widgets
+#' #'
+#' #' @param date_obj The date or date range to filter by
+#' #' @param inputId The id of the picker input widget to update
+#' #' @param session The current server session
+#' update_bin_selection <- function(date_obj, inputId, session) {
+#' 
+#'   # find bins that exist in date range
+#'   bin_choices <- filter_dates(feed_df, date, date_obj) %>%
+#'     select(Bin) %>%
+#'     unique() %>%
+#'     arrange(Bin)
+#'   colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
+#' 
+#'   # update widget
+#'   updatePickerInput(
+#'     session = session,
+#'     inputId = inputId,
+#'     choices = bin_choices,
+#'     selected = bin_choices[[1]]
+#'   )
+#' }
+#' 
+#' #' Widget for Bin Selection
+#' #'
+#' #' @param inputId The id of the picker input widget to update
+#' bin_selection_widget <- function(inputId) {
+#'   pickerInput(
+#'     inputId = inputId,
+#'     label = "Bins",
+#'     choices = list(),
+#'     multiple = TRUE,
+#'     options = list(
+#'       "actions-box" = TRUE,
+#'       "none-selected-text" = "Select bins"
+#'     )
+#'   )
+#' }
+
+#' Custom theme setting function for colors
 #'
-#' @param inputId The id of the picker input widget to update
-bin_wt_widget <- function(inputId) {
-  selectInput(
-    inputId = inputId,
-    label = "Full Bin Weight (KG)",
-    choices = rep(1:100),
-    selected = as.integer(75)
-  )
-}
-
-#' Helper function for updating bin selection picker input widgets
-#'
-#' @param date_obj The date or date range to filter by
-#' @param inputId The id of the picker input widget to update
-#' @param session The current server session
-update_bin_selection <- function(date_obj, inputId, session) {
-
-  # find bins that exist in date range
-  bin_choices <- filter_dates(feed_df, date, date_obj) %>%
-    select(Bin) %>%
-    unique() %>%
-    arrange(Bin)
-  colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
-
-  # update widget
-  updatePickerInput(
-    session = session,
-    inputId = inputId,
-    choices = bin_choices,
-    selected = bin_choices[[1]]
-  )
-}
-
-#' Widget for Bin Selection
-#'
-#' @param inputId The id of the picker input widget to update
-bin_selection_widget <- function(inputId) {
-  pickerInput(
-    inputId = inputId,
-    label = "Bins",
-    choices = list(),
-    multiple = TRUE,
-    options = list(
-      "actions-box" = TRUE,
-      "none-selected-text" = "Select bins"
-    )
-  )
-}
-
-#' Custom theme setting function
 #'
 custom_theme <- function() {
   theme <- tags$head(tags$style(HTML(

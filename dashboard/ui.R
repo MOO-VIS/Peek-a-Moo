@@ -13,9 +13,9 @@ sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "sidemenu",
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
-    menuItem("Activity Patterns", icon = icon("chart-line"), tabName = "activities"),
-    menuItem("Daily Behavior", icon = icon("calendar"), tabName = "daily_behavior"),
-    menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
+    menuItem("Behaviour Patterns", icon = icon("chart-line"), tabName = "activities"),
+    menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
+   # menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
   )
@@ -28,11 +28,11 @@ activities_tab <- tabItem(
     box(
       title = p(
         "Customizations",
-        tags$style(type = "text/css", "#button_activity{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_activity", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+        tags$style(type = "text/css", "#button_behaviour{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_behaviour", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
       ),
       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      column(2, aggregation_widget("activity_agg_type")),
+      column(2, aggregation_widget("behaviour_agg_type")),
       column(
         2,
         checkboxInput(
@@ -41,11 +41,11 @@ activities_tab <- tabItem(
           value = FALSE
         )
       ),
-      column(4, date_range_widget("activity_date_range")),
-      column(4, cow_selection_widget("activity_cow_selection")),
+      column(4, date_range_widget("behaviour_date_range")),
+      column(4, cow_selection_widget("behaviour_cow_selection")),
       bsPopover(
-        id = "button_activity", title = "Activity Patterns Tab",
-        content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+        id = "button_behaviour", title = "Behaviour Patterns Tab",
+        content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
           "",
           "<b>Customizations:</b>",
           "<u>Aggregate</u> - aggregates the data on the daily, or monthly level.",
@@ -89,7 +89,7 @@ daily_tab <- tabItem(
       column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
-        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows. Selecting more than a single cow, will aggregate the results.",
+        content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows.",
           "",
           "<b>Customizations:</b>",
           "<u>Date</u> - the date for the plots to showcase.",
@@ -125,8 +125,14 @@ daily_tab <- tabItem(
       "daily",
       width = 12,
       popover = bsPopover(
-        id = "button_daily_plot", title = "Data note:",
-        content = paste("Behaviour totals may not match those on the activity patterns tab, as this visualization does not include behaviours that started before or went beyond the given date. It only considers time for behaviours fully contained in the given date, so as to match the timeline plot."),
+        id = "button_daily_plot", title = "Average time boxes:",
+        content = paste(
+          "<b>Daily behaviour plots:</b>",
+          "Average daily value boxes are calculated based on the data presented in the daily behaviour timeline chart. Both plots use duration of bouts and only consider behaviours that are fully contained within the given date. Behaviours that extend beyond midnight or began before midnight the previous day are not considered.",
+          "",
+          "<u>Warning:</u> Including cows with missing behaviour data will effect the calculation of the average daily value boxes as they are still included in the total number of cows, and their available info is included in the calculation of the average.",
+          sep = "<br>"
+        ),
         placement = "right",
         trigger = "hover",
         options = list(container = "body")
@@ -178,8 +184,8 @@ relationships_tab <- tabItem(
         id = "button_global_network", title = "Global Network Customizations",
         content = paste(
           "<b>Customizations:</b>",
-          "<u>Date Range</u> - timeline for the given plots",
-          "<u>Network</u> - type of network to display",
+          "<u>Date Range</u> - timeline for the given plots.",
+          "<u>Network</u> - type of network to display.",
           sep = "<br>"
         ),
         placement = "right",
@@ -190,14 +196,14 @@ relationships_tab <- tabItem(
         id = "button_network", title = "Network Specific Customizations",
         content = paste(
           "<b>Customizations (Feeding/Lying networks) :</b>",
-          "<u>Layout Type</u> - shape of the displayed network",
-          "<u>Threshold</u> - top weighted % of connections to display in the network",
+          "<u>Layout Type</u> - shape of the displayed network.",
+          "<u>Threshold</u> - top weighted % of connections to display in the network.",
           "",
           "<b>Customizations (Displacement networks) :</b>",
-          "<u>Competition Density</u> - threshold of competition density to filter connections in the network by",
-          "<u>Threshold</u> - top weighted % of connections to display in the network (default only)",
-          "<u>Cow of Interest (star only) </u> - cow to be showcased in the network",
-          "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together",
+          "<u>Competition Density</u> - threshold of competition density to filter connections in the network by.",
+          "<u>Threshold (default only)</u> - top weighted % of connections to display in the network.",
+          "<u>Cow of Interest (star only) </u> - cow to be showcased in the network.",
+          "<u>First/Second Cow of Interest (paired only) </u> - the two cows to be showcased in the network together.",
           sep = "<br>"
         ),
         placement = "right",
@@ -273,7 +279,9 @@ relationships_tab <- tabItem(
             "",
             "<i>THI = 0.8*Temperature + Relative Humidity Index * (Temperature - 14.4) + 46.4 </i>",
             "",
-            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress. The threshold for heat stress is THI = 68, (pictured as the grey dashed line in the plot below).",
+            "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress.",
+            "",
+            "The threshold for heat stress is THI = 68, pictured as the grey dashed line in the plot below.",
             sep = "<br>"),
       placement = "right",
       trigger = "hover",
@@ -283,69 +291,69 @@ relationships_tab <- tabItem(
 )
 
 # Bins tab
-bins_tab <- tabItem(
-  "bins",
-  fluidRow(
-    box(
-      title = p(
-        "Customizations",
-        tags$style(type = "text/css", "#button_bins{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_bins", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ),
-      width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      fluidRow(
-        column(4, date_widget("bin_date"), ),
-        column(8, bin_selection_widget("activity_bin_selection")),
-        bsPopover(
-          id = "button_bins", title = "Bins Tab",
-          content = paste("This tab shows weight status and interaction information for the feedbins.",
-            "",
-            "<b>Customizations:</b>",
-            "<u>Date</u> - the date for the plots to showcase",
-            "<u>Bins</u> - feed bin(s) to showcase in the hunger plot",
-            sep = "<br>"
-          ),
-          placement = "right",
-          trigger = "hover",
-          options = list(container = "body")
-        )
-      )
-    )
-  ),
-  fluidRow(
-    default_tabBox("Hunger Plot", "hunger", width = 12)
-  ),
-  fluidRow(
-    box(
-      title = p(
-        "Customizations",
-        tags$style(type = "text/css", "#button_other{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_other", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ),
-      width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
-      fluidRow(
-        column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
-        column(4, bin_wt_widget("bin_weight")),
-        bsPopover(
-          id = "button_other", title = "Activity Patterns Tab",
-          content = paste("This tab shows six activity patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
-            "",
-            "<b>Customizations:</b>",
-            "<u>Hour</u> - hour of the selected date to observe in the plot",
-            "<u>Full Bin Weight</u> - TBD",
-            sep = "<br>"
-          ),
-          placement = "right",
-          trigger = "hover",
-          options = list(container = "body")
-        )
-      ),
-    )
-  ),
-  fluidRow(
-    default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
-  )
-)
+# bins_tab <- tabItem(
+#   "bins",
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_bins{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_bins", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(4, date_widget("bin_date"), ),
+#         column(8, bin_selection_widget("behaviour_bin_selection")),
+#         bsPopover(
+#           id = "button_bins", title = "Bins Tab",
+#           content = paste("This tab shows weight status and interaction information for the feedbins.",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Date</u> - the date for the plots to showcase.",
+#             "<u>Bins</u> - feed bin(s) to showcase in the hunger plot.",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       )
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hunger Plot", "hunger", width = 12)
+#   ),
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_other{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_other", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
+#         column(4, bin_wt_widget("bin_weight")),
+#         bsPopover(
+#           id = "button_other", title = "Behaviour Patterns Tab",
+#           content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Hour</u> - hour of the selected date to observe in the plot",
+#             "<u>Full Bin Weight</u> - TBD",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       ),
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
+#   )
+# )
 
 # Warnings tab
 warnings_tab <- tabItem(
@@ -389,9 +397,9 @@ warnings_tab <- tabItem(
       content = paste("This tab shows the detected Instatec warnings for the dataset.",
         "",
         "<b>Customizations:</b>",
-        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below",
-        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below",
-        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below",
+        "<u>Food Intake Cuttoff</u> - a value kg of feed to set a threshold for the warnings shown below.",
+        "<u>Water Intake Cuttoff</u> - a value kg of water to set a threshold for the warnings shown below.",
+        "<u>Bin Volume Cuttoff</u> - a value for volume of the bins to set a threshold for the warnings shown below.",
         sep = "<br>"
       ),
       placement = "right",
@@ -406,7 +414,12 @@ warnings_tab <- tabItem(
 FAQ_tab <- tabItem(
   "FAQ",
   tags$style(HTML("#shiny-tab-FAQ{ padding-left: 20px; padding-right: 20px; }")),
-  methodologies_data()
+  about_FAQ(),
+  methodologies_FAQ(),
+  data_FAQ(),
+  statistical_FAQ(),
+  references_FAQ(),
+  downloadButton('downloadReferences')
 )
 
 # Dashboard body and combining tabs
@@ -428,13 +441,18 @@ body <- dashboardBody(
     activities_tab,
     daily_tab,
     relationships_tab,
-    bins_tab,
+   # bins_tab,
     warnings_tab,
     FAQ_tab
   )
 )
 
-ui <- fluidPage(useShinyalert(), dashboardPage(title="Dairy Cow Dashboard", header, sidebar, body))
+ui <- fluidPage(setSliderColor(c("#6b96c7","#6b96c7","#6b96c7","#6b96c7"),
+                               c(1,2,3,4)),
+                dashboardPage(title="Dairy Cow Dashboard",
+                              header,
+                              sidebar,
+                              body))
 
 # Authentication page
 ui <- secure_app(ui,
@@ -463,7 +481,7 @@ ui <- secure_app(ui,
     font-family:Helvetica;}")),
       tags$h2("Peek-a-Moo\nDashboard", style = "align:center"),
       tags$img(
-        src = "../loading_cow1.gif", width = 100
+        src = "../welcome.png", width = 100
       ),
       tags$p(
         "General visitors please contact the administrator for login in credentials."
