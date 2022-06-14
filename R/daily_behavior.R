@@ -82,6 +82,7 @@ daily_total_schedumoo_info <- function(df) {
 
   cows <- as.list(unique(df$Cow))
   sum_bad_cow <- 0
+  bad_cow_list <- c()
 
   # check for missing data
   for (i in cows) {
@@ -97,15 +98,14 @@ daily_total_schedumoo_info <- function(df) {
 
   if(sum_bad_cow > 0){
     showNotification(type = "warning",
-                     paste0("Behaviour data incomplete for some cow(s).")
+                     paste0("Behaviour data incomplete for some cows. This will effect the averages.")
     )
   }
-  # 
-  #     
+   
     # instantiate summary df
     df_filter <- df %>%
       group_by(Behaviour) %>%
-      summarise(total = sum(time_for_total))
+      summarise(total = sum(time_for_total)/NROW(cows))
     values <- df_filter$total
     
     return(values)

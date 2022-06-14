@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
+    #  credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -153,7 +153,7 @@ server <- function(input, output, session) {
 
   # update cow selections based on selected dates
   observe({
-    update_cow_selection(input$activity_date_range, "activity_cow_selection", session)
+    update_cow_selection(input$behaviour_date_range, "behaviour_cow_selection", session)
   })
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
@@ -383,19 +383,33 @@ server <- function(input, output, session) {
             
             output$downloadReport <- downloadHandler(
               filename = function() {
-                paste('neighbor-report', sep = '.', switch(
+                paste0("Cow_",
+                      input$analysis_cow_id,
+                      "_",
+                      input$relationship_date_range[[1]],
+                      "_to_",
+                      input$relationship_date_range[[2]],
+                      '_neighbor_count_report', 
+                      '.', 
+                      switch(
                   input$analysis_format, PDF = 'pdf', HTML = 'html'
-                ))
-              },
+                        )
+                      )
+                },
               
               content = function(file) {
-                src <- normalizePath('report.Rmd')
+                src1 <- normalizePath('report.Rmd')
+                src2 <- normalizePath('reference.bib')
+                src3 <- normalizePath('neighbour_report.tex')
                 
                 # temporarily switch to the temp dir, in case you do not have write
                 # permission to the current working directory
                 owd <- setwd(tempdir())
                 on.exit(setwd(owd))
-                file.copy(src, 'report.Rmd', overwrite = TRUE)
+                file.copy(src1, 'report.Rmd', overwrite = TRUE)
+                file.copy(src2, 'reference.bib', overwrite = TRUE)
+                file.copy(src3, 'neighbour_report.tex', overwrite = TRUE)
+                
                 data <- Feeding_drinking_neighbour_bout
                 # Set up parameters to pass to Rmd document
                 params <- list(
@@ -410,8 +424,9 @@ server <- function(input, output, session) {
                   'report.Rmd', 
                   switch(
                     input$analysis_format,
-                    PDF = pdf_document(), 
-                    HTML = html_document()
+                    PDF = pdf_document(fig_caption = TRUE,        
+                                       includes = includes(in_header =  "neighbour_report.tex")), 
+                    HTML = html_document(toc = TRUE)
                   ),
                   params = params,
                   envir = new.env(parent = globalenv())
@@ -691,7 +706,7 @@ server <- function(input, output, session) {
     }
   })
 
-  # render activity plots
+  # render behaviour plots
   observe({
 
     #' Generate the plot and data tabs for time range plots
@@ -702,7 +717,7 @@ server <- function(input, output, session) {
     plot_cow_date_range <- function(df, y_col, var_name) {
 
       # filter table
-      df <- process_range_data(df, input$activity_agg_type, input$activity_cow_selection, input$activity_date_range)
+      df <- process_range_data(df, input$behaviour_agg_type, input$behaviour_cow_selection, input$behaviour_date_range)
 
       # generate table
       output[[paste0(var_name, "_table")]] <- format_dt_table(df, data_config = data_config)
@@ -769,36 +784,37 @@ server <- function(input, output, session) {
       daily_schedu_moo_plot(df) %>%
         config(modeBarButtonsToRemove = config)
     })
+    
     totals <- daily_total_schedumoo_info(df)
 
     output$total_standing <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[4], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total standing time",
-        icon = icon("circle-arrow-up", lib = "glyphicon", style = "font-size: 40px;"),
+        tags$p(paste0(format(round((totals[4]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average standing time",
+        icon = icon("walking", lib = "font-awesome", style = "font-size: 40px;"),
         color = "red"
       )
     })
     output$total_lying <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[3], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total lying time",
-        icon = icon("circle-arrow-down", lib = "glyphicon", style = "font-size: 40px;"),
+        tags$p(paste0(format(round((totals[3]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average lying time",
+        icon = icon("bed", lib = "font-awesome", style = "font-size: 40px;"),
         color = "yellow"
       )
     })
     output$total_feeding <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[2], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total feeding time",
+        tags$p(paste0(format(round((totals[2]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        "Average feeding time",
         icon = icon("grain", lib = "glyphicon", style = "font-size: 40px;"),
         color = "green"
       )
     })
     output$total_drinking <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(totals[1], big.mark = ","), " s"), style = "font-size: 60%;"),
-        "Total drinking time",
+        tags$p(paste0(format(round((totals[1]/60),1), big.mark = "."), " min"), style = "font-size: 60%;"),
+        "Average drinking time",
         icon = icon("tint", lib = "glyphicon", style = "font-size: 40px;"),
         color = "blue"
       )
@@ -896,46 +912,46 @@ server <- function(input, output, session) {
   })
 
 
-  # Feed Bin selection
-  observe({
-    update_bin_selection(input$bin_date, "activity_bin_selection", session)
-  })
+  # # Feed Bin selection
+  # observe({
+  #   update_bin_selection(input$bin_date, "behaviour_bin_selection", session)
+  # })
 
 
   # Feed bin tab
-  observe({
-    req(input$bin_date)
-    req(input$activity_bin_selection)
-
-    bin_df <- select_feed_bin_data(feed_df,
-      feed_date = input$bin_date,
-      bin_selection = input$activity_bin_selection
-    )
-    # plot
-    output$feed_bin_plot <- renderPlot({
-      plot_feed_bin_data(
-        hourly_df = bin_df,
-        hr = input$obs_hr,
-        max_wt = input$bin_weight
-      )
-    })
-    # CSV output
-    output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
-  })
-
-  observe({
-    req(input$bin_date)
-    req(input$activity_bin_selection)
-
-    df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
-      parse_hunger_df(input$activity_bin_selection)
-
-    output$hunger_table <- format_dt_table(df, data_config = data_config)
-    output$hunger_plot <- renderPlotly({
-      hunger_plot(df) %>%
-        config(modeBarButtonsToRemove = config)
-    })
-  })
+  # observe({
+  #   req(input$bin_date)
+  #   req(input$behaviour_bin_selection)
+  # 
+  #   bin_df <- select_feed_bin_data(feed_df,
+  #     feed_date = input$bin_date,
+  #     bin_selection = input$behaviour_bin_selection
+  #   )
+  #   # plot
+  #   output$feed_bin_plot <- renderPlot({
+  #     plot_feed_bin_data(
+  #       hourly_df = bin_df,
+  #       hr = input$obs_hr,
+  #       max_wt = input$bin_weight
+  #     )
+  #   })
+  #   # CSV output
+  #   output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
+  # })
+  # 
+  # observe({
+  #   req(input$bin_date)
+  #   req(input$behaviour_bin_selection)
+  # 
+  #   df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
+  #     parse_hunger_df(input$behaviour_bin_selection)
+  # 
+  #   output$hunger_table <- format_dt_table(df, data_config = data_config)
+  #   output$hunger_plot <- renderPlotly({
+  #     hunger_plot(df) %>%
+  #       config(modeBarButtonsToRemove = config)
+  #   })
+  # })
   
   observe({
     output$downloadReferences <- downloadHandler(
