@@ -19,9 +19,14 @@ library(rmarkdown)
 library(rstan)
 library(rstantools)
 library(shinyalert)
+library(tibble)
+library(stats)
+library(graphics)
+library(ggplot2)
 library(akima)
 library(DBI)
 library(RPostgres)
+
 
 
 
@@ -392,6 +397,7 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
       select(from) %>%
       unique() %>%
       arrange(desc(from))
+
     colnames(cow_choices) <- paste0(length(cow_choices[[1]]), " cows with data in date and cd range")
 
     # update widget
