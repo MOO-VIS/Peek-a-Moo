@@ -1,13 +1,13 @@
 library(shinymanager)
 
-# passphrase <- Sys.getenv("PASSPHRASE")
+passphrase <- Sys.getenv("PASSPHRASE")
 
-credentials <- data.frame(
-  user = c("guest", "user", "admin"), # mandatory
-  password = c("guest", "shiny", "shinymanager"), # mandatory
-  admin = c(FALSE, FALSE, TRUE),
-  stringsAsFactors = FALSE
-)
+# credentials <- data.frame(
+#   user = c("guest", "user", "admin"), # mandatory
+#   password = c("guest", "shiny", "shinymanager"), # mandatory
+#   admin = c(FALSE, FALSE, TRUE),
+#   stringsAsFactors = FALSE
+# )
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     credentials
-      # "../auth/database.sqlite",
-      # passphrase = passphrase
+     # credentials
+      "../auth/database.sqlite",
+      passphrase = passphrase
     )
   )
 

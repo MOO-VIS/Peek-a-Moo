@@ -24,6 +24,7 @@ library(DBI)
 library(RPostgres)
 
 
+
 # load in plot/table creation scripts
 source("../R/notifications.R")
 source("../R/behaviour.R")
@@ -37,37 +38,46 @@ source("../R/FAQ.R")
 
 
 
-# # download data from GCP
-# gcs_auth(json_file = '../auth/peek-a-moo.json')
-# 
-# gcs_global_bucket("peek-a-moo-data")
-# 
-# objects <- gcs_list_objects()
-# download_list <- grep("*.Rda", objects$name, value = TRUE)
-# 
-# if (!dir.exists("../data/")) {
-#   dir.create("../data/")
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
-# 
-# check_files = list.files('../data/')
-# 
-# if (!length(check_files) > 0) {
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
+# download data from GCP
+gcs_auth(json_file = '../auth/peek-a-moo.json')
+
+gcs_global_bucket("peek-a-moo-data")
+
+objects <- gcs_list_objects()
+download_list <- grep("*.Rda", objects$name, value = TRUE)
+
+if (!dir.exists("../data/")) {
+  dir.create("../data/")
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
+
+check_files = list.files('../data/')
+
+if (!length(check_files) > 0) {
+  map(download_list, function(x) gcs_get_object(x,
+    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+    overwrite = TRUE))
+}
+
+
 
 # use environment variable
 Postgres_user <- Sys.getenv("Postgres_user")
 Postgres_password <- Sys.getenv("Postgres_password")
+Postgres_host <- Sys.getenv("Postgres_host")
+Postgres_dbname <- Sys.getenv("Postgres_dbname")
+Postgres_timezone <- Sys.getenv("Postgres_timezone")
 
-# connect the PostgreSQL
-con <-  dbConnect(RPostgres::Postgres(), user=Postgres_user, password=Postgres_password,
-                  host="localhost", port=5432, dbname="postgres", timezone="America/Los_Angeles")
 
+con <-  dbConnect(RPostgres::Postgres(), 
+                  user=Postgres_user, 
+                  password=Postgres_password,
+                  host=Postgres_host, 
+                  port=5432, 
+                  dbname=Postgres_dbname, 
+                  timezone=Postgres_timezone)
 
 master_feed_replacement_all <- tbl(con,"master_feed_replacement_all") %>%
   as.data.frame()
