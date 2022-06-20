@@ -15,7 +15,7 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-    #  credentials
+     # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -297,46 +297,6 @@ server <- function(input, output, session) {
     # check for erroneous start date
     if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
       output$network_plot <- visNetwork::renderVisNetwork({
-        validate(
-          need(
-            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
-            paste0(
-              "Ending date must come after the starting date. Please select a different starting date."
-            )
-          )
-        )
-      })
-      output$feeding_plot <- visNetwork::renderVisNetwork({
-        validate(
-          need(
-            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
-            paste0(
-              "Ending date must come after the starting date. Please select a different starting date."
-            )
-          )
-        )
-      })
-      output$neighbour_plot <- visNetwork::renderVisNetwork({
-        validate(
-          need(
-            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
-            paste0(
-              "Ending date must come after the starting date. Please select a different starting date."
-            )
-          )
-        )
-      })
-      output$lying_plot <- visNetwork::renderVisNetwork({
-        validate(
-          need(
-            input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
-            paste0(
-              "Ending date must come after the starting date. Please select a different starting date."
-            )
-          )
-        )
-      })
-      output$network_disp_plot <- visNetwork::renderVisNetwork({
         validate(
           need(
             input$relationship_date_range[[1]] < input$relationship_date_range[[2]],
@@ -651,6 +611,12 @@ server <- function(input, output, session) {
           )
         )
       })
+    } else if (!(is.null(missing_date_range_check_plotly(input$relationship_date_range,
+                                                         df = raw_graph_data
+    )))) {
+      output$elo_plot <- missing_date_range_check_plotly(input$relationship_date_range,
+                                                         df = raw_graph_data
+      )
     } else {
       if (input$relationship_network_selection == "Displacement") {
         output$elo_plot <- renderPlotly({
