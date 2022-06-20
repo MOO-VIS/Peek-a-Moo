@@ -127,20 +127,18 @@ missing_date_range_check_plotly <- function(date_range, df = NULL) {
   `%!in%` <- Negate(`%in%`)
   df_dates <- sort(unique(df$Date))
   
-  if (date_range[[1]] %!in% df_dates && date_range[[2]] == date_range[[1]]) {
-    error_messagep1 <- renderPlotly({
+if (date_range[[1]] == date_range[[2]]) {
+    error_messagep3 <- renderPlotly({
       validate(
         need(
-          date_range[[1]] %in% df_dates,
+          date_range[[1]] != date_range[[2]],
           paste0(
-            "There is no data for the selected date ",
-            date_range[[1]],
-            ". Please select a different date."
+            "Plot cannot generate for a single day. Please select a timeline with more than a single date."
           )
         )
       )
     })
-    return(error_messagep1)
+    return(error_messagep3)
   } else if (date_range[[2]] %!in% df_dates) {
     error_messagep2 <- visNetwork::renderVisNetwork({
       validate(
