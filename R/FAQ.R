@@ -72,7 +72,7 @@ about_FAQ <- function(){
     tags$p("Guided by Borbala Foris and Sky Cheng, researchers with the UBC Animal Welfare Program, this dashboard was created as part of a capstone project for the ",
            tags$a("UBC Master of Data Science",
                   href = "https://masterdatascience.ubc.ca/"),
-           " program. The dashboard was first started in 2021 by Sasha Babicki, Elanor Boyle-Stanley, Steffen Pentelow, Ify Anene, Rafael P.H. and Selma. It was further contributed to in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu."
+           " program. The dashboard was first started in 2021 by Ifeanyi Anene, Sasha Babicki, Ela Bandari, Elanor Boyle-Stanley, Selma Durić, Rafael Hellwig, and Steffen Pentelow. It was further contributed to in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu."
     )
   )
 }
