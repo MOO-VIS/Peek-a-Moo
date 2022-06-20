@@ -240,7 +240,24 @@ relationships_tab <- tabItem(
         width = 6,
         output_fun = visNetworkOutput
       ),
-      default_tabBox("Dominance", "elo", width = 6)
+      default_tabBox(
+        title = p(
+        "Dominance",
+        tags$style(type = "text/css", "#button_Dominance_plot{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_Dominance_plot",
+                 label = "", icon = icon("info-circle", lib = "font-awesome"),
+                 size = "extra-small"
+        )
+      ),
+      "elo",
+      width = 6,
+      popover = bsPopover(
+        id = "button_Dominance_plot", title = "Dominance",
+        content = 
+          paste("The plot shown for the full Displacement network, (most and least dominant Cows), is calculated as the cows with the maximum and minimum average elo for the selected period."),
+        placement = "right",
+        trigger = "hover",
+        options = list(container = "body")))
     )
   ),
   fluidRow(
