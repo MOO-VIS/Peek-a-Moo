@@ -1,13 +1,13 @@
 library(shinymanager)
 
-passphrase <- Sys.getenv("PASSPHRASE")
+# passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
+credentials <- data.frame(
+  user = c("guest", "user", "admin"), # mandatory
+  password = c("guest", "shiny", "shinymanager"), # mandatory
+  admin = c(FALSE, FALSE, TRUE),
+  stringsAsFactors = FALSE
+)
 
 # Set up shiny server
 server <- function(input, output, session) {
@@ -15,9 +15,9 @@ server <- function(input, output, session) {
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-      # credentials
-      "../auth/database.sqlite",
-      passphrase = passphrase
+      credentials
+      # "../auth/database.sqlite",
+      # passphrase = passphrase
     )
   )
 
@@ -643,6 +643,12 @@ server <- function(input, output, session) {
                    input$relationship_date_range[[1]],
                    input$relationship_date_range[[2]]
           ) %>%
+            layout(legend = list(
+              orientation = "h",
+              x = 0,
+              y = -0.2
+            )
+            ) %>%
             config(modeBarButtonsToRemove = config)
         })
         
@@ -678,6 +684,12 @@ server <- function(input, output, session) {
             cow_id_1 = cow_id_1,
             cow_id_2 = cow_id_2
           ) %>%
+            layout(legend = list(
+              orientation = "h",
+              x = 0,
+              y = -0.2
+            )
+            ) %>%
             config(modeBarButtonsToRemove = config)
         })
 

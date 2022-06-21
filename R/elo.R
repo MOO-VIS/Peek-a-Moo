@@ -42,19 +42,30 @@ plot_elo <- function(x, start_date, end_date) {
     ungroup()
   
   df <- bind_rows(
-    df %>% slice_max(Elo_mean, n = 2),
-    df %>% slice_min(Elo_mean, n = 2),
-  )
-    
+    df %>% slice_max(Elo_mean, n = 1),
+    df %>% slice_min(Elo_mean, n = 1),
+  ) %>%
+    mutate(Color = case_when(
+      Elo_mean == max(Elo_mean) ~ "#F7766D",
+      Elo_mean == min(Elo_mean) ~ "#6fa8dc"
+      # ), 
+      #   Elo_Group = case_when(
+      #   Elo_mean == max(Elo_mean) ~ "Highest Mean",
+      #   Elo_mean == min(Elo_mean) ~ "Lowest Mean"
+    ))
   
-  plot <- ggplot(df, aes(x = Date, y = Elo, colour = Cow)) +
+  colors <- unique(df %>%
+                     select(Cow, Color))
+  
+  plot <- ggplot(df, aes(x = Date, y = Elo, color = Cow)) +
     geom_line() +
     scale_x_date(date_labels = "%d-%B-%y") +
+    scale_color_manual(name = "Cow", values = colors$Color, labels = unique(df$Cow)) +
     labs(x = 'Date', 
          y = 'Elo Rating',
          title = paste0('Daily Dominance Score of Cow ')) +
     ylim(min(x$Elo), max(x$Elo)) +
-    theme_classic() + theme(legend.position = "right")
+    theme_classic() + theme(legend.position = "bottom")
   
   ggplotly(plot)
 }
@@ -111,7 +122,7 @@ plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 =
          y = 'Elo Rating',
          title = paste0('Daily Dominance Score of Cow ', cow_id_1, ' vs. ', cow_id_2)) +
     ylim(min(x$Elo), max(x$Elo)) +
-    theme_classic() + theme(legend.position = "right")
+    theme_classic() + theme(legend.position = "bottom")
   
   ggplotly(plot)
 }
