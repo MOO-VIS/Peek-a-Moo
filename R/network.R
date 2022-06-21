@@ -29,7 +29,7 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
     ) %>%
     visEdges(
       smooth = list(enabled = TRUE, type = "horizontal"),
-      color = list(color = "#D3D3D3", highlight = "#ffcc66", hover = "#2B7CE9")
+      color = list(color = "#D3D3D3", highlight = "#ffaa00", hover = "#2B7CE9")
     ) %>%
     visInteraction(
       hover = TRUE,
@@ -64,7 +64,7 @@ nodes_edges_list_synchronicity <- function(raw_graph_data,
     threshold_selected
   )
   
-  g <- .make_tidygraph(raw_graph_data, edges)
+  g <- .make_tidygraph(edges)
   deg <- degree(g)
   size <- deg / max(deg) * 40
   
@@ -89,7 +89,7 @@ plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
     visNodes(
       shape = "dot",
       color = list(
-        highlight = list(background = "#ffcc66", border = "darkred")
+        highlight = list(background = "#ffaa00", border = "darkred")
       )
     ) %>%
     visEdges(
@@ -139,17 +139,18 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
   to_date <- to_date %||% Inf
 
   # combine list into one long data frame
-  edgelist <- x %>%
-    purrr::map_df(adjacency_to_long, .id = "date") %>%
-    dplyr::mutate(dplyr::across(date, as.Date)) %>%
-    rename(weight = value) %>%
+  edgelist <- tbl(con,x) %>%
+    # purrr::map_df(adjacency_to_long, .id = "date") %>%
+    # dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    # rename(weight = value) %>%
     filter(
       date >= from_date,
       date <= to_date
     ) %>%
     group_by(from, to) %>%
     summarise(weight = sum(weight, na.rm = TRUE)) %>%
-    ungroup() 
+    ungroup() %>%
+    as.data.frame()
   
   if (threshold != 0) {
     edgelist <- edgelist %>%
@@ -199,23 +200,18 @@ combine_replace_df <- function(x,
   CD_min <- CD_min %||% 0
   CD_max <- CD_max %||% 1
   
-  combo_df <- as.data.frame(x) %>%
-    mutate(date = as.Date(date)) %>%
-    rename(
-      CD = occupied_bins_with_feed_percent,
-      from = Actor_cow,
-      to = Reactor_cow
-    ) %>%
-    select(date, from, to, CD) %>%
+  combo_df <- tbl(con,x) %>%
     filter(
       date >= from_date,
       date <= to_date,
       CD <= CD_max,
       CD >= CD_min
     ) %>%
+    as.data.frame() %>%
     group_by(from, to) %>%
     summarise(weight = n()) %>%
     ungroup()
+    
 }
 
 combine_replace_edges <- function(x,
@@ -273,20 +269,16 @@ combine_replace_edges_star <- function(x,
   CD_min <- CD_min %||% 0
   CD_max <- CD_max %||% 1
 
-  combo_df <- as.data.frame(x) %>%
-    mutate(date = as.Date(date)) %>%
-    rename(
-      CD = occupied_bins_with_feed_percent,
-      from = Actor_cow,
-      to = Reactor_cow
-    ) %>%
-    select(date, from, to, CD) %>%
+  combo_df <- tbl(con,x) %>%
     filter(
       date >= from_date,
       date <= to_date,
-      (from == cow_id) | (to == cow_id),
       CD <= CD_max,
       CD >= CD_min
+    ) %>%
+    as.data.frame() %>%
+    filter(
+      (from == cow_id) | (to == cow_id)
     ) %>%
     group_by(from, to) %>%
     summarise(weight = n()) %>%
@@ -320,14 +312,15 @@ combine_nodes <- function(df,
                           from_date = NULL,
                           to_date = NULL, 
                           size) {
-  df <- df %>%
-    purrr::map_df(adjacency_to_long, .id = "date") %>%
-    dplyr::mutate(dplyr::across(date, as.Date)) %>%
-    rename(weight = value) %>%
+  df <- tbl(con,df) %>%
+    # purrr::map_df(adjacency_to_long, .id = "date") %>%
+    # dplyr::mutate(dplyr::across(date, as.Date)) %>%
+    # rename(weight = value) %>%
     filter(
       date >= from_date,
       date <= to_date
-    )
+    ) %>%
+    as.data.frame()
   
   nodes <- data.frame(id = unique(c(
     df$from,
@@ -406,7 +399,7 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
         id != cow_id ~ "#2B7CE9"
       ),
       color.hover.background = case_when(
-        id == cow_id ~ "#ffcc66",
+        id == cow_id ~ "#ffaa00",
         id != cow_id ~ "#D2E5FF"
       ),
       color.hover.border = case_when(
@@ -480,8 +473,8 @@ combine_elo_star <- function(from_date = NULL,
     ))
 }
 
-.make_tidygraph <- function(x, edgelist = NULL, directed = FALSE) {
-  edgelist <- edgelist %||% combine_data(x)
+.make_tidygraph <- function(edgelist = NULL, directed = FALSE) {
+  edgelist <- edgelist
   g <- graph_from_data_frame(edgelist, directed = directed)
 
   # return the graph
@@ -529,14 +522,16 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 #'
 #' @return error_message if there is a date input issue that needs to stop the graph generation
 missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
+  
   `%!in%` <- Negate(`%in%`)
-
-  if (!(network %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
-    df_dates <- names(df)
-    df_dates <- as.Date(df_dates, format = "%Y-%m-%d")
-  } else {
-    df_dates <- unique(df$date)
-  }
+  
+  df <-  tbl(con,df) %>%
+    select(date) %>%
+    distinct() %>%
+    arrange(date) %>%
+    as.data.frame()
+  df_dates <- sort(unique(df$date))
+  
   if (date_range[[1]] %!in% df_dates && date_range[[2]] == date_range[[1]]) {
     error_message1 <- visNetwork::renderVisNetwork({
       validate(
@@ -569,7 +564,7 @@ missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
     if (date_range[[1]] %!in% df_dates) {
       showNotification(
         type = "warning",
-        paste0("Date range contains days with missing data.")
+        paste0("Date range contains days with missing data: Social Network.")
       )
     }
     if (date_range[[1]] %in% df_dates && date_range[[2]] %in% df_dates) {
@@ -583,7 +578,7 @@ missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
       if (all(range_days %in% range_of_df) == FALSE) {
         showNotification(
           type = "warning",
-          paste0("Date range contains days with missing data.")
+          paste0("Date range contains days with missing data: Social Network.")
         )
       }
     }

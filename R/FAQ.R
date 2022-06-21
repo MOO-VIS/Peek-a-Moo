@@ -27,7 +27,7 @@ methodologies_FAQ <- function(){
             tags$a("ggplot2 ",
                    href = "https://github.com/tidyverse/ggplot2/blob/HEAD/R/plot.r"),
             "packages. The plot shows the daily max, min and average THI values over a given timeline, with the grey dashed line representing the threshold for when cows go into \"heat stress\". The value boxes above show the total max, min, and average THI for the given period."),
-    tags$u(tags$b( "Activity Patterns")),
+    tags$u(tags$b( "Behaviour Patterns")),
     tags$li(tags$b("All plots:"),
             "Created with the ",
             tags$a("Plotly ",
@@ -72,7 +72,7 @@ about_FAQ <- function(){
     tags$p("Guided by Borbala Foris and Sky Cheng, researchers with the UBC Animal Welfare Program, this dashboard was created as part of a capstone project for the ",
            tags$a("UBC Master of Data Science",
                   href = "https://masterdatascience.ubc.ca/"),
-           " program. The dashboard was first started in 2021 by Sasha Babicki, Elanor Boyle-Stanley, Steffen Pentelow, Ify Anene, Rafael P.H. and Selma. It was further contributed to in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu."
+           " program. The dashboard was first started in 2021 by Ifeanyi Anene, Sasha Babicki, Ela Bandari, Elanor Boyle-Stanley, Selma Durić, Rafael Hellwig, and Steffen Pentelow. It was further contributed to in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu."
     )
   )
 }
@@ -112,7 +112,7 @@ statistical_FAQ <- function(){
                    tags$em("initiating a download of the report."))),
     tags$p("The full statistical analysis and code can also be viewed within its separate repo ",
            tags$a("here.",
-                  href = "https://github.com/UBC-AWP/Peek-a-Moo"))
+                  href = "https://github.com/UBC-AWP/Bayesian-analysis"))
   )
 }
 
