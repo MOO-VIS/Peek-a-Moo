@@ -254,7 +254,7 @@ relationships_tab <- tabItem(
       popover = bsPopover(
         id = "button_Dominance_plot", title = "Dominance",
         content = 
-          paste("The plot shown for the full Displacement network, (most and least dominant Cows), is calculated as the cows with the maximum and minimum average elo for the selected period."),
+          paste("The plot shown for the full Displacement network, (most and least dominant cows), is calculated as the cows with the maximum and minimum average elo for the selected period."),
         placement = "right",
         trigger = "hover",
         options = list(container = "body")))
