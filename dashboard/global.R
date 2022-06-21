@@ -80,7 +80,6 @@ lying_standing_summary_by_date <- tbl(con,"lying_standing_summary_by_date") %>%
 master_summary <- tbl(con,"master_summary") %>%
   as.data.frame()
 
-
 # load data if not already in memory
 if (!exists("THI")) {
 
