@@ -81,6 +81,6 @@ jobs:
 
       env:
         HD_PASSPHRASE: ${{secrets.SHINYMANAGER_PASSPHRASE}}
-        POSTGRES_USER: ${{secrets.POSTGRES_USER}}
-        POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-        POSTGRES_HOST: ${{secrets. POSTGRES_HOST}}
+        HD_POSTGRES_USER: ${{secrets.POSTGRES_USER}}
+        HD_POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+        HD_POSTGRES_HOST: ${{secrets. POSTGRES_HOST}}
