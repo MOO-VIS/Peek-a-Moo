@@ -341,66 +341,67 @@ server <- function(input, output, session) {
             
             ## render R markdown file
             
-            output$downloadReport <- downloadHandler(
-              filename = function() {
-                paste0("Cow_",
-                      input$analysis_cow_id,
-                      "_",
-                      input$relationship_date_range[[1]],
-                      "_to_",
-                      input$relationship_date_range[[2]],
-                      '_neighbor_count_report', 
-                      '.', 
-                      switch(
-                  input$analysis_format, PDF = 'pdf', HTML = 'html'
-                        )
-                      )
-                },
-              
-              content = function(file) {
-                src1 <- normalizePath('report.Rmd')
-                src2 <- normalizePath('reference.bib')
-                src3 <- normalizePath('neighbour_report.tex')
-                
-                # temporarily switch to the temp dir, in case you do not have write
-                # permission to the current working directory
-                owd <- setwd(tempdir())
-                on.exit(setwd(owd))
-                file.copy(src1, 'report.Rmd', overwrite = TRUE)
-                file.copy(src2, 'reference.bib', overwrite = TRUE)
-                file.copy(src3, 'neighbour_report.tex', overwrite = TRUE)
-                
-                from_date_neighbour <- input$relationship_date_range[[1]]
-                to_date_neighbour <- input$relationship_date_range[[2]] 
-                Feeding_drinking_neighbour_bout <- tbl(con,"Feeding_drinking_neighbour_bout") %>%
-                  filter(
-                    date >= !!(from_date_neighbour),
-                    date <= !!(to_date_neighbour)
-                  ) %>%
-                  as.data.frame()
-                # Set up parameters to pass to Rmd document
-                params <- list(
-                  data = Feeding_drinking_neighbour_bout,
-                  cow_id = input$analysis_cow_id, 
-                  date_range = input$relationship_date_range
-                )
-                # Knit the document, passing in the `params` list, and eval it in a
-                # child of the global environment (this isolates the code in the document
-                # from the code in this app).
-                out <- rmarkdown::render(
-                  'report.Rmd', 
-                  switch(
-                    input$analysis_format,
-                    PDF = pdf_document(fig_caption = TRUE,        
-                                       includes = includes(in_header =  "neighbour_report.tex")), 
-                    HTML = html_document(toc = TRUE)
-                  ),
-                  params = params,
-                  envir = new.env(parent = globalenv())
-                )
-                file.rename(out, file)
-              }
-            )
+            # output$downloadReport <- downloadHandler(
+            #   filename = function() {
+            #     paste0("Cow_",
+            #           input$analysis_cow_id,
+            #           "_",
+            #           input$relationship_date_range[[1]],
+            #           "_to_",
+            #           input$relationship_date_range[[2]],
+            #           '_neighbor_count_report', 
+            #           '.', 
+            #           switch(
+            #       input$analysis_format, PDF = 'pdf', HTML = 'html'
+            #             )
+            #           )
+            #     },
+            #   
+            #   content = function(file) {
+            #     src1 <- normalizePath('report.Rmd')
+            #     src2 <- normalizePath('reference.bib')
+            #     src3 <- normalizePath('neighbour_report.tex')
+            #     
+            #     # temporarily switch to the temp dir, in case you do not have write
+            #     # permission to the current working directory
+            #     owd <- setwd(tempdir())
+            #     on.exit(setwd(owd))
+            #     file.copy(src1, 'report.Rmd', overwrite = TRUE)
+            #     file.copy(src2, 'reference.bib', overwrite = TRUE)
+            #     file.copy(src3, 'neighbour_report.tex', overwrite = TRUE)
+            #     
+            #     from_date_neighbour <- input$relationship_date_range[[1]]
+            #     to_date_neighbour <- input$relationship_date_range[[2]] 
+            #     Feeding_drinking_neighbour_bout <- tbl(con,"Feeding_drinking_neighbour_bout") %>%
+            #       filter(
+            #         date >= !!(from_date_neighbour),
+            #         date <= !!(to_date_neighbour)
+            #       ) %>%
+            #       as.data.frame()
+            #     # Set up parameters to pass to Rmd document
+            #     params <- list(
+            #       data = Feeding_drinking_neighbour_bout,
+            #       cow_id = input$analysis_cow_id, 
+            #       date_range = input$relationship_date_range
+            #     )
+            #     # Knit the document, passing in the `params` list, and eval it in a
+            #     # child of the global environment (this isolates the code in the document
+            #     # from the code in this app).
+            #     out <- rmarkdown::render(
+            #       'report.Rmd', 
+            #       switch(
+            #         input$analysis_format,
+            #         PDF = pdf_document(fig_caption = TRUE,        
+            #                            includes = includes(in_header =  "neighbour_report.tex")), 
+            #         HTML = html_document(toc = TRUE)
+            #       ),
+            #       params = params,
+            #       envir = new.env(parent = globalenv())
+            #     )
+            #     file.rename(out, file)
+            #   }
+            # )
+            
           }
         } else {
           
