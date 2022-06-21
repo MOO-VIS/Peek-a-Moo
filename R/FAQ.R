@@ -101,7 +101,7 @@ data_FAQ <- function(){
 statistical_FAQ <- function(){
   fluidRow(
     h2(paste0('Statistical Analysis')),
-    tags$p("As part of the work on this dashboard, a Bayesian statistical analysis was developed to contribute to the ongoing research of identifying significant social connections and networks amongst cows. Although the analysis is not explicitly included in the dashboard, an example simulation can be run (ONLY if using the dasboard locally)zf by naviagting to:",
+    tags$p("As part of the work on this dashboard, a Bayesian statistical analysis was developed to contribute to the ongoing research of identifying significant social connections and networks amongst cows. Although the analysis is not explicitly included in the dashboard, an example simulation can be run (ONLY if using the dasboard locally) by naviagting to:",
            tags$li(
                    tags$em('Relationships tab'),
                    " → ",
