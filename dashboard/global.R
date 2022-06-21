@@ -44,36 +44,36 @@ source("../R/FAQ.R")
 
 
 # download data from GCP
-gcs_auth(json_file = '../auth/peek-a-moo.json')
+# gcs_auth(json_file = '../auth/peek-a-moo.json')
 
-gcs_global_bucket("peek-a-moo-data")
+# gcs_global_bucket("peek-a-moo-data")
 
-objects <- gcs_list_objects()
-download_list <- grep("*.Rda", objects$name, value = TRUE)
+# objects <- gcs_list_objects()
+# download_list <- grep("*.Rda", objects$name, value = TRUE)
 
-if (!dir.exists("../data/")) {
-  dir.create("../data/")
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
+# if (!dir.exists("../data/")) {
+#   dir.create("../data/")
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
 
-check_files = list.files('../data/')
+# check_files = list.files('../data/')
 
-if (!length(check_files) > 0) {
-  map(download_list, function(x) gcs_get_object(x,
-    saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-    overwrite = TRUE))
-}
+# if (!length(check_files) > 0) {
+#   map(download_list, function(x) gcs_get_object(x,
+#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
+#     overwrite = TRUE))
+# }
 
 
 
 # use environment variable
-Postgres_user <- Sys.getenv("Postgres_user")
-Postgres_password <- Sys.getenv("Postgres_password")
-Postgres_host <- Sys.getenv("Postgres_host")
-Postgres_dbname <- Sys.getenv("Postgres_dbname")
-Postgres_timezone <- Sys.getenv("Postgres_timezone")
+Postgres_user <- Sys.getenv("POSTGRES_USER")
+Postgres_password <- Sys.getenv("POSTGRES_PASSWORD")
+Postgres_host <- Sys.getenv("POSTGRES_HOST")
+Postgres_dbname <- 'cowbonds'
+Postgres_timezone <- 'America/Los_Angeles'
 
 
 con <-  dbConnect(RPostgres::Postgres(), 
