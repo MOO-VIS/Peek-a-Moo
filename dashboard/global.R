@@ -10,10 +10,7 @@ library(shinyWidgets)
 library(plotly)
 library(igraph)
 library(lubridate)
-library(png)
 library(visNetwork)
-library(googleCloudStorageR)
-library(reshape2)
 library(shinyBS)
 library(rmarkdown)
 library(rstan)
@@ -27,9 +24,6 @@ library(akima)
 library(DBI)
 library(RPostgres)
 
-
-
-
 # load in plot/table creation scripts
 source("../R/notifications.R")
 source("../R/behaviour.R")
@@ -37,36 +31,8 @@ source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
 source("../R/bully_analysis.R")
-#source("../R/bins.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
-
-
-
-# download data from GCP
-# gcs_auth(json_file = '../auth/peek-a-moo.json')
-
-# gcs_global_bucket("peek-a-moo-data")
-
-# objects <- gcs_list_objects()
-# download_list <- grep("*.Rda", objects$name, value = TRUE)
-
-# if (!dir.exists("../data/")) {
-#   dir.create("../data/")
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
-
-# check_files = list.files('../data/')
-
-# if (!length(check_files) > 0) {
-#   map(download_list, function(x) gcs_get_object(x,
-#     saveToDisk = paste('../data/', gsub(".*/","",x), sep = ""),
-#     overwrite = TRUE))
-# }
-
-
 
 # use environment variable
 Postgres_user <- Sys.getenv("POSTGRES_USER")
