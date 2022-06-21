@@ -8,6 +8,8 @@ on:
       - 'auth/**'
       - 'README.md'
       - 'LICENSE'
+      - 'CONTRIBUTING.md'
+      - 'CODE_OF_CONDUCT.md'
       - '.gitignore'
       - '.github/workflows/**'
   
