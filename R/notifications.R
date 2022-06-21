@@ -7,7 +7,7 @@
 intake_warnings <- function(df, cuttoff){
   if (is.null(cuttoff)) cuttoff = 0
   
-  convert_date_col(df) %>%
+  df %>%
     mutate(date = as.Date(date)) %>%
     group_by(Cow, date) %>%
     summarise(intake = sum(Intake)) %>%
@@ -20,7 +20,7 @@ intake_warnings <- function(df, cuttoff){
 bin_warnings <- function(df, cuttoff){
   if (is.null(cuttoff)) cuttoff = 0
     
-  convert_date_col(df) %>%
+  df %>%
     mutate(date = as.Date(date)) %>%
     group_by(Bin, date) %>%
     filter(End == max(End)) %>%

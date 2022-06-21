@@ -14,24 +14,8 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
   cow_id <- as.numeric(cow_id)
   date <- as.character(date)
 
-  # Filter feeding, drinking, and lying_standing dataframes keeping only data from the date of interest
-  drinking <- drinking[[date]] %>%
-    mutate(Behaviour = 'drinking') %>%
-    select(Cow, Behaviour, Start, End, Intake)
-  
-  feeding <- feeding[[date]] %>%
-    mutate(Behaviour = 'feeding') %>%
-    select(Cow, Behaviour, Start, End, Intake)
-  
-  lying_standing <- lying_standing %>%
-    filter(floor_date(Start, 'day') == as_date(date) |
-             floor_date(End, 'day') == as_date(date)) %>%
-    mutate(Intake = NA) %>%
-    select(Cow, Behaviour, Start, End, Intake)
-  
-  # Concatenate dataframes and only keep data for the cow of interest.
-  df <- bind_rows(drinking, feeding, lying_standing) %>%
-    filter(Cow %in% cow_id) %>%
+    # Concatenate dataframes and only keep data for the cow of interest.
+  df <- rbind(drinking, feeding, lying_standing) %>%
     mutate(Cow = paste0('Cow ', as.character(Cow))) %>%
     mutate(event_id = row_number()) %>%
     #Trim events starting before the beginning of the day of interest or after the end of the day of interest
