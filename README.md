@@ -24,6 +24,28 @@ c("tidyverse",
 "googleCloudStorageR"))`
 
 # Preparing the codebase to run locally
+
+1. Clone this repo, and add a file called "data" to the repo and include the following files:
+
+  Wali_trial_summarized_THI.Rda
+  Feeding_and_drinking_analysis.Rda
+  data/Insentec_warning.Rda
+  duration_for_each_bout.Rda
+  lying_standing_summary_by_date.Rda
+  synchronized_lying_total_time.Rda
+  Cleaned_drinking_original_data.Rda
+  Cleaned_feeding_original_data.Rda
+  non_nutritive_visits.Rda
+  feed_replacement_10mon_CD.Rda
+  bin_empty_total_time_summary.Rda
+  Feeding_drinking_at_the_same_time_total_time.Rda
+  Feeding_drinking_neighbour_total.Rda
+  Feeding_drinking_neighbour_bout.Rda
+  Replacement_behaviour_by_date.Rda
+  _10-mon__elo_all_replacements_long_noNA.Rda
+
+2. Follow these instructions:
+
 In `dashboard/server.R` comment lines 3, 19 and 20 and uncomment lines 5-10 and 18.
 
 The code should look like this when completed:
