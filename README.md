@@ -36,6 +36,7 @@ The Peek-a-Moo dashboard features five tabs:
   - All displacement networks are plotted along side some kind of plot of Elo.
   - For information on the other customizations, please the info popovers within the app.
   
+![](docs/usage_examples/gifs/networks.gif)
   
   - The THI value boxes show the min, max and average THI for the selected time period, with a timeseries graph below.
 
@@ -50,20 +51,27 @@ The Peek-a-Moo dashboard features five tabs:
 
 The data can be aggregated by day oor by month, using the widgets in the Customization's bar. The herd average is shown in red for comparison.
 
+![](docs/usage_examples/gifs/behaviour.gif)
+
 **Daily Behaviour**
 - This showcases the feeding, drinking, standing and lying timeline of selected cows for a given day, with the average for those behaviours displayed above the plot.
+
+![](docs/usage_examples/gifs/daily_behaviour.gif)
 
 **Warnings**
 - This tab shows warnings detected about the data collection.
 
+![](docs/usage_examples/gifs/warnings.gif)
+
 **FAQ**
 - This tab gives a background for the dashboard, methodology and package information, references, and a citation guide.
 
+![](docs/usage_examples/gifs/FAQ.gif)
 ## Usage
 
 The app is designed to be intuitive with helpful pop-over information integrated throughout. There are also dyanmic error messages and warning flags to assist the user experience.
 
-For usage examples and videos, please visit this [link](https://github.com/UBC-AWP/Peek-a-Moo/blob/main/usage_examples)
+For usage example videos, please visit this link:
 
 ## The Data
 
@@ -100,7 +108,7 @@ The Peek-a-Moo dashborad is licensed under the terms of the MIT license, full de
 
 2. Follow these instructions:
 
-Delete and replace all the code in the `global.R`, `server.R`, and `network.R` files in the dashboard folder, with the code in the following files from the `local_resouces` folder:
+Delete and replace all the code in the `global.R`, `server.R`, and `network.R` files in the dashboard folder, with the code in the following files from the `docs/local_resouces` folder:
 
 - replace `global.R` code with the code in `local-global.R`
 - replace `server.R` code with the code in `local-server.R` 
@@ -147,9 +155,10 @@ Peek-a-Moo/
 │   ├── notifications.R
 │   └── THI_analysis.R
 └── local_resources/
-    ├── local-global.R
-    ├── local-server.R
-    ├── local-network.R
+    └── docs/
+       ├── local-global.R
+       ├── local-server.R
+       └── local-network.R
 ```
 
 ## Questions?
