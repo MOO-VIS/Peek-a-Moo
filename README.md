@@ -145,7 +145,6 @@ Peek-a-Moo/
 │   └── _10-mon__elo_all_replacements_long_noNA.Rda
 └── R/
 │   ├── activites.R
-│   ├── bins.R
 │   ├── bully_analysis.R
 │   ├── daily_behavior.R
 │   ├── elo.R
