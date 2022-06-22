@@ -8,16 +8,13 @@
 Thank you for visiting the Peek-a-Moo app project repository. Link to our app here: [Peek-a-Moo](https://peek-a-moo.herokuapp.com/)
 
 ## Background
-### Problem
-
+**Problem**
 Cows have been shown to lead very complex social and emotional lives, things that directly effect their well being. Research that analyzes cow behaviour is of growing relevance as it's essential to understanding their needs. 
 
-### Solution
+**Solution**
+With the goal of improving the lives of animals through research, and education, the UBC Animal Welfare Program's (AWP) current area of research looks at how the information collected from farming technology can be used to inform decisions to improve dairy cow welfare. The Peek-a-Moo dashboard visualizes this data, allowing for social networking and behavioural analysis to be conducted in an easy and accessible way. 
 
-With the goal of improving the lives of animals through research, and education, the UBC Animal Welfare Program's (AWP) current area of research looks at how the information collected from farming technology can be used to inform decisions to improve dairy cow welfare. The Peek-a-Moo dashboard allows this data to be visualized, allowing for social networking and behavioural analysis to be conducted in an easy and accessible way. 
-
-### Who are we?
-
+**Who are we?**
 Guided by Borbala Foris and Sky Cheng, researchers with the AWP, this dashboard was first created as a volunteer project in 2021 by Ifeanyi Anene, Sasha Babicki, Ela Bandari, Elanor Boyle-Stanley, Selma Durić, Rafael Hellwig, and Steffen Pentelow. It was then expanded upon as part of a capstone project for the [UBC Master of Data Science](https://masterdatascience.ubc.ca/) program in 2022 by Allyson Stoll, Kristin Bunyan, Chaoran Wang, and Jiwei Hu.
 
 ## Access
@@ -83,7 +80,7 @@ The data was collected using various Instantec and HOBO smart technology within 
 
 ## License
 
-The Peek-a-Moo dashborad is licensed under the terms of the MIT license, full details [here](https://github.com/UBC-AWP/Peek-a-Moo/blob/main/LICENSE)
+The Peek-a-Moo dashboard is licensed under the terms of the MIT license, full details [here](https://github.com/UBC-AWP/Peek-a-Moo/blob/main/LICENSE)
 
 # Running the app locally
 
