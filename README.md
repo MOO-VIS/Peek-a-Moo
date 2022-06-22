@@ -68,7 +68,7 @@ The data can be aggregated by day oor by month, using the widgets in the Customi
 
 The app is designed to be intuitive with helpful pop-over information integrated throughout. There are also dyanmic error messages and warning flags to assist the user experience.
 
-For usage example videos, please visit this link:
+For a usage example video of the dashboard, please visit this [link](https://www.youtube.com/watch?v=m35yaKY-6vw)
 
 ## The Data
 
@@ -82,7 +82,7 @@ The data was collected using various Instantec and HOBO smart technology within 
 
 The Peek-a-Moo dashboard is licensed under the terms of the MIT license, full details [here](https://github.com/UBC-AWP/Peek-a-Moo/blob/main/LICENSE)
 
-# Running the app locally
+## Running the app locally
 
 1. Clone this repo, add a file called "data" to the repo and include the following files:
 
