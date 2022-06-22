@@ -12,7 +12,7 @@ Thank you for visiting the Peek-a-Moo app project repository. Link to our app he
 
 Cows have been shown to lead very complex social and emotional lives, things that directly effect their well being. Research that analyzes cow behaviour is of growing relevance as it's essential to understanding their needs. 
 
-###Solution
+### Solution
 
 With the goal of improving the lives of animals through research, and education, the UBC Animal Welfare Program's (AWP) current area of research looks at how the information collected from farming technology can be used to inform decisions to improve dairy cow welfare. The Peek-a-Moo dashboard allows this data to be visualized, allowing for social networking and behavioural analysis to be conducted in an easy and accessible way. 
 
@@ -89,6 +89,7 @@ The Peek-a-Moo dashborad is licensed under the terms of the MIT license, full de
 
 1. Clone this repo, add a file called "data" to the repo and include the following files:
 
+```
   Wali_trial_summarized_THI.Rda
   Feeding_and_drinking_analysis.Rda
   Insentec_warning.Rda
@@ -105,20 +106,20 @@ The Peek-a-Moo dashborad is licensed under the terms of the MIT license, full de
   Feeding_drinking_neighbour_bout.Rda
   Replacement_behaviour_by_date.Rda
   _10-mon__elo_all_replacements_long_noNA.Rda
+```
 
 2. Follow these instructions:
 
-Delete and replace all the code in the `global.R`, `server.R`, and `network.R` files in the dashboard folder, with the code in the following files from the `docs/local_resouces` folder:
+- Delete and replace all the code in the `global.R`, `server.R`, and `network.R` files in the dashboard folder, with the code in the following files from the `docs/local_resouces` folder:
 
-- replace `global.R` code with the code in `local-global.R`
-- replace `server.R` code with the code in `local-server.R` 
-- replace `network.R` code with the code in `local-network.R` 
+  - replace `global.R` code with the code in `local-global.R`
+  - replace `server.R` code with the code in `local-server.R` 
+  - replace `network.R` code with the code in `local-network.R` 
 
-Then uncomment all the code that was just copied over, save each file, then from the root directory `Peek-a-Moo/`, run:
+- Then uncomment all the code that was just copied over, save each file, then from the root directory `Peek-a-Moo/`, run:
+  - `shiny::runApp("dashboard")`
 
-`shiny::runApp("dashboard")`
-
-For clarity, at a minimum, the following file structure is needed to run the app locally:
+- For clarity, at a minimum, the following file structure is needed to run the app locally:
 
 ```
 Peek-a-Moo/
