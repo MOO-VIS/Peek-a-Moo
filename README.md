@@ -66,7 +66,7 @@ The data can be aggregated by day oor by month, using the widgets in the Customi
 ![](docs/usage_examples/gifs/FAQ.gif)
 ## Usage
 
-The app is designed to be intuitive with helpful pop-over information integrated throughout. There are also dyanmic error messages and warning flags to assist the user experience.
+The app is designed to be intuitive with helpful pop-over information integrated throughout. There are also dynamic error messages and warning flags to assist the user experience.
 
 For a usage example video of the dashboard, please visit this [link](https://www.youtube.com/watch?v=m35yaKY-6vw)
 
