@@ -181,6 +181,20 @@ relationships_tab <- tabItem(
         column(4, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       bsPopover(
+        id = "button_network_info", title = "Network Decriptions",
+        content = paste(
+          "<b>Neighbours</b> - Cows who feed and drink directly beside each other.",
+          "<b>Synchronicity</b> - Split into two networks, this showcases networks of cows who stand and lie at the same time.",
+          "<b>Displacement</b> - Displacement is an instance of a cow replacing another cow at the same feeder within a time frame of 23 seconds or less. This network showcases that type of interaction between cows.",
+          "<b>Displacement Star*</b> - An indiviual cows displacement interactions.",
+          "<b>Displacement Paired</b> - A pair of cows displacement interactions.",
+          sep = "<br>"
+        ),
+        placement = "right",
+        trigger = "hover",
+        options = list(container = "body")
+      ),
+      bsPopover(
         id = "button_global_network", title = "Global Network Customizations",
         content = paste(
           "<b>Customizations:</b>",
@@ -506,7 +520,7 @@ ui <- secure_app(ui,
     border-color: #6b96c7;
 }")),
       tags$p(
-        "For any questions, please contact ",
+        "For any questions, please contact the ",
         tags$a(
           href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
           target = "_top", "administrator"

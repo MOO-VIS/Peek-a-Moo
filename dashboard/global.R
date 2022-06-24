@@ -263,7 +263,11 @@ cow_selection_widget <- function(inputId, multiple = TRUE, label = "Cows") {
 network_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
-    label = "Network",
+    label = p(
+      "Network",
+      tags$style(type = "text/css", "#button_network_info{border-radius: 0px;border-width: 0px}"),
+      bsButton("button_network_info", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+    ),
     choices = c("Neighbour", "Synchronicity", "Displacement", "Displacement Star*", "Displacement Paired"),
     selected = NULL,
     multiple = multiple,
