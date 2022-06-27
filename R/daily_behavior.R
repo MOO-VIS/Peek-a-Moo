@@ -8,43 +8,45 @@
 #'
 #' @return a formatted data table for plotting
 #'
-#' @examples 
-#' daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = 6047, date = '2020-07-15')
+#' @examples
+#' daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = 6047, date = "2020-07-15")
 daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, date) {
   cow_id <- as.numeric(cow_id)
   date <- as.character(date)
 
-    # Concatenate dataframes and only keep data for the cow of interest.
+  # Concatenate dataframes and only keep data for the cow of interest.
   df <- rbind(drinking, feeding, lying_standing) %>%
-    mutate(Cow = paste0('Cow ', as.character(Cow))) %>%
+    mutate(Cow = paste0("Cow ", as.character(Cow))) %>%
     mutate(event_id = row_number()) %>%
-    #Trim events starting before the beginning of the day of interest or after the end of the day of interest
+    # Trim events starting before the beginning of the day of interest or after the end of the day of interest
     mutate(Start = case_when(
-      floor_date(Start, 'day') < as.POSIXct(date, tz = 'America/Los_Angeles') ~
-        as.POSIXct(date, tz = 'America/Los_Angeles'),
+      floor_date(Start, "day") < as.POSIXct(date, tz = "America/Los_Angeles") ~
+        as.POSIXct(date, tz = "America/Los_Angeles"),
       TRUE ~ Start
     )) %>%
     mutate(End = case_when(
-      floor_date(End, 'day') > as.POSIXct(date, tz = 'America/Los_Angeles') ~
-        as.POSIXct(paste0(date, ' 23:59:59'), tz = 'America/Los_Angeles'),
+      floor_date(End, "day") > as.POSIXct(date, tz = "America/Los_Angeles") ~
+        as.POSIXct(paste0(date, " 23:59:59"), tz = "America/Los_Angeles"),
       TRUE ~ End
     )) %>%
-    pivot_longer(cols = Start:End,
-                 names_to = 'StartEnd',
-                 values_to = 'Time')
-  
+    pivot_longer(
+      cols = Start:End,
+      names_to = "StartEnd",
+      values_to = "Time"
+    )
+
   # Create new dataframe with an extra row inserted between each event.  Extra row contains Time=NA and Cow=NA.  These rows are required to ensure breaks between line segments are displayed during plotting
-  df_blanks = df[1, ]
+  df_blanks <- df[1, ]
   for (i in seq(from = 2, to = nrow(df))) {
     df_blanks <- rbind(df_blanks, df[i, ])
     if (i %% 2 == 0) {
-      narow = df[i, ]
-      narow$Time = NA
-      narow$Cow = NA
-      df_blanks = rbind(df_blanks, narow)
+      narow <- df[i, ]
+      narow$Time <- NA
+      narow$Cow <- NA
+      df_blanks <- rbind(df_blanks, narow)
     }
   }
-  
+
   df_blanks
 }
 
@@ -57,7 +59,7 @@ daily_schedu_moo_data <- function(feeding, drinking, lying_standing, cow_id, dat
 #' @examples
 #' daily_total_schedumoo_info(df)
 daily_total_schedumoo_info <- function(df) {
-  
+
   # prep the dataframe
   df <- df %>%
     mutate(time_for_total = as.integer(df$Time - lag(df$Time))) %>%
@@ -76,24 +78,24 @@ daily_total_schedumoo_info <- function(df) {
       summarise(total = sum(time_for_total))
 
     if (length(df_check$Behaviour) != 4) {
-      sum_bad_cow =+ 1
+      sum_bad_cow <- +1
     }
   }
 
-  if(sum_bad_cow > 0){
-    showNotification(type = "warning",
-                     paste0("Behaviour data incomplete for some cows. This will effect the averages.")
+  if (sum_bad_cow > 0) {
+    showNotification(
+      type = "warning",
+      paste0("Behaviour data incomplete for some cows. This will effect the averages.")
     )
   }
-   
-    # instantiate summary df
-    df_filter <- df %>%
-      group_by(Behaviour) %>%
-      summarise(total = sum(time_for_total)/NROW(cows))
-    values <- df_filter$total
-    
-    return(values)
 
+  # instantiate summary df
+  df_filter <- df %>%
+    group_by(Behaviour) %>%
+    summarise(total = sum(time_for_total) / NROW(cows))
+  values <- df_filter$total
+
+  return(values)
 }
 
 
@@ -109,51 +111,50 @@ daily_schedu_moo_plot <- function(df) {
   # Instantiate figure object
   fig <-
     plot_ly(
-      type = 'scatter',
-      mode = 'lines',
-      yaxis=list(type='category'),
+      type = "scatter",
+      mode = "lines",
+      yaxis = list(type = "category"),
     )
-  
+
   # Set plotting colours
-  standing_colour <- '#ff9999'
-  lying_colour <- '#ffcc66'
-  drinking_colour <- '#6b96c7'
-  feeding_colour <- '#b2bb90'
-  
-  
+  standing_colour <- "#ff9999"
+  lying_colour <- "#ffcc66"
+  drinking_colour <- "#6b96c7"
+  feeding_colour <- "#b2bb90"
+
+
   # Plot traces for standing, lying, feeding, and drinking events.
-  for (i in c('standing', 'lying', 'feeding', 'drinking')) {
+  for (i in c("standing", "lying", "feeding", "drinking")) {
     plot_df <- df %>% filter(Behaviour == i)
-    color <-  case_when(
-      i == 'standing' ~ standing_colour,
-      i == 'lying' ~ lying_colour,
-      i == 'drinking' ~ drinking_colour,
-      i == 'feeding' ~ feeding_colour ,
+    color <- case_when(
+      i == "standing" ~ standing_colour,
+      i == "lying" ~ lying_colour,
+      i == "drinking" ~ drinking_colour,
+      i == "feeding" ~ feeding_colour,
     )
     fig <-
       add_trace(
         fig,
         data = plot_df,
-        y =  ~ Cow,
-        x =  ~ Time,
+        y = ~Cow,
+        x = ~Time,
         line = list(
           color = color,
           width = 20,
           opacity = 0.8
         ),
-        text =  ~ Intake,
+        text = ~Intake,
         name = str_to_title(i),
         hovertemplate = paste0(
           str_to_title(i),
           " <br>",
-          ifelse(i == 'drinking' |
-                   i == 'feeding', "Intake = %{text} kg", ""),
+          ifelse(i == "drinking" |
+            i == "feeding", "Intake = %{text} kg", ""),
           "<extra></extra>"
-        ), template="simple_white"
+        ), template = "simple_white"
       )
-    fig <- layout(fig,yaxis=list(title=""))
+    fig <- layout(fig, yaxis = list(title = ""))
   }
-  
+
   fig
 }
-
