@@ -2,20 +2,12 @@ library(shinymanager)
 
 passphrase <- Sys.getenv("PASSPHRASE")
 
-# credentials <- data.frame(
-#   user = c("guest", "user", "admin"), # mandatory
-#   password = c("guest", "shiny", "shinymanager"), # mandatory
-#   admin = c(FALSE, FALSE, TRUE),
-#   stringsAsFactors = FALSE
-# )
-
 # Set up shiny server
 server <- function(input, output, session) {
 
   # check_credentials directly on sqlite db
   res_auth <- secure_server(
     check_credentials = check_credentials(
-     # credentials
       "../auth/database.sqlite",
       passphrase = passphrase
     )
@@ -338,69 +330,6 @@ server <- function(input, output, session) {
                   filter((from == input$current_neighbour) | (to == input$current_neighbour)), 
                 data_config = data_config)
             }
-            
-            ## render R markdown file
-            
-            # output$downloadReport <- downloadHandler(
-            #   filename = function() {
-            #     paste0("Cow_",
-            #           input$analysis_cow_id,
-            #           "_",
-            #           input$relationship_date_range[[1]],
-            #           "_to_",
-            #           input$relationship_date_range[[2]],
-            #           '_neighbor_count_report', 
-            #           '.', 
-            #           switch(
-            #       input$analysis_format, PDF = 'pdf', HTML = 'html'
-            #             )
-            #           )
-            #     },
-            #   
-            #   content = function(file) {
-            #     src1 <- normalizePath('report.Rmd')
-            #     src2 <- normalizePath('reference.bib')
-            #     src3 <- normalizePath('neighbour_report.tex')
-            #     
-            #     # temporarily switch to the temp dir, in case you do not have write
-            #     # permission to the current working directory
-            #     owd <- setwd(tempdir())
-            #     on.exit(setwd(owd))
-            #     file.copy(src1, 'report.Rmd', overwrite = TRUE)
-            #     file.copy(src2, 'reference.bib', overwrite = TRUE)
-            #     file.copy(src3, 'neighbour_report.tex', overwrite = TRUE)
-            #     
-            #     from_date_neighbour <- input$relationship_date_range[[1]]
-            #     to_date_neighbour <- input$relationship_date_range[[2]] 
-            #     Feeding_drinking_neighbour_bout <- tbl(con,"Feeding_drinking_neighbour_bout") %>%
-            #       filter(
-            #         date >= !!(from_date_neighbour),
-            #         date <= !!(to_date_neighbour)
-            #       ) %>%
-            #       as.data.frame()
-            #     # Set up parameters to pass to Rmd document
-            #     params <- list(
-            #       data = Feeding_drinking_neighbour_bout,
-            #       cow_id = input$analysis_cow_id, 
-            #       date_range = input$relationship_date_range
-            #     )
-            #     # Knit the document, passing in the `params` list, and eval it in a
-            #     # child of the global environment (this isolates the code in the document
-            #     # from the code in this app).
-            #     out <- rmarkdown::render(
-            #       'report.Rmd', 
-            #       switch(
-            #         input$analysis_format,
-            #         PDF = pdf_document(fig_caption = TRUE,        
-            #                            includes = includes(in_header =  "neighbour_report.tex")), 
-            #         HTML = html_document(toc = TRUE)
-            #       ),
-            #       params = params,
-            #       envir = new.env(parent = globalenv())
-            #     )
-            #     file.rename(out, file)
-            #   }
-            # )
             
           }
         } else {
@@ -923,48 +852,6 @@ server <- function(input, output, session) {
       })
     }
   })
-
-
-  # # Feed Bin selection
-  # observe({
-  #   update_bin_selection(input$bin_date, "behaviour_bin_selection", session)
-  # })
-
-
-  # Feed bin tab
-  # observe({
-  #   req(input$bin_date)
-  #   req(input$behaviour_bin_selection)
-  # 
-  #   bin_df <- select_feed_bin_data(feed_df,
-  #     feed_date = input$bin_date,
-  #     bin_selection = input$behaviour_bin_selection
-  #   )
-  #   # plot
-  #   output$feed_bin_plot <- renderPlot({
-  #     plot_feed_bin_data(
-  #       hourly_df = bin_df,
-  #       hr = input$obs_hr,
-  #       max_wt = input$bin_weight
-  #     )
-  #   })
-  #   # CSV output
-  #   output$feed_bin_table <- format_dt_table(bin_df, data_config = data_config)
-  # })
-  # 
-  # observe({
-  #   req(input$bin_date)
-  #   req(input$behaviour_bin_selection)
-  # 
-  #   df <- filter_dates(bin_empty_total_time_summary, date, input$bin_date) %>%
-  #     parse_hunger_df(input$behaviour_bin_selection)
-  # 
-  #   output$hunger_table <- format_dt_table(df, data_config = data_config)
-  #   output$hunger_plot <- renderPlotly({
-  #     hunger_plot(df) %>%
-  #       config(modeBarButtonsToRemove = config)
-  #   })
-  # })
   
   observe({
     output$downloadReferences <- downloadHandler(
