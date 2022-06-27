@@ -6,14 +6,15 @@
 #' @param cow_id_1 The interested cow
 #' @param cow_id_2 Second interested cow (optional)
 #'
-#' @return A filtered data. 
+#' @return A dataframe
+
 elo_df <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- x %>%
     select(-present) %>%
     filter(Date >= as.Date(start_date) & Date <= as.Date(end_date))
 }
 
-#' Filtered elo data. 
+#' Filtered elo data for paired layout. 
 #'
 #' @param x The dataframe
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -21,20 +22,21 @@ elo_df <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
 #' @param cow_id_1 The interested cow
 #' @param cow_id_2 Second interested cow (optional)
 #'
-#' @return A filtered data. 
+#' @return A dataframe
+
 elo_df_cow <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- elo_df(x, start_date, end_date) %>%
     filter(Cow %in% c(cow_id_1, cow_id_2))
 }
 
-#' Make an interactive plot of ELO data and return both plot and filtered data. 
+#' Plot elo scores shows cows with highest and lowest mean elo scores.
 #'
 #' @param x The dataframe 
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
 #' @param end_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
-#' @param cow_id The interested cow
 #'
 #' @return An interactive plotly plot. 
+
 plot_elo <- function(x, start_date, end_date) {
   df <- elo_df(x, start_date, end_date) %>%
     group_by(Cow) %>%
@@ -70,7 +72,7 @@ plot_elo <- function(x, start_date, end_date) {
   ggplotly(plot)
 }
 
-#' Make an interactive plot of ELO data and return both plot and filtered data. 
+#' Plot elo scores for the center cow in star layout of displacement. 
 #'
 #' @param x The dataframe
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -78,6 +80,7 @@ plot_elo <- function(x, start_date, end_date) {
 #' @param cow_id The interested cow
 #'
 #' @return An interactive plotly plot. 
+
 plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
   df <- elo_df_cow(x, start_date, end_date, cow_id)
   
@@ -93,7 +96,7 @@ plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
   ggplotly(plot)
 }
 
-#' Make an interactive plot of ELO data and return both plot and filtered data. 
+#' Plot elo scores for the paired cows in paired layout of displacement. 
 #'
 #' @param x The dataframe
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -102,6 +105,7 @@ plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
 #' @param cow_id_2 Second interested cow (optional)
 #'
 #' @return An interactive plotly plot. 
+
 plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- elo_df_cow(x, start_date, end_date, cow_id_1, cow_id_2) %>%
     group_by(Cow) %>%
@@ -133,6 +137,7 @@ plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 =
 #' @param date_range The input date range from the date range widget
 #'
 #' @return error_message if there is a date input issue that needs to stop the graph generation
+
 missing_date_range_check_plotly <- function(date_range, df = NULL) {
   `%!in%` <- Negate(`%in%`)
   df_dates <- sort(unique(df$Date))
