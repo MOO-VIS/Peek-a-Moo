@@ -1,5 +1,6 @@
 library(shinymanager)
 
+# Header
 header <- dashboardHeader(
   title = tags$a(
     href = "https://awp.landfood.ubc.ca/",
@@ -9,6 +10,7 @@ header <- dashboardHeader(
   dropdownMenuOutput("github")
 )
 
+# Side bar
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "sidemenu",
