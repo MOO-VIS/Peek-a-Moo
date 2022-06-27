@@ -108,7 +108,7 @@ daily_tab <- tabItem(
         tags$style(type = "text/css", "#button_Cows_info1{border-radius: 0px;border-width: 0px}"),
         bsButton("button_Cows_info1", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
       ))),
-      column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
+      column(4, h5(br(), "Please select a valid date and cow(s) to generate the plot below.")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
         content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows.",
