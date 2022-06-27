@@ -9,7 +9,13 @@ passphrase <- Sys.getenv("PASSPHRASE")
 #   stringsAsFactors = FALSE
 # )
 
-# Set up shiny server
+#' Set up shiny server
+#'
+#' @param input
+#' @param output 
+#' @param session
+#'
+#' @return A shiny server
 server <- function(input, output, session) {
 
   # check_credentials directly on sqlite db
@@ -158,14 +164,12 @@ server <- function(input, output, session) {
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
-
   observe({
     update_cow_selection_neighbour(
       input$relationship_date_range, 
       "analysis_cow_id", 
       session)
   })
-
   observe({
     req(input$relationship_date_range)
 
@@ -175,7 +179,6 @@ server <- function(input, output, session) {
       session = session
     )
   })
-
   observe({
     req(input$relationship_date_range)
 
@@ -185,7 +188,6 @@ server <- function(input, output, session) {
       session = session
     )
   })
-
   observe({
     req(input$relationship_date_range)
     req(input$paired_cow_selection_1)
@@ -200,6 +202,7 @@ server <- function(input, output, session) {
     )
   })
   
+  # set up an object for storing reactive values from shiny
   values <- reactiveValues(nodes_feeding = NULL, 
                            edges_feeding = NULL, 
                            nodes_lying = NULL,
@@ -207,7 +210,7 @@ server <- function(input, output, session) {
                            nodes_neighbour = NULL,
                            edges_neighbour = NULL)
   
-  # render Synchronicity network
+  # get edges and nodes lists for synchronicity and neighbour network
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
@@ -280,7 +283,7 @@ server <- function(input, output, session) {
     }
   })
 
-  # render network
+  # render networks
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
@@ -542,6 +545,8 @@ server <- function(input, output, session) {
                 data_config = data_config)
             }
           } else if (input$relationship_network_selection == "Displacement Star*") {
+            # Plot Displacement network in star layout
+            
             cow_id <- input$star_cow_selection
 
             edges <- combine_replace_edges_star(raw_graph_data,
@@ -568,6 +573,8 @@ server <- function(input, output, session) {
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)), data_config = data_config)
           } else {
+            # Plot Displacement network in paired layout
+            
             cow_id_1 <- input$paired_cow_selection_1
             cow_id_2 <- input$paired_cow_selection_2
 
@@ -627,6 +634,8 @@ server <- function(input, output, session) {
       )
     } else {
       if (input$relationship_network_selection == "Displacement") {
+        # Plot elo plot for Displacement network
+        
         output$elo_plot <- renderPlotly({
           plot_elo(raw_graph_data,
                    input$relationship_date_range[[1]],
@@ -646,6 +655,8 @@ server <- function(input, output, session) {
                                                    input$relationship_date_range[[2]]
         ), data_config = data_config)
       } else if (input$relationship_network_selection == "Displacement Star*") {
+        # Plot elo plot for Displacement network in star layout
+        
         cow_id <- input$star_cow_selection
 
         output$elo_plot <- renderPlotly({
@@ -663,6 +674,8 @@ server <- function(input, output, session) {
           cow_id_1 = cow_id
         ), data_config = data_config)
       } else if (input$relationship_network_selection == "Displacement Paired") {
+        # Plot elo plot for Displacement network in paired layout
+        
         cow_id_1 <- input$paired_cow_selection_1
         cow_id_2 <- input$paired_cow_selection_2
 
@@ -700,6 +713,8 @@ server <- function(input, output, session) {
     #' @param df The dataframe containing data to be displayed
     #' @param y_col The column of interest
     #' @param var_name The name of the UI output variable
+    #' 
+    #' @return A plotly plot
     plot_cow_date_range <- function(df, y_col, var_name) {
 
       # filter table
@@ -835,26 +850,28 @@ server <- function(input, output, session) {
   })
 
   # Render Relationship tab plots
+  # observe({
+  #   req(input$relationship_cow_selection)
+  #   req(input$relationship_date_range)
+  # 
+  # 
+  # 
+  #   df <- Replacement_behaviour_by_date
+  #   output$bullying_table <- format_dt_table(df, data_config = data_config)
+  #   output$bullying_plot <- renderPlotly({
+  #     plot_bully_analysis(
+  #       df,
+  #       input$relationship_cow_selection,
+  #       input$relationship_date_range[[1]],
+  #       input$relationship_date_range[[2]]
+  #     ) %>%
+  #       config(modeBarButtonsToRemove = config)
+  #   })
+  # })
+
   observe({
-    req(input$relationship_cow_selection)
-    req(input$relationship_date_range)
-
-
-
-    df <- Replacement_behaviour_by_date
-    output$bullying_table <- format_dt_table(df, data_config = data_config)
-    output$bullying_plot <- renderPlotly({
-      plot_bully_analysis(
-        df,
-        input$relationship_cow_selection,
-        input$relationship_date_range[[1]],
-        input$relationship_date_range[[2]]
-      ) %>%
-        config(modeBarButtonsToRemove = config)
-    })
-  })
-
-  observe({
+    # Plot THI plot
+    
     req(input$relationship_date_range)
 
     if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
