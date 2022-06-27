@@ -7,7 +7,6 @@
 #' @param cow_id_2 Second interested cow (optional)
 #'
 #' @return A dataframe
-
 elo_df <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- x %>%
     select(-present) %>%
@@ -23,7 +22,6 @@ elo_df <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
 #' @param cow_id_2 Second interested cow (optional)
 #'
 #' @return A dataframe
-
 elo_df_cow <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- elo_df(x, start_date, end_date) %>%
     filter(Cow %in% c(cow_id_1, cow_id_2))
@@ -36,7 +34,6 @@ elo_df_cow <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL
 #' @param end_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
 #'
 #' @return An interactive plotly plot. 
-
 plot_elo <- function(x, start_date, end_date) {
   df <- elo_df(x, start_date, end_date) %>%
     group_by(Cow) %>%
@@ -80,7 +77,6 @@ plot_elo <- function(x, start_date, end_date) {
 #' @param cow_id The interested cow
 #'
 #' @return An interactive plotly plot. 
-
 plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
   df <- elo_df_cow(x, start_date, end_date, cow_id)
   
@@ -105,7 +101,6 @@ plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
 #' @param cow_id_2 Second interested cow (optional)
 #'
 #' @return An interactive plotly plot. 
-
 plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL) {
   df <- elo_df_cow(x, start_date, end_date, cow_id_1, cow_id_2) %>%
     group_by(Cow) %>%
@@ -137,7 +132,6 @@ plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 =
 #' @param date_range The input date range from the date range widget
 #'
 #' @return error_message if there is a date input issue that needs to stop the graph generation
-
 missing_date_range_check_plotly <- function(date_range, df = NULL) {
   `%!in%` <- Negate(`%in%`)
   df_dates <- sort(unique(df$Date))

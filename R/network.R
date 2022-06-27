@@ -8,7 +8,6 @@ library(igraph)
 #' @param selected_nodes The selected cow used in visInteraction
 #'
 #' @return A general visNetwork plot 
-
 plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes = NULL) {
   if (layouts_type == "Circle") {
     layouts = "layout_in_circle"
@@ -69,7 +68,6 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
 #' @param threshold_selected A vector of selected threshold
 #'
 #' @return A list contains nodes and edges list
-
 nodes_edges_list_synchronicity <- function(raw_graph_data, 
                                            date_range, 
                                            threshold_selected) {
@@ -107,7 +105,6 @@ nodes_edges_list_synchronicity <- function(raw_graph_data,
 #' @param layouts_type A string value that represents the layout type
 #'
 #' @return A visNetwork plot for global displacement
-
 plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
   
   plot_network(nodes, edges, layouts_type) %>%
@@ -142,7 +139,6 @@ plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
 #' @param edges The dataframe with edges list
 #'
 #' @return A visNetwork plot for displacement in star layout
-
 plot_network_disp_star <- function(nodes, edges) {
   visNetwork(nodes,
     edges,
@@ -172,7 +168,6 @@ plot_network_disp_star <- function(nodes, edges) {
 #' @param threshold A vector of selected threshold
 #'
 #' @return A dataframe of edges list
-
 combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) {
 
   # set defaults
@@ -237,7 +232,6 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
 #' @param CD_max A vector of selected maximum completion density
 #'
 #' @return A dataframe of combined data
-
 combine_replace_df <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
@@ -274,7 +268,6 @@ combine_replace_df <- function(x,
 #' @param threshold A vector of selected threshold
 #'
 #' @return A dataframe of edges list
-
 combine_replace_edges <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
@@ -326,7 +319,6 @@ combine_replace_edges <- function(x,
 #' @param CD_max A vector of selected maximum completion density
 #'
 #' @return A dataframe of combined data
-
 combine_replace_edges_star <- function(x,
                                        from_date = NULL,
                                        to_date = NULL,
@@ -375,7 +367,6 @@ combine_replace_edges_star <- function(x,
 #' @param CD_max A vector of selected maximum completion density
 #'
 #' @return A dataframe of combined data
-
 combine_replace_edges_paired <- function(x,
                                        from_date = NULL,
                                        to_date = NULL,
@@ -397,7 +388,6 @@ combine_replace_edges_paired <- function(x,
 #' @param size The dataframe of the degree calculated from igraph
 #'
 #' @return A dataframe of nodes list
-
 combine_nodes <- function(df,
                           from_date = NULL,
                           to_date = NULL, 
@@ -440,7 +430,6 @@ combine_nodes <- function(df,
 #' @param deg The dataframe of the degree calculated from igraph
 #'
 #' @return A dataframe of nodes list
-
 combine_replace_nodes <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
@@ -478,7 +467,6 @@ combine_replace_nodes <- function(x,
 #' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
 #'
 #' @return A dataframe of nodes list
-
 combine_replace_nodes_star <- function(edges, cow_id = NULL,
                                        from_date = NULL,
                                        to_date = NULL) {
@@ -540,7 +528,6 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
 #' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
 #'
 #' @return A dataframe of nodes list
-
 combine_replace_nodes_paired <- function(edges,
                                        from_date = NULL,
                                        to_date = NULL) {
@@ -569,7 +556,6 @@ combine_replace_nodes_paired <- function(edges,
 #' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
 #'
 #' @return A dataframe
-
 combine_elo_star <- function(from_date = NULL,
                              to_date = NULL) {
   # set defaults
@@ -595,6 +581,12 @@ combine_elo_star <- function(from_date = NULL,
     ))
 }
 
+#' Creates an igraph graph from the edges list 
+#'
+#' @param edgelist The edges list 
+#' @param directed A boolean value represents if a directed graph is needed
+#'
+#' @return A igraph graph
 .make_tidygraph <- function(edgelist = NULL, directed = FALSE) {
   edgelist <- edgelist
   g <- graph_from_data_frame(edgelist, directed = directed)
@@ -602,7 +594,6 @@ combine_elo_star <- function(from_date = NULL,
   # return the graph
   g
 }
-
 
 make_tidygraph <- memoise::memoise(.make_tidygraph)
 
@@ -612,8 +603,6 @@ make_tidygraph <- memoise::memoise(.make_tidygraph)
 #' @param upper_only A boolean value represents if raw data has lower triangle being all zeros
 #'
 #' @return A dataframe
-
-
 adjacency_to_long <- function(x, upper_only = FALSE) {
   # check inputs
   dn <- dimnames(x)
@@ -650,7 +639,6 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 #' @param network The input for the selected network
 #'
 #' @return error_message if there is a date input issue that needs to stop the graph generation
-
 missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
   
   `%!in%` <- Negate(`%in%`)
