@@ -41,7 +41,7 @@ Postgres_host <- Sys.getenv("POSTGRES_HOST")
 Postgres_dbname <- 'cowbonds'
 Postgres_timezone <- 'America/Los_Angeles'
 
-
+# Connect to PostgresSQL database
 con <-  dbConnect(RPostgres::Postgres(), 
                   user=Postgres_user, 
                   password=Postgres_password,
@@ -99,7 +99,7 @@ dominance_df <- elo_24h_na_filled
 max_date <- max(feed_drink_df[["date"]])
 min_date <- min(feed_drink_df[["date"]])
 
-#' Helper function to filter by user input date range
+#' Filter by user input date range
 #'
 #' @param df The dataframe to filter
 #' @param col The date column
@@ -119,13 +119,20 @@ filter_dates <- function(df, col, date_obj) {
   }
 }
 
+#' Filter data by completion density
+#'
+#' @param df The dataframe to filter
+#' @param col The date column
+#' @param cd_range A list of a selected completion density range
+#'
+#' @return Filtered dataframe within the selected completion density range
 filter_cd <- function(df, col, cd_range) {
   df %>%
     filter({{ col }} >= cd_range[[1]]) %>%
     filter({{ col }} <= cd_range[[2]])
 }
 
-#' Helper function to filter by user input cow selection
+#' Filter by user input cow selection
 #'
 #' @param df The dataframe to filter
 #' @param col The cow column
@@ -137,12 +144,14 @@ filter_cows <- function(df, col, cow_selection) {
     filter({{ col }} %in% cow_selection)
 }
 
-#' Helper function for creating boxes with plot and data tab
+#' Creating boxes with plot and data tab
 #'
 #' @param title The title to display for the box
 #' @param var_name The beginning of the variable name used by server.R
 #' @param width The width of the box, defaults to 6
+#' @param height The height of the box, defaults to 6
 #' @param output_fun Function for producing the plot output, defaults to plotlyOutput
+#' @param popover Popover information
 #'
 #' @return tabBox
 default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
@@ -161,6 +170,15 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
   )
 }
 
+#' Creating boxes for report tab
+#'
+#' @param title The title to display for the box
+#' @param var_name The beginning of the variable name used by server.R
+#' @param width The width of the box, defaults to 6
+#' @param output_fun Function for producing the plot output, defaults to plotlyOutput
+#' @param popover Popover information
+#'
+#' @return tabBox
 report_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
   tabBox(
     title = title, side = "right", selected = "Plot", width = width,
@@ -181,12 +199,11 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
   )
 }
 
-
-
-#' Helper function to format tables with export option
+#' Format tables with export option
 #'
 #' @param df The dataframe to convert
 #' @param page_length Number of pages to show, defaults to 5
+#' @param data_config User authenticity
 #'
 #' @return DT datatable
 format_dt_table <- function(df, page_length = 5, data_config) {
@@ -214,7 +231,12 @@ format_dt_table <- function(df, page_length = 5, data_config) {
     )
   }
 }
-# widget helper functions:
+
+#' Widget to add aggregate choices
+#'
+#' @param inputId The session of input
+#'
+#' @return A set of radio buttons
 aggregation_widget <- function(inputId) {
   radioButtons(
     inputId = inputId,
@@ -225,6 +247,11 @@ aggregation_widget <- function(inputId) {
   )
 }
 
+#' Widget to download the report
+#'
+#' @param inputId The session of input
+#'
+#' @return A set of radio buttons
 download_format_widget <- function(inputId) {
   radioButtons(
     inputId = inputId,
@@ -235,6 +262,11 @@ download_format_widget <- function(inputId) {
   )
 }
 
+#' Widget to select date range
+#'
+#' @param inputId The session of input
+#'
+#' @return A pair of text inputs
 date_range_widget <- function(inputId) {
   dateRangeInput(
     inputId = inputId,
@@ -246,6 +278,13 @@ date_range_widget <- function(inputId) {
   )
 }
 
+#' Widget to select interested cow
+#'
+#' @param inputId The session of input
+#' @param multiple A boolean value represents if multiple inputs can be selected
+#' @param label A string of widget title
+#'
+#' @return A select list
 cow_selection_widget <- function(inputId, multiple = TRUE, label = "Cows") {
   pickerInput(
     inputId = inputId,
@@ -260,6 +299,12 @@ cow_selection_widget <- function(inputId, multiple = TRUE, label = "Cows") {
   )
 }
 
+#' Widget to select interested network
+#'
+#' @param inputId The session of input
+#' @param multiple A boolean value represents if multiple inputs can be selected
+#'
+#' @return A select list
 network_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
@@ -276,6 +321,12 @@ network_selection_widget <- function(inputId, multiple = FALSE) {
   )
 }
 
+#' Widget to select interested threshold
+#'
+#' @param inputId The session of input
+#' @param multiple A boolean value represents if multiple inputs can be selected
+#'
+#' @return A select list
 threshold_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
@@ -290,6 +341,12 @@ threshold_selection_widget <- function(inputId, multiple = FALSE) {
   )
 }
 
+#' Widget to select interested layout type
+#'
+#' @param inputId The session of input
+#' @param multiple A boolean value represents if multiple inputs can be selected
+#'
+#' @return A select list
 layout_selection_widget <- function(inputId, multiple = FALSE) {
   pickerInput(
     inputId = inputId,
@@ -304,6 +361,11 @@ layout_selection_widget <- function(inputId, multiple = FALSE) {
   )
 }
 
+#' Widget to select date
+#'
+#' @param inputId The session of input
+#'
+#' @return A text inputs
 date_widget <- function(inputId) {
   dateInput(
     inputId = inputId,
@@ -314,11 +376,14 @@ date_widget <- function(inputId) {
 }
 
 
-#' Helper function for updating cow selection picker input widgets
+#' Updating cow selection picker input widgets
 #'
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
+#' @param select_all A boolean value represents if all inputs can be selected
+#' 
+#' @return An updated session of input
 update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE) {
 
   # find cows that exist in date range
@@ -337,6 +402,14 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
   )
 }
 
+#' Updating cow selection picker input widgets for neighbour network
+#'
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+#' @param select_all A boolean value represents if all inputs can be selected
+#' 
+#' @return An updated session of input
 update_cow_selection_neighbour <- function(date_obj, inputId, session, select_all = FALSE) {
     
   # find cows that exist in date range
@@ -356,6 +429,14 @@ update_cow_selection_neighbour <- function(date_obj, inputId, session, select_al
   )
 }
 
+#' Updating cow selection picker input widgets for displacement network
+#'
+#' @param relationship_type The string represents the interested network type
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+#' 
+#' @return An updated session of input
 update_cow_selection_displacement <- function(relationship_type = "Displacement Star*", date_obj, inputId, session) {
   if (relationship_type != "Displacement Star*") {
     update_cow_selection(date_obj, inputId, session)
@@ -379,6 +460,16 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
   }
 }
 
+#' Updating cow selection picker input widgets for displacement network
+#'
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+#' @param cow_id_1 A vector of the 1st interested cow
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#' 
+#' @return An updated session of input
 update_2nd_cow_selection_displacement <- function(date_obj,
                                                   inputId,
                                                   session,
