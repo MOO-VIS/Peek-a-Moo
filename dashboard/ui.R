@@ -44,7 +44,11 @@ activities_tab <- tabItem(
         )
       ),
       column(4, date_range_widget("behaviour_date_range")),
-      column(4, cow_selection_widget("behaviour_cow_selection")),
+      column(4, cow_selection_widget("behaviour_cow_selection", label = p(
+        "Cows",
+        tags$style(type = "text/css", "#button_Cows_info2{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_Cows_info2", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+      ))),
       bsPopover(
         id = "button_behaviour", title = "Behaviour Patterns Tab",
         content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
@@ -53,6 +57,18 @@ activities_tab <- tabItem(
           "<u>Aggregate</u> - aggregates the data on the daily, or monthly level.",
           "<u>Date Range</u> - timeline for the plots.",
           "<u>Cows</u> - cow(s) to showcase in the plots.",
+          sep = "<br>"
+        ),
+        placement = "right",
+        trigger = "hover",
+        options = list(container = "body")
+      ),
+      bsPopover(
+        id = "button_Cows_info2", title = "Cows",
+        content = paste("Multiple cows may be selected for these plots, to a max of 60 cows.",
+          "",
+          "<b>Select All:</b> selects all cows available for the date range.",
+          "<b>Deselect All:</b> deselects all cows available for the date range.",
           sep = "<br>"
         ),
         placement = "right",
@@ -87,7 +103,11 @@ daily_tab <- tabItem(
       ),
       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_widget("daily_date")),
-      column(4, cow_selection_widget("daily_cow_selection")),
+      column(4, cow_selection_widget("daily_cow_selection", label = p(
+        "Cows",
+        tags$style(type = "text/css", "#button_Cows_info1{border-radius: 0px;border-width: 0px}"),
+        bsButton("button_Cows_info1", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+      ))),
       column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
@@ -96,6 +116,18 @@ daily_tab <- tabItem(
           "<b>Customizations:</b>",
           "<u>Date</u> - the date for the plots to showcase.",
           "<u>Cows</u> - the cow(s) to showcase in the plots.",
+          sep = "<br>"
+        ),
+        placement = "right",
+        trigger = "hover",
+        options = list(container = "body")
+      ),
+      bsPopover(
+        id = "button_Cows_info1", title = "Cows",
+        content = paste("Multiple cows may be selected for this plot.",
+          "",
+          "<b>Select All:</b> selects all cows available for the date range.",
+          "<b>Deselect All:</b> deselects all cows available for the date range.",
           sep = "<br>"
         ),
         placement = "right",
