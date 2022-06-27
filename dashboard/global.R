@@ -18,11 +18,6 @@ library(graphics)
 library(ggplot2)
 library(DBI)
 library(RPostgres)
-# library(rmarkdown)
-# library(rstan)
-# library(rstantools)
-# library(stats)
-# library(akima)
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
@@ -151,8 +146,7 @@ filter_cows <- function(df, col, cow_selection) {
 #' @param width The width of the box, defaults to 6
 #' @param height The height of the box, defaults to 6
 #' @param output_fun Function for producing the plot output, defaults to plotlyOutput
-#' @param popover Popover information
-#'
+#' @param popover An input for a popover message to include in the boxes, defaults to NULL
 #' @return tabBox
 default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
   tabBox(
@@ -202,6 +196,8 @@ format_dt_table <- function(df, page_length = 5, data_config) {
     )
   }
 }
+
+# widget helper functions:
 
 #' Widget to add aggregate choices
 #'
@@ -354,7 +350,7 @@ date_widget <- function(inputId) {
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
-#' @param select_all A boolean value represents if all inputs can be selected
+#' @param select_all A boolean value that dictates whether all cows are selected upon initialization, defaults to FALSE
 #'
 #' @return An updated session of input
 update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE) {
@@ -375,12 +371,13 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
   )
 }
 
+#' Helper function for updating cow selection picker for Neighbours network
 #' Updating cow selection picker input widgets for neighbour network
 #'
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
-#' @param select_all A boolean value represents if all inputs can be selected
+#' @param select_all A boolean value that dictates whether all cows are selected upon initialization, defaults to FALSE
 #'
 #' @return An updated session of input
 update_cow_selection_neighbour <- function(date_obj, inputId, session, select_all = FALSE) {
@@ -404,7 +401,7 @@ update_cow_selection_neighbour <- function(date_obj, inputId, session, select_al
 
 #' Updating cow selection picker input widgets for displacement network
 #'
-#' @param relationship_type The string represents the interested network type
+#' @param relationship_type The string represents the interested network type, defaults to: Displacement Star*
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
@@ -438,9 +435,9 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
-#' @param cow_id_1 A vector of the 1st interested cow
-#' @param CD_min A vector of selected minimum completion density
-#' @param CD_max A vector of selected maximum completion density
+#' @param cow_id_1 A vector of the 1st interested cow, defaults to NULL
+#' @param CD_min A vector of selected minimum completion density, defaults to NULL
+#' @param CD_max A vector of selected maximum completion density, defaults to NULL
 #'
 #' @return An updated session of input
 update_2nd_cow_selection_displacement <- function(date_obj,
@@ -472,60 +469,7 @@ update_2nd_cow_selection_displacement <- function(date_obj,
   )
 }
 
-#' #' Widget for Bin Weight Selection
-#' #'
-#' #' @param inputId The id of the picker input widget to update
-#' bin_wt_widget <- function(inputId) {
-#'   selectInput(
-#'     inputId = inputId,
-#'     label = "Full Bin Weight (KG)",
-#'     choices = rep(1:100),
-#'     selected = as.integer(75)
-#'   )
-#' }
-
-#' #' Helper function for updating bin selection picker input widgets
-#' #'
-#' #' @param date_obj The date or date range to filter by
-#' #' @param inputId The id of the picker input widget to update
-#' #' @param session The current server session
-#' update_bin_selection <- function(date_obj, inputId, session) {
-#'
-#'   # find bins that exist in date range
-#'   bin_choices <- filter_dates(feed_df, date, date_obj) %>%
-#'     select(Bin) %>%
-#'     unique() %>%
-#'     arrange(Bin)
-#'   colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
-#'
-#'   # update widget
-#'   updatePickerInput(
-#'     session = session,
-#'     inputId = inputId,
-#'     choices = bin_choices,
-#'     selected = bin_choices[[1]]
-#'   )
-#' }
-#'
-#' #' Widget for Bin Selection
-#' #'
-#' #' @param inputId The id of the picker input widget to update
-#' bin_selection_widget <- function(inputId) {
-#'   pickerInput(
-#'     inputId = inputId,
-#'     label = "Bins",
-#'     choices = list(),
-#'     multiple = TRUE,
-#'     options = list(
-#'       "actions-box" = TRUE,
-#'       "none-selected-text" = "Select bins"
-#'     )
-#'   )
-#' }
-
-#' Custom theme setting function for colors
-#'
-#'
+#' Custom theme setting function for colors in dashboard
 custom_theme <- function() {
   theme <- tags$head(tags$style(HTML(
     ".headerStyling { 
