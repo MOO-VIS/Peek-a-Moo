@@ -667,7 +667,7 @@ server <- function(input, output, session) {
 
       # generate plot
       output[[paste0(var_name, "_plot")]] <- renderPlotly({
-        cow_date_range_plot(df, {{ y_col }}, input$show_average) %>%
+        cow_date_range_plot(df, {{ y_col }}, input$show_average, input$behaviour_date_range, input$behaviour_agg_type) %>%
           config(modeBarButtonsToRemove = config)
       })
     }

@@ -64,10 +64,13 @@ format_col_name <- function(col_name) {
 #' @param show_average Boolean whether to show average line per cow
 #'
 #' @return NULL
-cow_date_range_plot <- function(df, y_col, show_average) {
+cow_date_range_plot <- function(df, y_col, show_average, date_range, agg_type) {
 
   # throw error if no data available for date range
   if (nrow(df) == 0) stop("No data available for this date range")
+  Date_1 = format(as.POSIXct(as.character(date_range[1])),"%m")
+  Date_2 = format(as.POSIXct(as.character(date_range[2])),"%m")
+  if(Date_1 == Date_2 && agg_type == 'month') stop('Date range must span over 2 months, please adjust date input selection.')
   if (length(unique(df$Cow)) > 21) stop("The maximum cows to plot is 20. Please adjust selection.")
 
   # custom color palette
