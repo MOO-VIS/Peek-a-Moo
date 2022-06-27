@@ -25,7 +25,7 @@ This dashboard requires log in credentials. Please reach out to the [AWP](https:
 
 The Peek-a-Moo dashboard features five tabs:
 
-**Relationships**
+1. **Relationships**
   - This tab visualizes four different types of data in five different social networks: Neighbour, Synchronicity, Displacement, Displacement Star*, and Displacement paired. The type of network can be selected from the Global Customization's bar under "Network", and the time frame can be limited by adjusting the date range. In all networks, the nodes represent cows, and the edges their connections either by time or number of interactions with another cow.
   - Nodes can be highlighted by clicking on them in the Neighbour, Synchronicity, and Displacement networks, with their size representing the weight of interactions for that period.
   - The shading of the nodes in the Displacement star plot represents the strength of a cows Elo score, with the red directed edges coming from a cow to another representing agressor interactions and blue victim interactions.
@@ -37,7 +37,7 @@ The Peek-a-Moo dashboard features five tabs:
   
   - The THI value boxes show the min, max and average THI for the selected time period, with a timeseries graph below.
 
-**Behaviour Patterns**
+2. **Behaviour Patterns**
 - This tab shows six various behaviour patterns for selected cows, over a selected timeline. They include:
   - Feeding Duration (length of time in seconds a cow spent feeding)
   - Drinking Duration (length of time in seconds a cow spent drinking)
@@ -50,17 +50,17 @@ The data can be aggregated by day oor by month, using the widgets in the Customi
 
 ![](docs/usage_examples/gifs/behaviour.gif)
 
-**Daily Behaviour**
+3. **Daily Behaviour**
 - This showcases the feeding, drinking, standing and lying timeline of selected cows for a given day, with the average for those behaviours displayed above the plot.
 
 ![](docs/usage_examples/gifs/daily_behaviour.gif)
 
-**Warnings**
+4. **Warnings**
 - This tab shows warnings detected about the data collection.
 
 ![](docs/usage_examples/gifs/warnings.gif)
 
-**FAQ**
+5. **FAQ**
 - This tab gives a background for the dashboard, methodology and package information, references, and a citation guide.
 
 ![](docs/usage_examples/gifs/FAQ.gif)
