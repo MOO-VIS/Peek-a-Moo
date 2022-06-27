@@ -1,6 +1,6 @@
 library(igraph)
 
-#' Plot a general visNetwork. 
+#' Plots a general visNetwork. 
 #'
 #' @param nodes The dataframe with nodes list 
 #' @param edges The dataframe with edges list
@@ -61,7 +61,7 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
     visPhysics(stabilization = FALSE)
 }
 
-#' Convert a raw network dataframe to nodes and edges list. 
+#' Converts a raw network dataframe to nodes and edges list. 
 #'
 #' @param raw_graph_data The dataframe of synchronicity or neighbours
 #' @param date_range The list of start and end date range
@@ -98,7 +98,7 @@ nodes_edges_list_synchronicity <- function(raw_graph_data,
   
 }
 
-#' Plot a visNetwork for global displacement. 
+#' Plots a visNetwork for global displacement. 
 #'
 #' @param nodes The dataframe with nodes list 
 #' @param edges The dataframe with edges list
@@ -133,7 +133,7 @@ plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
     )
 }
 
-#' Plot a visNetwork for displacement in star layout. 
+#' Plots a visNetwork for displacement in star layout. 
 #'
 #' @param nodes The dataframe with nodes list 
 #' @param edges The dataframe with edges list
@@ -160,7 +160,7 @@ plot_network_disp_star <- function(nodes, edges) {
     visPhysics(stabilization = FALSE)
 }
 
-#' Get edges list from a raw network dataframe. 
+#' Gets edges list from a raw network dataframe. 
 #'
 #' @param x The dataframe of synchronicity or neighbours data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -223,7 +223,7 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
   edgelist
 }
 
-#' Combine displacement dataframe for creating the edges list
+#' Combines displacement dataframe for creating the edges list
 #'
 #' @param x The dataframe of synchronicity or neighbours data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -258,7 +258,7 @@ combine_replace_df <- function(x,
     
 }
 
-#' Get edges list from a combined displacement dataframe. 
+#' Gets edges list from a combined displacement dataframe. 
 #'
 #' @param x The dataframe of displacement data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -309,7 +309,7 @@ combine_replace_edges <- function(x,
   }
 }
 
-#' Combine displacement dataframe for creating the edges list in star layout
+#' Combines displacement dataframe for creating the edges list in star layout
 #'
 #' @param x The dataframe of displacement data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -356,7 +356,7 @@ combine_replace_edges_star <- function(x,
     arrange(from != cow_id)
 }
 
-#' Combine displacement dataframe for creating the edges list in paired layout
+#' Combines displacement dataframe for creating the edges list in paired layout
 #'
 #' @param x The dataframe of displacement data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -380,7 +380,7 @@ combine_replace_edges_paired <- function(x,
     mutate(label = title)
 }
 
-#' Get nodes list from an edges list. 
+#' Gets nodes list from an edges list. 
 #'
 #' @param df The edges list 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -419,7 +419,7 @@ combine_nodes <- function(df,
   return(nodes)
 }
 
-#' Get nodes list from an edges list for displacement data. 
+#' Gets nodes list from an edges list for displacement data. 
 #'
 #' @param x The dataframe of displacement data 
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -459,7 +459,7 @@ combine_replace_nodes <- function(x,
   return(nodes)
 }
 
-#' Get nodes list from an edges list for displacement data in star layout. 
+#' Gets nodes list from an edges list for displacement data in star layout. 
 #'
 #' @param edges The edges list
 #' @param cow_id A vector of center cow
@@ -521,7 +521,7 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
     )
 }
 
-#' Get nodes list from an edges list for displacement data in paired layout. 
+#' Gets nodes list from an edges list for displacement data in paired layout. 
 #'
 #' @param edges The edges list
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -550,7 +550,7 @@ combine_replace_nodes_paired <- function(edges,
   return(nodes)
 }
 
-#' Combine elo score data filtered from date range and color code deplacement network in star layout
+#' Combines elo score data filtered from date range and color code deplacement network in star layout
 #'
 #' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
 #' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
@@ -597,7 +597,7 @@ combine_elo_star <- function(from_date = NULL,
 
 make_tidygraph <- memoise::memoise(.make_tidygraph)
 
-#' Process raw data into an edges list
+#' Processes raw data into an edges list
 #'
 #' @param x The dataframe of raw data 
 #' @param upper_only A boolean value represents if raw data has lower triangle being all zeros
@@ -632,7 +632,7 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
   if (is.null(x)) y else x
 }
 
-#' Helper function for catching if there are missing date inputs in the networks
+#' Catches errores if there are missing date inputs in the networks
 #'
 #' @param date_range The input date range from the date range widget
 #' @param df The data frame for the selected network

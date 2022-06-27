@@ -27,7 +27,7 @@ elo_df_cow <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 = NULL
     filter(Cow %in% c(cow_id_1, cow_id_2))
 }
 
-#' Plot elo scores shows cows with highest and lowest mean elo scores.
+#' Plots the elo scores of the cows with highest and lowest mean elo scores.
 #'
 #' @param x The dataframe 
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -69,7 +69,7 @@ plot_elo <- function(x, start_date, end_date) {
   ggplotly(plot)
 }
 
-#' Plot elo scores for the center cow in star layout of displacement. 
+#' Plots the elo score for the centre cow in the star layout of displacement. 
 #'
 #' @param x The dataframe
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -92,7 +92,7 @@ plot_elo_star <- function(x, start_date, end_date, cow_id = NULL) {
   ggplotly(plot)
 }
 
-#' Plot elo scores for the paired cows in paired layout of displacement. 
+#' Plots the elo scores for the paired cows in the paired layout of displacement. 
 #'
 #' @param x The dataframe
 #' @param start_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
@@ -126,7 +126,7 @@ plot_elo_paired <- function(x, start_date, end_date, cow_id_1 = NULL, cow_id_2 =
   ggplotly(plot)
 }
 
-#' Helper function for catching if there are missing dates in plotly plots
+#' Catches errores if there are missing dates in plotly plots
 #'
 #' @param df The data frame for the selected network
 #' @param date_range The input date range from the date range widget

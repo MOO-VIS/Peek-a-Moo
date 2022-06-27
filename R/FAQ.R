@@ -1,4 +1,4 @@
-#' A helper function for calling the 'methodologies'
+#' Calls the 'methodologies'
 #' written section for the FAQ into ui.R
 #' 
 #' 
@@ -62,7 +62,7 @@ methodologies_FAQ <- function(){
   )
 }
 
-#' A helper function for calling the 'about'
+#' Calls the 'about'
 #' written section for the FAQ into ui.R
 #' 
 #' 
@@ -77,7 +77,7 @@ about_FAQ <- function(){
   )
 }
 
-#' A helper function for calling the 'data'
+#' Calls the 'data'
 #' written section for the FAQ into ui.R
 #' 
 #' 
@@ -94,7 +94,7 @@ data_FAQ <- function(){
   )
 }
 
-#' A helper function for calling the 'statistical analysis'
+#' Calls the 'statistical analysis'
 #' written section for the FAQ into ui.R
 #' 
 #' 
@@ -116,7 +116,7 @@ statistical_FAQ <- function(){
   )
 }
 
-#' A helper function for calling the 'statistical analysis'
+#' Calls the 'statistical analysis'
 #' written section for the FAQ into ui.R
 #' 
 #' 
