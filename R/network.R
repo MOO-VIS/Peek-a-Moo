@@ -1,5 +1,14 @@
 library(igraph)
 
+#' Plot a general visNetwork. 
+#'
+#' @param nodes The dataframe with nodes list 
+#' @param edges The dataframe with edges list
+#' @param layouts_type A string value that represents the layout type
+#' @param selected_nodes The selected cow used in visInteraction
+#'
+#' @return A general visNetwork plot 
+
 plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes = NULL) {
   if (layouts_type == "Circle") {
     layouts = "layout_in_circle"
@@ -53,6 +62,14 @@ plot_network <- function(nodes, edges, layouts_type = "Circle", selected_nodes =
     visPhysics(stabilization = FALSE)
 }
 
+#' Convert a raw network dataframe to nodes and edges list. 
+#'
+#' @param raw_graph_data The dataframe of synchronicity or neighbours
+#' @param date_range The list of start and end date range
+#' @param threshold_selected A vector of selected threshold
+#'
+#' @return A list contains nodes and edges list
+
 nodes_edges_list_synchronicity <- function(raw_graph_data, 
                                            date_range, 
                                            threshold_selected) {
@@ -83,6 +100,14 @@ nodes_edges_list_synchronicity <- function(raw_graph_data,
   
 }
 
+#' Plot a visNetwork for global displacement. 
+#'
+#' @param nodes The dataframe with nodes list 
+#' @param edges The dataframe with edges list
+#' @param layouts_type A string value that represents the layout type
+#'
+#' @return A visNetwork plot for global displacement
+
 plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
   
   plot_network(nodes, edges, layouts_type) %>%
@@ -111,6 +136,13 @@ plot_network_disp <- function(nodes, edges, layouts_type = "Circle") {
     )
 }
 
+#' Plot a visNetwork for displacement in star layout. 
+#'
+#' @param nodes The dataframe with nodes list 
+#' @param edges The dataframe with edges list
+#'
+#' @return A visNetwork plot for displacement in star layout
+
 plot_network_disp_star <- function(nodes, edges) {
   visNetwork(nodes,
     edges,
@@ -131,6 +163,15 @@ plot_network_disp_star <- function(nodes, edges) {
     ) %>%
     visPhysics(stabilization = FALSE)
 }
+
+#' Get edges list from a raw network dataframe. 
+#'
+#' @param x The dataframe of synchronicity or neighbours data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param threshold A vector of selected threshold
+#'
+#' @return A dataframe of edges list
 
 combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) {
 
@@ -187,7 +228,16 @@ combine_edges <- function(x, from_date = NULL, to_date = NULL, threshold = 0.9) 
   edgelist
 }
 
-# combine dataframe for displacement data and create edges list (displacement)
+#' Combine displacement dataframe for creating the edges list
+#'
+#' @param x The dataframe of synchronicity or neighbours data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#'
+#' @return A dataframe of combined data
+
 combine_replace_df <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
@@ -213,6 +263,17 @@ combine_replace_df <- function(x,
     ungroup()
     
 }
+
+#' Get edges list from a combined displacement dataframe. 
+#'
+#' @param x The dataframe of displacement data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#' @param threshold A vector of selected threshold
+#'
+#' @return A dataframe of edges list
 
 combine_replace_edges <- function(x,
                                   from_date = NULL,
@@ -255,7 +316,17 @@ combine_replace_edges <- function(x,
   }
 }
 
-# combine dataframe for displacement data and create edges list (star version)
+#' Combine displacement dataframe for creating the edges list in star layout
+#'
+#' @param x The dataframe of displacement data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param cow_id A vector of center cow
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#'
+#' @return A dataframe of combined data
+
 combine_replace_edges_star <- function(x,
                                        from_date = NULL,
                                        to_date = NULL,
@@ -293,7 +364,18 @@ combine_replace_edges_star <- function(x,
     arrange(from != cow_id)
 }
 
-# combine dataframe for displacement data and create edges list (paired version)
+#' Combine displacement dataframe for creating the edges list in paired layout
+#'
+#' @param x The dataframe of displacement data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param cow_id_1 A vector of the 1st interested cow
+#' @param cow_id_2 A vector of the 2nd interested cow
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#'
+#' @return A dataframe of combined data
+
 combine_replace_edges_paired <- function(x,
                                        from_date = NULL,
                                        to_date = NULL,
@@ -307,7 +389,15 @@ combine_replace_edges_paired <- function(x,
     mutate(label = title)
 }
 
-# create nodes list from edges list
+#' Get nodes list from an edges list. 
+#'
+#' @param df The edges list 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param size The dataframe of the degree calculated from igraph
+#'
+#' @return A dataframe of nodes list
+
 combine_nodes <- function(df,
                           from_date = NULL,
                           to_date = NULL, 
@@ -339,7 +429,18 @@ combine_nodes <- function(df,
   return(nodes)
 }
 
-# create nodes list from edges list (displacement)
+#' Get nodes list from an edges list for displacement data. 
+#'
+#' @param x The dataframe of displacement data 
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#' @param cow_id A vector of center cow
+#' @param CD_min A vector of selected minimum completion density
+#' @param CD_max A vector of selected maximum completion density
+#' @param deg The dataframe of the degree calculated from igraph
+#'
+#' @return A dataframe of nodes list
+
 combine_replace_nodes <- function(x,
                                   from_date = NULL,
                                   to_date = NULL,
@@ -369,7 +470,15 @@ combine_replace_nodes <- function(x,
   return(nodes)
 }
 
-# create nodes list from edges list (star version)
+#' Get nodes list from an edges list for displacement data in star layout. 
+#'
+#' @param edges The edges list
+#' @param cow_id A vector of center cow
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#'
+#' @return A dataframe of nodes list
+
 combine_replace_nodes_star <- function(edges, cow_id = NULL,
                                        from_date = NULL,
                                        to_date = NULL) {
@@ -424,7 +533,14 @@ combine_replace_nodes_star <- function(edges, cow_id = NULL,
     )
 }
 
-# create nodes list from edges list (star version)
+#' Get nodes list from an edges list for displacement data in paired layout. 
+#'
+#' @param edges The edges list
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#'
+#' @return A dataframe of nodes list
+
 combine_replace_nodes_paired <- function(edges,
                                        from_date = NULL,
                                        to_date = NULL) {
@@ -447,7 +563,13 @@ combine_replace_nodes_paired <- function(edges,
   return(nodes)
 }
 
-# Fiter elo score data
+#' Combine elo score data filtered from date range and color code deplacement network in star layout
+#'
+#' @param from_date A character value in the format 'YYYY-MM-DD', that represents the start date of the analysis
+#' @param to_date A character value in the format 'YYYY-MM-DD', that represents the end date of the analysis
+#'
+#' @return A dataframe
+
 combine_elo_star <- function(from_date = NULL,
                              to_date = NULL) {
   # set defaults
@@ -484,6 +606,13 @@ combine_elo_star <- function(from_date = NULL,
 
 make_tidygraph <- memoise::memoise(.make_tidygraph)
 
+#' Process raw data into an edges list
+#'
+#' @param x The dataframe of raw data 
+#' @param upper_only A boolean value represents if raw data has lower triangle being all zeros
+#'
+#' @return A dataframe
+
 
 adjacency_to_long <- function(x, upper_only = FALSE) {
   # check inputs
@@ -516,11 +645,12 @@ adjacency_to_long <- function(x, upper_only = FALSE) {
 
 #' Helper function for catching if there are missing date inputs in the networks
 #'
-#' @param network The input for the selected network
-#' @param df The data frame for the selected network
 #' @param date_range The input date range from the date range widget
+#' @param df The data frame for the selected network
+#' @param network The input for the selected network
 #'
 #' @return error_message if there is a date input issue that needs to stop the graph generation
+
 missing_date_range_check <- function(date_range, df = NULL, network = NULL) {
   
   `%!in%` <- Negate(`%in%`)
