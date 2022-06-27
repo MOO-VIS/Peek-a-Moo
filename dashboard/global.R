@@ -18,11 +18,6 @@ library(graphics)
 library(ggplot2)
 library(DBI)
 library(RPostgres)
-# library(rmarkdown)
-# library(rstan)
-# library(rstantools)
-# library(stats)
-# library(akima)
 
 # load in plot/table creation scripts
 source("../R/notifications.R")
@@ -50,6 +45,7 @@ con <-  dbConnect(RPostgres::Postgres(),
                   dbname=Postgres_dbname, 
                   timezone=Postgres_timezone)
 
+# load in the data
 master_feed_replacement_all <- tbl(con,"master_feed_replacement_all") %>%
   as.data.frame()
 
@@ -143,7 +139,7 @@ filter_cows <- function(df, col, cow_selection) {
 #' @param var_name The beginning of the variable name used by server.R
 #' @param width The width of the box, defaults to 6
 #' @param output_fun Function for producing the plot output, defaults to plotlyOutput
-#'
+#' @param popover An input for a popover message to include in the boxes, defaults to NULL
 #' @return tabBox
 default_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
   tabBox(
@@ -161,32 +157,13 @@ default_tabBox <- function(title, var_name, width = 6, height = "500px", output_
   )
 }
 
-report_tabBox <- function(title, var_name, width = 6, height = "500px", output_fun = plotlyOutput, popover = NULL) {
-  tabBox(
-    title = title, side = "right", selected = "Plot", width = width,
-    height = height,
-    popover,
-    # tabPanel("Analysis", helpText("Select a cow of interest to generate a Bayesian analysis report on \"Feeding Neighbours\". Note: generating a report will take more than 4 minutes, as a Markov chain Monte Carlo simulation is running under the hood."),
-    #          cow_selection_widget("analysis_cow_id", multiple = FALSE, label = "Cow of Interest"),
-    #          download_format_widget("analysis_format"),
-    #          downloadButton('downloadReport')),
-    tabPanel("Data", shinycssloaders::withSpinner(
-      image = "loading_cow_table.gif",
-      DT::dataTableOutput(paste0(var_name, "_table"))
-    )),
-    tabPanel("Plot", shinycssloaders::withSpinner(
-      image = paste0("loading_cow6.gif"),
-      output_fun(paste0(var_name, "_plot"))
-    ))
-  )
-}
-
 
 
 #' Helper function to format tables with export option
 #'
 #' @param df The dataframe to convert
 #' @param page_length Number of pages to show, defaults to 5
+#' @param data_config A variable that instructs access based on user name
 #'
 #' @return DT datatable
 format_dt_table <- function(df, page_length = 5, data_config) {
@@ -214,6 +191,7 @@ format_dt_table <- function(df, page_length = 5, data_config) {
     )
   }
 }
+
 # widget helper functions:
 aggregation_widget <- function(inputId) {
   radioButtons(
@@ -319,6 +297,7 @@ date_widget <- function(inputId) {
 #' @param date_obj The date or date range to filter by
 #' @param inputId The id of the picker input widget to update
 #' @param session The current server session
+#' @param select_all Dictates whether all cows are selected upon initialization, defaults to FALSE
 update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE) {
 
   # find cows that exist in date range
@@ -337,6 +316,12 @@ update_cow_selection <- function(date_obj, inputId, session, select_all = FALSE)
   )
 }
 
+#' Helper function for updating cow selection picker for Neighbours network
+#'
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
+#' @param select_all Dictates whether all cows are selected upon initialization, defaults to FALSE
 update_cow_selection_neighbour <- function(date_obj, inputId, session, select_all = FALSE) {
     
   # find cows that exist in date range
@@ -356,6 +341,12 @@ update_cow_selection_neighbour <- function(date_obj, inputId, session, select_al
   )
 }
 
+#' Helper function for updating cow selection picker for Displacement network
+#'
+#' @param relationship_type The input for type of network, defaults to: Displacement Star*
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
 update_cow_selection_displacement <- function(relationship_type = "Displacement Star*", date_obj, inputId, session) {
   if (relationship_type != "Displacement Star*") {
     update_cow_selection(date_obj, inputId, session)
@@ -379,6 +370,12 @@ update_cow_selection_displacement <- function(relationship_type = "Displacement 
   }
 }
 
+#' Helper function for updating cow selection picker for Displacement network
+#'
+#' @param relationship_type The input for type of network, defaults to: Displacement Star*
+#' @param date_obj The date or date range to filter by
+#' @param inputId The id of the picker input widget to update
+#' @param session The current server session
 update_2nd_cow_selection_displacement <- function(date_obj,
                                                   inputId,
                                                   session,
@@ -407,61 +404,9 @@ update_2nd_cow_selection_displacement <- function(date_obj,
     selected = NULL
   )
 }
-      
-#' #' Widget for Bin Weight Selection
-#' #'
-#' #' @param inputId The id of the picker input widget to update
-#' bin_wt_widget <- function(inputId) {
-#'   selectInput(
-#'     inputId = inputId,
-#'     label = "Full Bin Weight (KG)",
-#'     choices = rep(1:100),
-#'     selected = as.integer(75)
-#'   )
-#' }
 
-#' #' Helper function for updating bin selection picker input widgets
-#' #'
-#' #' @param date_obj The date or date range to filter by
-#' #' @param inputId The id of the picker input widget to update
-#' #' @param session The current server session
-#' update_bin_selection <- function(date_obj, inputId, session) {
-#' 
-#'   # find bins that exist in date range
-#'   bin_choices <- filter_dates(feed_df, date, date_obj) %>%
-#'     select(Bin) %>%
-#'     unique() %>%
-#'     arrange(Bin)
-#'   colnames(bin_choices) <- paste0(length(bin_choices[[1]]), " bins with data in date range")
-#' 
-#'   # update widget
-#'   updatePickerInput(
-#'     session = session,
-#'     inputId = inputId,
-#'     choices = bin_choices,
-#'     selected = bin_choices[[1]]
-#'   )
-#' }
-#' 
-#' #' Widget for Bin Selection
-#' #'
-#' #' @param inputId The id of the picker input widget to update
-#' bin_selection_widget <- function(inputId) {
-#'   pickerInput(
-#'     inputId = inputId,
-#'     label = "Bins",
-#'     choices = list(),
-#'     multiple = TRUE,
-#'     options = list(
-#'       "actions-box" = TRUE,
-#'       "none-selected-text" = "Select bins"
-#'     )
-#'   )
-#' }
 
 #' Custom theme setting function for colors
-#'
-#'
 custom_theme <- function() {
   theme <- tags$head(tags$style(HTML(
     ".headerStyling { 
