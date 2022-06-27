@@ -63,14 +63,6 @@ jobs:
     - name: touch files to commit to heroku
       run: |
         touch -a auth/database.sqlite
-    
-    - name: create-json
-      id: create-auth-json
-      uses: jsdaniell/create-json@1.1.2
-      with:
-        name: "peek-a-moo.json"
-        json: ${{ secrets.GCP_AUTH_JSON }}
-        dir: "auth/"
         
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12

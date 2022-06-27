@@ -2,7 +2,13 @@ library(shinymanager)
 
 passphrase <- Sys.getenv("PASSPHRASE")
 
-# Set up shiny server
+#' Set up shiny server
+#'
+#' @param input
+#' @param output
+#' @param session
+#'
+#' @return A shiny server
 server <- function(input, output, session) {
 
   # check_credentials directly on sqlite db
@@ -150,14 +156,13 @@ server <- function(input, output, session) {
   observe({
     update_cow_selection(input$daily_date, "daily_cow_selection", session)
   })
-
   observe({
     update_cow_selection_neighbour(
-      input$relationship_date_range, 
-      "analysis_cow_id", 
-      session)
+      input$relationship_date_range,
+      "analysis_cow_id",
+      session
+    )
   })
-
   observe({
     req(input$relationship_date_range)
 
@@ -167,7 +172,6 @@ server <- function(input, output, session) {
       session = session
     )
   })
-
   observe({
     req(input$relationship_date_range)
 
@@ -177,7 +181,6 @@ server <- function(input, output, session) {
       session = session
     )
   })
-
   observe({
     req(input$relationship_date_range)
     req(input$paired_cow_selection_1)
@@ -191,26 +194,29 @@ server <- function(input, output, session) {
       CD_max = input$paired_cd_range[[2]]
     )
   })
-  
-  values <- reactiveValues(nodes_feeding = NULL, 
-                           edges_feeding = NULL, 
-                           nodes_lying = NULL,
-                           edges_lying = NULL,
-                           nodes_neighbour = NULL,
-                           edges_neighbour = NULL)
-  
-  # render Synchronicity network
+
+  # set up an object for storing reactive values from shiny
+  values <- reactiveValues(
+    nodes_feeding = NULL,
+    edges_feeding = NULL,
+    nodes_lying = NULL,
+    edges_lying = NULL,
+    nodes_neighbour = NULL,
+    edges_neighbour = NULL
+  )
+
+  # get edges and nodes lists for synchronicity and neighbour network
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-    
+
     `%!in%` <- Negate(`%in%`)
-    
+
     threshold_id <- input$relationship_threshold_selection
     threshold_df <- data.frame(threshold = c(0.95, 0.9, 0.75, 0))
     rownames(threshold_df) <- c("5%", "10%", "25%", "All")
     threshold_selected <- threshold_df[threshold_id, ]
-    
+
     if (input$relationship_network_selection == "Synchronicity") {
       if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
         output$feeding_plot <- visNetwork::renderVisNetwork({
@@ -223,7 +229,7 @@ server <- function(input, output, session) {
             )
           )
         })
-        
+
         output$lying_plot <- visNetwork::renderVisNetwork({
           validate(
             need(
@@ -235,19 +241,27 @@ server <- function(input, output, session) {
           )
         })
       } else {
-        values$nodes_feeding <- nodes_edges_list_synchronicity("Feeding_drinking_at_the_same_time_total_time",
-                                                               input$relationship_date_range,
-                                                               threshold_selected)[[1]]
-        values$edges_feeding <- nodes_edges_list_synchronicity("Feeding_drinking_at_the_same_time_total_time",
-                                                               input$relationship_date_range,
-                                                               threshold_selected)[[2]]
-        
-        values$nodes_lying <- nodes_edges_list_synchronicity("synchronized_lying_total_time",
-                                                             input$relationship_date_range,
-                                                             threshold_selected)[[1]]
-        values$edges_lying <- nodes_edges_list_synchronicity("synchronized_lying_total_time",
-                                                             input$relationship_date_range,
-                                                             threshold_selected)[[2]]
+        values$nodes_feeding <- nodes_edges_list_synchronicity(
+          "Feeding_drinking_at_the_same_time_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[1]]
+        values$edges_feeding <- nodes_edges_list_synchronicity(
+          "Feeding_drinking_at_the_same_time_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[2]]
+
+        values$nodes_lying <- nodes_edges_list_synchronicity(
+          "synchronized_lying_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[1]]
+        values$edges_lying <- nodes_edges_list_synchronicity(
+          "synchronized_lying_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[2]]
       }
     } else if (input$relationship_network_selection == "Neighbour") {
       if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
@@ -262,21 +276,25 @@ server <- function(input, output, session) {
           )
         })
       } else {
-        values$nodes_neighbour <- nodes_edges_list_synchronicity("Feeding_drinking_neighbour_total_time",
-                                                                 input$relationship_date_range,
-                                                                 threshold_selected)[[1]]
-        values$edges_neighbour <- nodes_edges_list_synchronicity("Feeding_drinking_neighbour_total_time",
-                                                               input$relationship_date_range,
-                                                               threshold_selected)[[2]]
+        values$nodes_neighbour <- nodes_edges_list_synchronicity(
+          "Feeding_drinking_neighbour_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[1]]
+        values$edges_neighbour <- nodes_edges_list_synchronicity(
+          "Feeding_drinking_neighbour_total_time",
+          input$relationship_date_range,
+          threshold_selected
+        )[[2]]
       }
     }
   })
 
-  # render network
+  # render networks
   observe({
     req(input$relationship_date_range)
     req(input$relationship_network_selection)
-    
+
 
     `%!in%` <- Negate(`%in%`)
 
@@ -303,17 +321,15 @@ server <- function(input, output, session) {
       # select network to plot
       if (!(input$relationship_network_selection %in% c("Displacement", "Displacement Star*", "Displacement Paired"))) {
         if (input$relationship_network_selection == "Neighbour") {
-          
           if (!(is.null(missing_date_range_check(input$relationship_date_range,
-                                                 df = "Feeding_drinking_neighbour_total_time",
-                                                 network = input$relationship_network_selection
+            df = "Feeding_drinking_neighbour_total_time",
+            network = input$relationship_network_selection
           )))) {
             output$neighbour_plot <- missing_date_range_check(input$relationship_date_range,
-                                                            df = "Feeding_drinking_neighbour_total_time",
-                                                            network = input$relationship_network_selection
+              df = "Feeding_drinking_neighbour_total_time",
+              network = input$relationship_network_selection
             )
           } else {
-            
             if (length(input$current_neighbour) == 0) {
               output$neighbour_plot <- visNetwork::renderVisNetwork({
                 plot_network(values$nodes_neighbour, values$edges_neighbour, layouts_type, selected_nodes = NULL) %>%
@@ -321,34 +337,33 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_neighbour', nodes.nodes);
                 ;}")
               })
-              
+
               output$neighbour_table <- format_dt_table(values$edges_neighbour %>% select(c(from, to, weight)), data_config = data_config)
             } else if (length(input$current_neighbour) == 1) {
               output$neighbour_table <- format_dt_table(
-                values$edges_neighbour %>% 
+                values$edges_neighbour %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_neighbour) | (to == input$current_neighbour)), 
-                data_config = data_config)
+                  filter((from == input$current_neighbour) | (to == input$current_neighbour)),
+                data_config = data_config
+              )
             }
-            
           }
         } else {
-          
           if (!(is.null(missing_date_range_check(input$relationship_date_range,
-                                                 df = "Feeding_drinking_at_the_same_time_total_time",
-                                                 network = input$relationship_network_selection
+            df = "Feeding_drinking_at_the_same_time_total_time",
+            network = input$relationship_network_selection
           )))) {
             output$feeding_plot <- missing_date_range_check(input$relationship_date_range,
-                                                            df = "Feeding_drinking_at_the_same_time_total_time",
-                                                            network = input$relationship_network_selection
+              df = "Feeding_drinking_at_the_same_time_total_time",
+              network = input$relationship_network_selection
             )
           } else if (!(is.null(missing_date_range_check(input$relationship_date_range,
-                                                        df = "synchronized_lying_total_time",
-                                                        network = input$relationship_network_selection
+            df = "synchronized_lying_total_time",
+            network = input$relationship_network_selection
           )))) {
             output$lying_plot <- missing_date_range_check(input$relationship_date_range,
-                                                            df = "synchronized_lying_total_time",
-                                                            network = input$relationship_network_selection
+              df = "synchronized_lying_total_time",
+              network = input$relationship_network_selection
             )
           } else {
             if (length(input$current_feeding) == 0 && length(input$current_lying) == 0) {
@@ -358,16 +373,16 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_feeding', nodes.nodes);
                 ;}")
               })
-              
+
               output$feeding_table <- format_dt_table(values$edges_feeding %>% select(c(from, to, weight)), data_config = data_config)
-              
+
               output$lying_plot <- visNetwork::renderVisNetwork({
                 plot_network(values$nodes_lying, values$edges_lying, layouts_type, selected_nodes = NULL) %>%
                   visEvents(select = "function(nodes) {
                 Shiny.onInputChange('current_lying', nodes.nodes);
                 ;}")
               })
-              
+
               output$lying_table <- format_dt_table(values$edges_lying %>% select(c(from, to, weight)), data_config = data_config)
             } else if (length(input$current_feeding) > 0) {
               output$lying_plot <- visNetwork::renderVisNetwork({
@@ -376,18 +391,18 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_lying', nodes.nodes);
                 ;}")
               })
-              
+
               output$feeding_table <- format_dt_table(
-                values$edges_feeding %>% 
+                values$edges_feeding %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_feeding) | (to == input$current_feeding)), 
+                  filter((from == input$current_feeding) | (to == input$current_feeding)),
                 data_config = data_config
-                )
-              
+              )
+
               output$lying_table <- format_dt_table(
-                values$edges_lying %>% 
+                values$edges_lying %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_feeding) | (to == input$current_feeding)), 
+                  filter((from == input$current_feeding) | (to == input$current_feeding)),
                 data_config = data_config
               )
             } else if (length(input$current_lying) > 0) {
@@ -397,21 +412,21 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_feeding', nodes.nodes);
                 ;}")
               })
-              
+
               output$feeding_table <- format_dt_table(
-                values$edges_feeding %>% 
+                values$edges_feeding %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_lying) | (to == input$current_lying)), 
+                  filter((from == input$current_lying) | (to == input$current_lying)),
                 data_config = data_config
               )
-              
+
               output$lying_table <- format_dt_table(
-                values$edges_lying %>% 
+                values$edges_lying %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_lying) | (to == input$current_lying)), 
+                  filter((from == input$current_lying) | (to == input$current_lying)),
                 data_config = data_config
-                )
-            } 
+              )
+            }
           }
         }
       } else {
@@ -429,7 +444,7 @@ server <- function(input, output, session) {
         } else {
           if (input$relationship_network_selection == "Displacement") {
             # Plot Displacement network
-            
+
             edges <- combine_replace_edges(raw_graph_data,
               input$relationship_date_range[[1]],
               input$relationship_date_range[[2]],
@@ -453,7 +468,7 @@ server <- function(input, output, session) {
             if (mean(edges$width > 2)) {
               edges$width <- edges$width / 2
             }
-            
+
             if (length(input$current_disp) == 0) {
               output$network_plot <- visNetwork::renderVisNetwork({
                 plot_network_disp(nodes, edges, layouts_type) %>%
@@ -461,16 +476,19 @@ server <- function(input, output, session) {
                 Shiny.onInputChange('current_disp', nodes.nodes);
                 ;}")
               })
-              
+
               output$network_table <- format_dt_table(edges %>% select(c(from, to, weight)), data_config = data_config)
             } else if (length(input$current_disp) == 1) {
               output$network_disp_table <- format_dt_table(
-                edges %>% 
+                edges %>%
                   select(c(from, to, weight)) %>%
-                  filter((from == input$current_disp) | (to == input$current_disp)), 
-                data_config = data_config)
+                  filter((from == input$current_disp) | (to == input$current_disp)),
+                data_config = data_config
+              )
             }
           } else if (input$relationship_network_selection == "Displacement Star*") {
+            # Plot Displacement network in star layout
+
             cow_id <- input$star_cow_selection
 
             edges <- combine_replace_edges_star(raw_graph_data,
@@ -497,6 +515,8 @@ server <- function(input, output, session) {
             })
             output$network_table <- format_dt_table(edges %>% select(c(from, to, weight, type)), data_config = data_config)
           } else {
+            # Plot Displacement network in paired layout
+
             cow_id_1 <- input$paired_cow_selection_1
             cow_id_2 <- input$paired_cow_selection_2
 
@@ -549,32 +569,37 @@ server <- function(input, output, session) {
         )
       })
     } else if (!(is.null(missing_date_range_check_plotly(input$relationship_date_range,
-                                                         df = raw_graph_data
+      df = raw_graph_data
     )))) {
       output$elo_plot <- missing_date_range_check_plotly(input$relationship_date_range,
-                                                         df = raw_graph_data
+        df = raw_graph_data
       )
     } else {
       if (input$relationship_network_selection == "Displacement") {
+        # Plot elo plot for Displacement network
+
         output$elo_plot <- renderPlotly({
-          plot_elo(raw_graph_data,
-                   input$relationship_date_range[[1]],
-                   input$relationship_date_range[[2]]
+          plot_elo(
+            raw_graph_data,
+            input$relationship_date_range[[1]],
+            input$relationship_date_range[[2]]
           ) %>%
             layout(legend = list(
               orientation = "h",
               x = 0,
               y = -0.2
-            )
-            ) %>%
+            )) %>%
             config(modeBarButtonsToRemove = config)
         })
-        
-        output$elo_table <- format_dt_table(elo_df(raw_graph_data,
-                                                   input$relationship_date_range[[1]],
-                                                   input$relationship_date_range[[2]]
+
+        output$elo_table <- format_dt_table(elo_df(
+          raw_graph_data,
+          input$relationship_date_range[[1]],
+          input$relationship_date_range[[2]]
         ), data_config = data_config)
       } else if (input$relationship_network_selection == "Displacement Star*") {
+        # Plot elo plot for Displacement network in star layout
+
         cow_id <- input$star_cow_selection
 
         output$elo_plot <- renderPlotly({
@@ -592,6 +617,8 @@ server <- function(input, output, session) {
           cow_id_1 = cow_id
         ), data_config = data_config)
       } else if (input$relationship_network_selection == "Displacement Paired") {
+        # Plot elo plot for Displacement network in paired layout
+
         cow_id_1 <- input$paired_cow_selection_1
         cow_id_2 <- input$paired_cow_selection_2
 
@@ -606,8 +633,7 @@ server <- function(input, output, session) {
               orientation = "h",
               x = 0,
               y = -0.2
-            )
-            ) %>%
+            )) %>%
             config(modeBarButtonsToRemove = config)
         })
 
@@ -629,6 +655,8 @@ server <- function(input, output, session) {
     #' @param df The dataframe containing data to be displayed
     #' @param y_col The column of interest
     #' @param var_name The name of the UI output variable
+    #'
+    #' @return A plotly plot
     plot_cow_date_range <- function(df, y_col, var_name) {
 
       # filter table
@@ -684,38 +712,38 @@ server <- function(input, output, session) {
   observe({
     req(input$daily_date)
     req(input$daily_cow_selection)
-    
+
     daily_date <- input$daily_date
     daily_cow_id <- input$daily_cow_selection
     # Create feeding, drinking, and lying_standing dataframes
     feeding <- Cleaned_feeding_original_data %>%
-      mutate(Behaviour = 'feeding') %>%
+      mutate(Behaviour = "feeding") %>%
       filter(
         date == as.Date(!!daily_date),
         Cow %in% !!daily_cow_id
-             ) %>%
+      ) %>%
       select(Cow, Behaviour, Start, End, Intake) %>%
-      as.data.frame() 
+      as.data.frame()
 
-    
-    drinking <- tbl(con,"Cleaned_drinking_original_data") %>%
-      mutate(Behaviour = 'drinking') %>%
+
+    drinking <- tbl(con, "Cleaned_drinking_original_data") %>%
+      mutate(Behaviour = "drinking") %>%
       filter(
         date == as.Date(!!daily_date),
         Cow %in% !!daily_cow_id
-        ) %>%
+      ) %>%
       select(Cow, Behaviour, Start, End, Intake) %>%
-      as.data.frame() 
-      
-    
-    lying_standing <- tbl(con,"duration_for_each_bout") %>%
+      as.data.frame()
+
+
+    lying_standing <- tbl(con, "duration_for_each_bout") %>%
       filter(
-        floor_date(Start, 'day') == as.Date(!!daily_date) | floor_date(End, 'day') == as.Date(!!daily_date),
+        floor_date(Start, "day") == as.Date(!!daily_date) | floor_date(End, "day") == as.Date(!!daily_date),
         Cow %in% !!daily_cow_id
-            ) %>%
+      ) %>%
       mutate(Intake = NA) %>%
       select(Cow, Behaviour, Start, End, Intake) %>%
-      as.data.frame() 
+      as.data.frame()
 
     # Render daily behavior plot
     df <- daily_schedu_moo_data(feeding, drinking, lying_standing, cow_id = input$daily_cow_selection, date = input$daily_date)
@@ -726,12 +754,12 @@ server <- function(input, output, session) {
       daily_schedu_moo_plot(df) %>%
         config(modeBarButtonsToRemove = config)
     })
-    
+
     totals <- daily_total_schedumoo_info(df)
 
     output$total_standing <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(round((totals[4]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        tags$p(paste0(format(round((totals[4] / 3600), 1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
         "Average standing time",
         icon = icon("walking", lib = "font-awesome", style = "font-size: 40px;"),
         color = "red"
@@ -739,7 +767,7 @@ server <- function(input, output, session) {
     })
     output$total_lying <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(round((totals[3]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        tags$p(paste0(format(round((totals[3] / 3600), 1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
         "Average lying time",
         icon = icon("bed", lib = "font-awesome", style = "font-size: 40px;"),
         color = "yellow"
@@ -747,7 +775,7 @@ server <- function(input, output, session) {
     })
     output$total_feeding <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(round((totals[2]/3600),1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
+        tags$p(paste0(format(round((totals[2] / 3600), 1), big.mark = "."), " hrs"), style = "font-size: 60%;"),
         "Average feeding time",
         icon = icon("grain", lib = "glyphicon", style = "font-size: 40px;"),
         color = "green"
@@ -755,7 +783,7 @@ server <- function(input, output, session) {
     })
     output$total_drinking <- renderValueBox({
       valueBox(
-        tags$p(paste0(format(round((totals[1]/60),1), big.mark = "."), " min"), style = "font-size: 60%;"),
+        tags$p(paste0(format(round((totals[1] / 60), 1), big.mark = "."), " min"), style = "font-size: 60%;"),
         "Average drinking time",
         icon = icon("tint", lib = "glyphicon", style = "font-size: 40px;"),
         color = "blue"
@@ -764,26 +792,10 @@ server <- function(input, output, session) {
   })
 
   # Render Relationship tab plots
-  observe({
-    req(input$relationship_cow_selection)
-    req(input$relationship_date_range)
-
-
-
-    df <- Replacement_behaviour_by_date
-    output$bullying_table <- format_dt_table(df, data_config = data_config)
-    output$bullying_plot <- renderPlotly({
-      plot_bully_analysis(
-        df,
-        input$relationship_cow_selection,
-        input$relationship_date_range[[1]],
-        input$relationship_date_range[[2]]
-      ) %>%
-        config(modeBarButtonsToRemove = config)
-    })
-  })
 
   observe({
+    # Plot THI plot
+
     req(input$relationship_date_range)
 
     if (input$relationship_date_range[[1]] > input$relationship_date_range[[2]]) {
@@ -852,7 +864,6 @@ server <- function(input, output, session) {
       })
     }
   })
-  
   observe({
     output$downloadReferences <- downloadHandler(
       filename = "citation-references.pdf",
