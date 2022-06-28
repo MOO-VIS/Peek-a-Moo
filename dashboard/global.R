@@ -239,8 +239,8 @@ date_range_widget <- function(inputId) {
     label = "Date Range",
     start = lubridate::as_date("2020-8-1"),
     end = lubridate::as_date("2020-8-14"),
-    min = lubridate::as_date(min_date),
-    max = lubridate::as_date(max_date)
+    min = lubridate::as_date("2020-7-15"),
+    max = lubridate::as_date("2021-5-19")
   )
 }
 
@@ -339,7 +339,8 @@ date_widget <- function(inputId) {
     inputId = inputId,
     label = "Date",
     value = lubridate::as_date("2020-8-1"),
-    max = lubridate::as_date("2020-8-14")
+    min = lubridate::as_date("2020-7-15"),
+    max = lubridate::as_date("2021-5-19")
   )
 }
 
