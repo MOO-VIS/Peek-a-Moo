@@ -1,5 +1,5 @@
 # Test the lexical_sort function from R/network.R
-context("network")
+# context("network")
 
 test_that("`%||%` works", {
   expect_equal(1 %||% 2, 1)
