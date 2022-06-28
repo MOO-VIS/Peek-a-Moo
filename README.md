@@ -1,5 +1,9 @@
 <!-- badges: start -->
-[![deploy to dev](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml) [![promote dev to prod](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml) [![update passwords](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml)
+[![deploy to dev](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/deploy.yml) [![promote dev to prod](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/prod-release.yml)
+
+[![update passwords](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml)
+
+[![tests](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test.yaml) [![test coverage](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 # Peek-a-Moo: A dairy cow dashboard for UBC Faculty of Land and Food Systems - Animal Welfare Program
 
