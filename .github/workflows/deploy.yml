@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - 'auth/**'
       - 'README.md'
+      - 'DESCRIPTION'
       - 'LICENSE'
       - 'CONTRIBUTING.md'
       - 'CODE_OF_CONDUCT.md'
@@ -15,6 +16,23 @@ on:
   
   workflow_dispatch:
   workflow_call:
+    secrets:
+      SHINYMANGER_PASSPHRASE:
+        required: true
+      SHINYMANGER_ADMIN:
+        required: true
+      SHINYMANGER_USER:
+        required: true
+      SHINYMANGER_GUEST:
+        required: true
+      HEROKU_API_KEY:
+        required: true
+      POSTGRES_USER:
+        required: true
+      POSTGRES_PASSWORD:
+        required: true
+      POSTGRES_HOST:
+        required: true
 
 permissions: write-all
 
@@ -63,14 +81,6 @@ jobs:
     - name: touch files to commit to heroku
       run: |
         touch -a auth/database.sqlite
-    
-    - name: create-json
-      id: create-auth-json
-      uses: jsdaniell/create-json@1.1.2
-      with:
-        name: "peek-a-moo.json"
-        json: ${{ secrets.GCP_AUTH_JSON }}
-        dir: "auth/"
         
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12
