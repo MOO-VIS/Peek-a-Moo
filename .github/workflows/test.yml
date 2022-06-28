@@ -36,18 +36,18 @@ jobs:
         ADMIN_PW: ${{secrets.SHINYMANAGER_ADMIN}}
         USER_PW: ${{secrets.SHINYMANAGER_USER}}
   
-    - name: login to heroku
-      uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
-      with:
-        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-        heroku_app_name: ""
-        heroku_email: "allyson@datallurgy.com"
-        justlogin: true 
+    #- name: login to heroku
+    #  uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
+    #  with:
+    #    heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+    #    heroku_app_name: ""
+    #    heroku_email: "allyson@datallurgy.com"
+    #    justlogin: true 
     
-    - name: reset heroku repo
-      run: |
-        heroku plugins:install heroku-repo
-        heroku repo:reset --app peek-a-moo
+    #- name: reset heroku repo
+    #  run: |
+    #    heroku plugins:install heroku-repo
+    #    heroku repo:reset --app peek-a-moo
     
     - name: deploy to heroku  
       uses: akhileshns/heroku-deploy@v3.12.12
