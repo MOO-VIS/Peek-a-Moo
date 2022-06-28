@@ -28,6 +28,9 @@ jobs:
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       R_KEEP_PKG_SOURCE: yes
 
     steps:
@@ -46,16 +49,18 @@ jobs:
           working-directory: 'src/'
           extra-packages: |
             shinymanager
-            rcmdcheck
-
-      # - uses: r-lib/actions/check-r-package@master
-      
-      - name: Install dependencies
-        run: |
-          install.packages(c("devtools", "testthat"))
-        #   remotes::install_cran("testthat")
-        #   remotes::install_deps(dependencies = TRUE)
-        shell: Rscript {0}
+            shinydashboard
+            shinyBS
+            shinyWidgets
+            shinyalert
+            plotly
+            DBI
+            RPostgres
+            tidyverse
+            covr
+            igraph
+            visNetwork
+            testthat
 
       - name: Run tests
         run: testthat::test_dir('tests')
