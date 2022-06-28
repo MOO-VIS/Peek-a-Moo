@@ -62,10 +62,14 @@ jobs:
             visNetwork
             testthat
 
+      # - name: Run tests
+      #   run: testthat::test_dir('tests')
+      #   shell: Rscript {0}
+        
       - name: Run tests
-        run: testthat::test_dir('tests')
+        run: testthat::test_dir("tests/testthat/", env = shiny::loadSupport(appDir = 'dashboard/'))
         shell: Rscript {0}
-
+        
       - name: Show testthat output
         if: always()
         run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
