@@ -25,7 +25,6 @@ source("../R/behaviour.R")
 source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
-source("../R/bully_analysis.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
 
