@@ -50,14 +50,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
         
-      - name: Experimental test coverage
+      - name: Test coverage
         run: |
           covr::file_coverage(source_files = 'R/network.R', test_files = 'tests/testthat.R')
         shell: Rscript {0}        
-
-      - name: Test coverage
-        run: |
-          devtools::as.package(getwd())
-          devtools::install_local(getwd())
-          devtools::test_coverage()
-        shell: Rscript {0}
