@@ -36,5 +36,6 @@ jobs:
       - name: Test coverage
         run: |
           devtools::as.package(getwd())
-          devtools::test_coverage(getwd())
+          devtools::install_local(getwd())
+          devtools::test_coverage()
         shell: Rscript {0}
