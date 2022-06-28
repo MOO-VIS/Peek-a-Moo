@@ -64,7 +64,7 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "peek-a-moo"
         heroku_email: "allyson@datallurgy.com"
-        buildpack: "vsv/heroku-buildpack-r"
+        # buildpack: "vsv/heroku-buildpack-r"
         # branch: ${{steps.get-latest-release.outputs.release}}
         procfile: "web: R --file=dashboard/run.R --gui-none --no-save"
       env:
