@@ -1,7 +1,7 @@
 library(testthat)
 
 test_dir(
-  "tests/testthat/",
+  "testthat/",
   # Run in the app's environment containing all support methods.
   env = shiny::loadSupport(appDir = 'dashboard/'),
   # Display the regular progress output and throw an error if any test error is found
