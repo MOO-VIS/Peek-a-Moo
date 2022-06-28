@@ -1,0 +1,11 @@
+Package: peekaMooDashboard
+Title: Peek-a-Moo Dashboard
+Version: 2.1.0
+Authors@R: 
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This dashboard is to assist the University of British Columbia's Animal Welfare Program with the social network analysis of dairy cows.
+License: `use_mit_license()`
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.0
