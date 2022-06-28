@@ -24,6 +24,7 @@ jobs:
         with:
           extra-packages: |
             shinymanager
+            tidyverse
             covr
             igraph
             devtools
