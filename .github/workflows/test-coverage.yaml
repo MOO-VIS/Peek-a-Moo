@@ -30,9 +30,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages(c("devtools", "DT"))
+          install.packages(c("covr", "devtools", "DT"))
         shell: Rscript {0}
         
+      - name: Experimental test coverage
+        run: |
+          covr::file_coverage(source_files = 'R/network.R', test_files = 'tests/testthat.R')
+        shell: Rscript {0}        
+
       - name: Test coverage
         run: |
           devtools::as.package(getwd())
