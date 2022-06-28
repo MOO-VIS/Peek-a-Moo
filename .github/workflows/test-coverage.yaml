@@ -28,10 +28,13 @@ jobs:
             shinyBS
             shinyWidgets
             shinyalert
+            plotly
             DBI
+            RPostgres
             tidyverse
             covr
             igraph
+            visNetwork
             devtools
             DT
 
