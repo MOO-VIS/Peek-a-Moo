@@ -58,7 +58,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Run tests
-        run: devtools::test()
+        run: testthat::test_dir('tests')
         shell: Rscript {0}
 
       - name: Show testthat output
