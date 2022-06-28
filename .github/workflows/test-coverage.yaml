@@ -24,6 +24,11 @@ jobs:
         with:
           extra-packages: |
             shinymanager
+            shinydashboard
+            shinyBS
+            shinyWidgets
+            shinyalert
+            DBI
             tidyverse
             covr
             igraph
