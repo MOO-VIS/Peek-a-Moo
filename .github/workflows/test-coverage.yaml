@@ -52,7 +52,7 @@ jobs:
         
       - name: Test coverage
         run: |
-          covr::file_coverage(source_files = 'R/network.R', test_files = 'tests/testthat/test-network.R')
+          covr::file_coverage(source_files = 'R/network.R', test_files = 'tests/testthat.R')
         shell: Rscript {0}
         
       # - name: Test coverage with covr
