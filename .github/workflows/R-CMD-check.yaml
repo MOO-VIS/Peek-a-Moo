@@ -52,13 +52,13 @@ jobs:
       
       - name: Install dependencies
         run: |
-          install.packages(c("devtools"))
+          install.packages(c("devtools", "testthat"))
         #   remotes::install_cran("testthat")
         #   remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
       - name: Run tests
-        run: devtools:test()
+        run: devtools::test()
         shell: Rscript {0}
 
       - name: Show testthat output
