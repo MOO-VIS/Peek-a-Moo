@@ -43,7 +43,10 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@master
         with:
-          extra-packages: rcmdcheck
+          working-directory: 'src/'
+          extra-packages: |
+            shinymanager
+            rcmdcheck
 
       - uses: r-lib/actions/check-r-package@master
 
