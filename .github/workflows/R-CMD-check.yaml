@@ -48,7 +48,18 @@ jobs:
             shinymanager
             rcmdcheck
 
-      - uses: r-lib/actions/check-r-package@master
+      # - uses: r-lib/actions/check-r-package@master
+      
+      - name: Install dependencies
+        run: |
+          install.packages(c("devtools"))
+        #   remotes::install_cran("testthat")
+        #   remotes::install_deps(dependencies = TRUE)
+        shell: Rscript {0}
+
+      - name: Run tests
+        run: devtools:test()
+        shell: Rscript {0}
 
       - name: Show testthat output
         if: always()
