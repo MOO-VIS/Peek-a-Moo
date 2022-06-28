@@ -37,9 +37,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          install.packages(c("remotes", "devtools"))
+          install.packages(c("remotes", "devtools", "DT"))
           remotes::install_cran("covr")
-        #   remotes::install_deps(dependencies = TRUE)
         shell: Rscript {0}
 
       - name: get working directory
