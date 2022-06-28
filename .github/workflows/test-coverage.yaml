@@ -44,7 +44,7 @@ jobs:
 
       - name: Test coverage
         run: |
-          devtools::as.package()
+          devtools::as.package(getwd())
           devtools::test_coverage()
         # covr::codecov()
         shell: Rscript {0}
