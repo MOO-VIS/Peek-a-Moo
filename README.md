@@ -3,7 +3,7 @@
 
 [![update passwords](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/update-passwords.yml)
 
-[![tests](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test.yaml) [![test coverage](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml)
+[![test code](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-code.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-code.yaml) [![test coverage](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/UBC-AWP/Peek-a-Moo/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 # Peek-a-Moo: A dairy cow dashboard for UBC Faculty of Land and Food Systems - Animal Welfare Program
 
