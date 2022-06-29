@@ -9,7 +9,7 @@ on:
     branches:
       - main
 
-name: code tests
+name: test code
 
 jobs:
   test-code:
