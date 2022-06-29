@@ -9,10 +9,10 @@ on:
     branches:
       - main
 
-name: tests
+name: code tests
 
 jobs:
-  R-CMD-check:
+  test-code:
     runs-on: ${{ matrix.config.os }}
 
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
