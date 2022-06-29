@@ -9,7 +9,11 @@
 
 ## Welcome :cow: :heart:
 
-Thank you for visiting the Peek-a-Moo app project repository. Link to our app here: [Peek-a-Moo](https://peek-a-moo.herokuapp.com/)
+Thank you for visiting the Peek-a-Moo app project repository. 
+
+Our production app is located here: [Peek-a-Moo Dashboard](https://peek-a-moo.herokuapp.com/)
+
+Our development app is located here: [Peek-a-Moo Development Dashboard](https://peek-a-moo-dev.herokuapp.com/)
 
 ## Background
 **Problem**
